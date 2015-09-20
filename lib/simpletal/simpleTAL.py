@@ -34,14 +34,15 @@
 		Module Dependencies: logging, simpleTALES, simpleTALTemplates
 """
 
-__version__ = "3.5"
-
 try:
 	import logging
 except:
 	import DummyLogger as logging
 	
 import sgmllib, xml.sax, cgi, StringIO, codecs, re, htmlentitydefs
+import simpletal
+
+__version__ = simpletal.__version__
 
 try:
     # check to see if pyxml is installed
@@ -602,7 +603,7 @@ class XMLTemplate (Template):
 		Template.__init__ (self, commands, macros, symbols)
 		self.doctype = doctype
 	
-	def expand (self, context, outputFile, outputEncoding="iso-8859-1", docType=None, interpreter=None):
+	def expand (self, context, outputFile, outputEncoding="iso-8859-1", docType=None, suppressXMLDeclaration=0,interpreter=None):
 		""" This method will write to the outputFile, using the encoding specified,
 			the expanded version of this template.  The context passed in is used to resolve
 			all expressions with the template.
@@ -612,10 +613,11 @@ class XMLTemplate (Template):
 		
 		# Write out the XML prolog
 		encodingFile = codecs.lookup (outputEncoding)[3](outputFile)
-		if (outputEncoding.lower() != "utf-8"):
-			encodingFile.write ('<?xml version="1.0" encoding="%s"?>\n' % outputEncoding.lower())
-		else:
-			encodingFile.write ('<?xml version="1.0"?>\n')
+		if (not suppressXMLDeclaration):
+			if (outputEncoding.lower() != "utf-8"):
+				encodingFile.write ('<?xml version="1.0" encoding="%s"?>\n' % outputEncoding.lower())
+			else:
+				encodingFile.write ('<?xml version="1.0"?>\n')
 		if not docType and self.doctype:
 			docType = self.doctype
 		if docType:
@@ -1296,7 +1298,6 @@ class XMLTemplateCompiler (TemplateCompiler, xml.sax.handler.ContentHandler, xml
 		
 	def tagAsText (self, (tag,atts), singletonFlag=0):
 		"""This escapes the attribute values - used because SAX expands the values"""
-		self.log.info ("XML tagAsText called.")
 		result = ["<"]
 		result.append (tag)
 		for att in atts:

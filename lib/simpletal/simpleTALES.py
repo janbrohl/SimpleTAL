@@ -33,14 +33,16 @@
 		Module Dependencies: logging
 """
 
-__version__ = "3.5"
-
 import copy
 
 try:
 	import logging
 except:
 	import DummyLogger as logging
+	
+import simpletal
+
+__version__ = simpletal.__version__
 
 
 class ContextVariable:

@@ -1,5 +1,15 @@
-simpleTAL / simpleTALES (Version 3.5)
+simpleTAL / simpleTALES (Version 3.6)
 -------------------------------------
+
+Version 3.6
+-----------
+
+New features:
+  - The XML Declaration can now be suppressed by passing 
+	suppressXMLDeclaration=1 to the template "expand" method.
+Bug fixes:
+  - Removed stray 'info' logging call.
+  
 Version 3.5
 -----------
 New features:

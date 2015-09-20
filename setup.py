@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 
+import sys, os
+sys.path.insert(0, os.path.join(os.getcwd(),'lib'))
+
 from distutils.core import setup
+import simpletal
 
 setup(name="SimpleTAL",
-	version="3.5",
+	version= simpletal.__version__,
 	description="SimpleTAL is a stand alone Python implementation of the TAL, TALES and METAL  specifications  used in Zope to power HTML and XML templates.",
 	author="Colin Stewart",
 	author_email="colin@owlfish.com",

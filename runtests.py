@@ -39,7 +39,7 @@ def regressionTest():
 	#Find all the files to run
 	files = []
 	os.path.walk("tests", path_vistor, files)					
-	test = re.compile(".*.py$", re.IGNORECASE)
+	test = re.compile(".*\.py$", re.IGNORECASE)
 	files = filter(test.search, files)
 	
 	#load each test into the testsuite

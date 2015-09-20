@@ -34,12 +34,10 @@
 		Module Dependencies: None
 """
 
-__version__ = "3.5"
-
-
 import StringIO, os, stat, threading, sys, codecs, sgmllib, cgi, re
+import simpletal, simpleTAL
 
-import simpleTAL
+__version__ = simpletal.__version__
 
 # This is used to check for already escaped attributes.
 ESCAPED_TEXT_REGEX=re.compile (r"\&\S+?;")

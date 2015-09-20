@@ -191,6 +191,24 @@ class TALHandlerTestCases (unittest.TestCase):
 		realResult = fh.getvalue()
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3c.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n<html><p>Test</p></html>"""
 		self.failUnless (realResult == expectedResult, "Doctype failed - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (txt, realResult, expectedResult, str(template)))
+		
+	def testXMLDeclarationSuppressionWithDocType (self):
+		txt = """<?xml version="1.0" encoding="iso-8859-1"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n<html><p>Test</p></html>"""
+		template = simpleTAL.compileXMLTemplate (txt)
+		fh = StringIO.StringIO ()
+		template.expand (self.context, fh, docType="""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3c.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">""", suppressXMLDeclaration=1)
+		realResult = fh.getvalue()
+		expectedResult = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3c.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n<html><p>Test</p></html>"""
+		self.failUnless (realResult == expectedResult, "Doctype failed - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (txt, realResult, expectedResult, str(template)))
+
+	def testXMLDeclarationSuppressionWithNoDocType (self):
+		txt = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p>Test</p></html>"""
+		template = simpleTAL.compileXMLTemplate (txt)
+		fh = StringIO.StringIO ()
+		template.expand (self.context, fh, suppressXMLDeclaration=1)
+		realResult = fh.getvalue()
+		expectedResult = """<html><p>Test</p></html>"""
+		self.failUnless (realResult == expectedResult, "Doctype failed - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (txt, realResult, expectedResult, str(template)))
 
 	def testDTDPassthru (self):
 		if not use_lexical_handler:
