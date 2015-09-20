@@ -32,6 +32,8 @@
 
 import unittest, os, codecs, os.path, time
 import io
+import tempfile
+import shutil
 import logging, logging.config
 
 logging.basicConfig(level = logging.INFO)
@@ -42,7 +44,6 @@ HTMLTemplate1 = """<html><body><h1 tal:content="title">Title</h1></body></html>"
 HTMLTemplate2 = """<html><body><h1 tal:content="title">Title</h1><p tal:content="message">Message</p></body></html>"""
 XMLTemplate1 = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1 tal:content="title">Title</h1></body></html>"""
 XMLTemplate2 = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1 tal:content="title">Title</h1><p tal:content="message">Message</p></body></html>"""
-TEMP_DIR="/tmp/"
 HTML_TEMPLATE_NAME='TemplateCacheTestCasesHtmlTemplate.html'
 XML_TEMPLATE_NAME='TemplateCacheTestCasesXmlTemplate.xml'
 EXPXML_TEMPLATE_NAME='TemplateCacheTestCasesXmlTemplate.xhtml'
@@ -51,11 +52,16 @@ EXPXML_TEMPLATE_NAME='TemplateCacheTestCasesXmlTemplate.xhtml'
 
 class TemplateCacheTestCases (unittest.TestCase):
 	def setUp (self):
+		self.temp_dir = tempfile.mkdtemp()
+
 		self.context = simpleTALES.Context()
 		self.cache = simpleTALUtils.TemplateCache()
 		
 		self.context.addGlobal ('title', 'Cache Test')
 		self.context.addGlobal ('message', 'Testing the cache...')
+
+	def tearDown (self):
+		shutil.rmtree (self.temp_dir)
 		
 	def _runTest_ (self, template, txt, result, errMsg="Error"):
 		realResult = simpleTALUtils.ExpandMacros (self.context, template)
@@ -63,7 +69,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 			
 	def testHTMLTemplateCacheNoFile (self):
 		# Remove any previously created test files
-		name = os.path.join (TEMP_DIR, HTML_TEMPLATE_NAME)
+		name = os.path.join (self.temp_dir, HTML_TEMPLATE_NAME)
 		try:
 			os.remove (name)
 		except:
@@ -78,7 +84,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 			
 	def testHTMLTemplateCache (self):
 		# Remove any previously created test files
-		name = os.path.join (TEMP_DIR, HTML_TEMPLATE_NAME)
+		name = os.path.join (self.temp_dir, HTML_TEMPLATE_NAME)
 		try:
 			os.remove (name)
 		except:
@@ -132,7 +138,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		
 	def testXMLTemplateCacheNoFile (self):
 		# Remove any previously created test files
-		name = os.path.join (TEMP_DIR, XML_TEMPLATE_NAME)
+		name = os.path.join (self.temp_dir, XML_TEMPLATE_NAME)
 		try:
 			os.remove (name)
 		except:
@@ -147,7 +153,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 			
 	def testXMLTemplateCache (self):
 		# Remove any previously created test files
-		name = os.path.join (TEMP_DIR, EXPXML_TEMPLATE_NAME)
+		name = os.path.join (self.temp_dir, EXPXML_TEMPLATE_NAME)
 		try:
 			os.remove (name)
 		except:
@@ -202,7 +208,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		
 	def testExplicitXMLTemplateCache (self):
 		# Remove any previously created test files
-		name = os.path.join (TEMP_DIR, EXPXML_TEMPLATE_NAME)
+		name = os.path.join (self.temp_dir, EXPXML_TEMPLATE_NAME)
 		try:
 			os.remove (name)
 		except:
