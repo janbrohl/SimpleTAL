@@ -15,6 +15,8 @@
 		Module Dependencies: logging, simpleTALES
 """
 
+__version__ = "1.1"
+
 try:
 	import logging
 except:
@@ -518,25 +520,31 @@ class EventRecorder:
 		handler.enableRecord()
 		
 class HTMLParser (sgmllib.SGMLParser):
-	def setupParser (self, context, output, encoding):
+	def setupParser (self, context, output, encoding, allowTALInStructure):
 		self.log = logging.getLogger ("simpleTAL.HTMLParser")
-		self.context = context
-		self.eventHandler = EventHandler (self.context, output, self.parseStructure)
+		self.eventHandler = EventHandler (context, output, self.parseStructure)
 		self.encoding = encoding
+		self.allowTALInStructure = allowTALInStructure
 		
 	def parseStructure (self, structure):
 		# Called when evaluating a structure
 		self.log.debug ("Creating child parser to read structure.")
 		newParser = HTMLParser ()
 		newParser.log = logging.getLogger ("simpleTAL.HTMLParser.Child")
-		newParser.contenxt = self.context
 		newParser.eventHandler = self.eventHandler
 		# Any data sent into this new version will already be in unicode!
 		newParser.encoding = None
 		
+		# Inform the event handler whether TAL attributes should be used or ignored
+		if (not self.allowTALInStructure):
+			self.eventHandler.enableTALHandling (0)
 		self.log.debug ("Feeding structure to child parser")
 		newParser.feed (structure)
 		newParser.close()
+		
+		# Turn TAL handling back on if we turned it off.
+		if (not self.allowTALInStructure):
+			self.eventHandler.enableTALHandling (1)
 		self.log.debug ("Finished with child parser - returning.")
 		
 	def unknown_starttag (self, tag, attributes):
@@ -566,21 +574,30 @@ class HTMLParser (sgmllib.SGMLParser):
 			self.eventHandler.handle_data (unicode (data, self.encoding))
 			
 class XMLParser (xml.sax.handler.ContentHandler):
-	def setupParser (self, context, output):
+	def setupParser (self, context, output, allowTALInStructure):
 		self.log = logging.getLogger ("simpleTAL.XMLParser")
-		self.context = context
-
-		self.eventHandler = EventHandler (self.context, output, self.parseStructure)
+		self.eventHandler = EventHandler (context, output, self.parseStructure)
+		self.allowTALInStructure = allowTALInStructure
 		
 	def parseStructure (self, structure):
 		# Called when evaluating a structure
 		self.log.debug ("Creating child XML Parser for structure.")
 		newParser = XMLParser()
 		newParser.log = logging.getLogger ("simpleTAL.XMLParser.Child")
-		newParser.context = self.context
+		newParser.eventHandler = self.eventHandler
 		structureFile = StringIO.StringIO (structure)
+		
+		# Inform the event handler whether TAL attributes should be used or ignored
+		if (not self.allowTALInStructure):
+			self.eventHandler.enableTALHandling (0)
+			
 		self.log.debug ("Parsing structure with child.")
 		xml.sax.parse (structureFile, newParser)
+		
+		# # Turn TAL handling back on if we turned it off.
+		if (not self.allowTALInStructure):
+			self.eventHandler.enableTALHandling (1)
+			
 		self.log.debug ("Finished, returning.")
 		
 	def startElement (self, tag, attributes):
@@ -614,10 +631,19 @@ class EventHandler:
 		self.recorderList = []
 		self.repeatHook = None
 		
-		self.handlerMap = {'tal:attributes': TALAttribute, 'tal:content': TALContent
+		# By default TAL Handling is switched on
+		self.enableTALHandling (1)
+						  
+	def enableTALHandling (self, switchVal):
+		if (switchVal):
+			# Enable TAL Handling
+			self.handlerMap = {'tal:attributes': TALAttribute, 'tal:content': TALContent
 						  ,'tal:define': TALDefine, 'tal:replace': TALReplace
 						  ,'tal:omit-tag': TALOmitTag, 'tal:condition': TALCondition
 						  ,'tal:repeat': TALRepeat}
+		else:
+			# Disable TAL Handling
+			self.handlerMap = {}
 						  
 	def pushRecorder (self, recorder):
 		self.recorderList.append (recorder)
@@ -735,20 +761,21 @@ class EventHandler:
 		if (self.repeatHook is not None):
 			apply (self.repeatHook, ())
 
-def expandTemplate (file, context, inputEncoding="iso8859-1", outputEncoding="iso8859-1"):
+def expandTemplate (file, context, inputEncoding="iso8859-1"
+									 ,outputEncoding="iso8859-1", allowTALInStructure=1):
 	output = HTMLOuput(outputEncoding)
 	parser = HTMLParser()
-	parser.setupParser (context, output, inputEncoding)
+	parser.setupParser (context, output, inputEncoding, allowTALInStructure)
 	parser.feed (file.read())
 	parser.close()
 	return output.getValue()
 	
-def expandXMLTemplate (file, context, outputEncoding="iso8859-1"):
+def expandXMLTemplate (file, context, outputEncoding="iso8859-1", allowTALInStructure=1):
 	stringFile = StringIO.StringIO()
 	output = XMLOutput(stringFile, outputEncoding)
 	
 	handler = XMLParser()
-	handler.setupParser (context, output)
+	handler.setupParser (context, output, allowTALInStructure)
 	
 	xml.sax.parse (file, handler)
 	return stringFile.getvalue()

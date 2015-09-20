@@ -1,0 +1,15 @@
+simpleTAL / simpleTALES (Version 1.1)
+-------------------------------------
+
+Version 1.1
+-----------
+Bug fixes:
+	- The "structure" keyword when used in XML templates would fail with an exception.
+	
+New features:
+	- Added test cases for TALES and TAL (both HTML and XML)
+	- Added allowTALInStructure flag to control expansion of TAL attributes
+
+Version 1.0
+-----------
+Initial release.

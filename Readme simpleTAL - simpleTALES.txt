@@ -1,6 +1,5 @@
-simpleTAL / simpleTALES (Version 1.0)
+simpleTAL / simpleTALES (Version 1.1)
 -------------------------------------
-
 This is an implementation of the TAL and TALES specifications
 see (http://www.zope.org/Documentation/Books/ZopeBook/current/AppendixC.stx)
 
@@ -16,6 +15,8 @@ The DummyLogger.py module is required if you do not have either Python 2.3
 http://www.red-dove.com/python_logging.html installed.  Just drop it, along
 with simpleTAL.py and simpleTALES.py into your site-packages and all should
 work.
+
+Note that the unit test cases (under tests) require logging to be installed to run.
 
 Known limitations
 -----------------
