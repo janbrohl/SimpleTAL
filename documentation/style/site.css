@@ -1,0 +1,84 @@
+.navbar {
+	margin-top: 2em;
+	text-align: center;
+}
+
+h1 {
+	margin-bottom: 0px;
+	padding-bottom: 0px;
+}
+
+#subject {
+	font-style: italic;
+	margin-top: 0px;
+	padding-top: 0px;
+}
+	
+#footer {
+	font-size: smaller;
+	margin-top: 2em;
+}
+
+#footer p {
+	padding: 0px;
+	margin: 0px;
+}
+
+#version {
+	margin-top: 2em;
+	font-size: smaller;
+	float: right;
+}
+
+code {
+	font-size: small;
+	margin-top: 0em;
+	white-space: pre;
+	font-family: monospace;
+	overflow: auto;
+}
+
+p + code {
+	margin-top: 0em;
+}
+
+/* To work around the block effect of using <pre> as well as <code> - more IE bugs  */
+pre {
+	display: block;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	margin-left: 30px;
+	line-height: 100%;
+}
+
+* Paragraphs in tables are small */
+table p {
+	margin: 0px;
+}
+
+/* Ordinary tables have borders. */
+table {
+	border: 1px solid black;
+}
+td {
+	border: 1px solid black;
+}
+
+/* Nested tables do not. */
+td table {
+	border: 0px;
+}
+
+td table td {
+	border: 0px;
+}
+
+/* Lists with paragraphs in them should not be spread out. */
+li p {
+	margin: 0px;
+}
+
+
+.configOptions {
+	margin-left: 2em;
+}

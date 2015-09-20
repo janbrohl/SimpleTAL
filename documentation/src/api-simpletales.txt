@@ -1,0 +1,65 @@
+title: SimpleTAL API: simpleTALES Module.
+subject: Documentation on how to use the simpleTALES Module.
+
+<h2>simpleTALES</h2>
+The only external class in this module is the Context class.
+
+<h3>Context ([options] [,allowPythonPath])</h3>
+Creates a new Context object, used by SimpleTAL when expanding a template.  The options variable, if passed, will be made available as a global variable under the name "options" as per the TALES specification.
+
+By default Python TAL paths (e.g. 'python: 1 + 2') are not allowed.  If you require them, and you completely trust the authors of the templates, they can be enabled by passing in allowPythonPath=1.
+
+<h4>Context.addGlobal (name, value)</h4>
+Adds the value to the context under name.  Value can either be a fundamental python data type or a callable object.  For example, take the code:
+
+<pre>
+<code>
+class Test:
+	def __init__ (self, val):
+		self.val = val
+		
+	def getResult (self):
+		return str (self.val + 4)
+		
+test = Test (10)
+
+context = SimpleTALES.Context()
+context.addGlobal ("number14", test.getResult)
+context.addGlobal ("data", {"one": {"blue": ("Cat", "Dog", "Mouse"), "pink": ["One"]}})
+</code>
+</pre>
+
+The affect of this context is shown for several different TALES expressions:
+
+<pre>
+<code>
+&lt;b tal:define="test1 nocall:number14"&gt;&lt;/b&gt;</code>
+</pre>
+The method 'getResult' is bound to the local variable test1.
+
+<pre>
+<code>
+&lt;b tal:define="test2 number14"&gt;&lt;/b&gt;
+</code>
+</pre>
+The local variable test2 is assigned the value "14"
+
+<pre>
+<code>
+&lt;b tal:repeat="pets data/one/blue"&gt;&lt;i tal:replace="pets"&gt;&lt;/i&gt;&lt;/b&gt;
+</code>
+</pre>
+Prints out &lt;b&gt;CatDogMouse&lt;/b&gt;
+
+All strings placed into the context, and all strings returned by callable objects should be unicode strings.  This allows the rendering of the template into different character sets  without requiring any code changes.
+
+<h3><a name="PathFunctionVariable">PathFunctionVariable (callableObject)</a></h3>
+This class wraps a callable object (e.g. function) so that it can receive part of a TAL path as it's argument.  To use this simply create a new instance of the PathFunctionVariable and then place this into the Context (see above).  The path passed to the function is that part of the path not already used.  For example if the function "helloFunc" is placed in the Context the path "helloFunc/an/example" results in the string "an/example" being passed to the function.
+
+<h3>CachedFuncResult (callableObject)</h3>
+This class wraps a callable object (e.g. function) so that the callable is only called once.  In normal SimpleTAL operation any function placed into a Context will be called multiple times during template expansion.  To ensure that it is only called once simply wrap in the CachedFuncResult object first.
+
+<h4>clearCache ()</h4>
+Clears the cache.  Use this to clear the cache between multiple template expansions if the callable should be executed once per template expansion.
+
+<a href="api.html">Back to SimpleTAL API</a>

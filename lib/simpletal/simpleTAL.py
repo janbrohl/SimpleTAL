@@ -156,6 +156,8 @@ class TemplateInterpreter:
 		self.outputTag = 1
 		self.originalAttributes = []
 		self.currentAttributes = []
+		# Used in repeat only.
+		self.repeatAttributesCopy = []
 		self.currentSlots = {}
 		self.repeatVariable = None
 		self.repeatIndex = 0
@@ -266,6 +268,8 @@ class TemplateInterpreter:
 				self.tagContent = None
 				self.outputTag = 0
 				self.programCounter = self.symbolTable [args[2]]
+				# Restore the state of repeatAttributesCopy in case we are nested.
+				self.repeatAttributesCopy = self.scopeStack.pop()
 				return
 			self.context.setLocal (args[0], self.repeatSequence[self.repeatIndex])
 			self.repeatVariable.increment()
@@ -293,6 +297,8 @@ class TemplateInterpreter:
 		self.movePCBack = self.programCounter
 		self.repeatVariable = simpleTALES.RepeatVariable (self.repeatSequence)
 		self.context.addRepeat (args[0], self.repeatVariable, self.repeatSequence[self.repeatIndex])
+		# We keep the old state of the repeatAttributesCopy for nested loops
+		self.scopeStack.append (self.repeatAttributesCopy)
 		# Keep a copy of the current attributes for this tag
 		self.repeatAttributesCopy = copy.copy (self.currentAttributes)
 		self.programCounter += 1
@@ -326,6 +332,11 @@ class TemplateInterpreter:
 	def cmdAttributes (self, command, args):
 		""" args: [(attributeName, expression)]
 				Add, leave, or remove attributes from the start tag
+				
+			If self.escapeAttributes is true then the tag attributes will be escaped
+			when they are output by cmdOutputStartTag (using tagAsText).  Hence
+			we only escape the generated content here if they will *not* be when
+			written out later!
 		"""
 		attsToRemove = {}
 		newAtts = []
@@ -346,14 +357,22 @@ class TemplateInterpreter:
 				elif (type (resultVal) == type ("")):
 					if (not self.escapeAttributes):
 						# XML will get escaped automatically, HTML will not...
+						# THIS IS NOT A BUG!
+						# Use Unicode in the Context object if you are not using Ascii
 						escapedAttVal = cgi.escape (unicode (resultVal, 'ascii'), quote=1)
 					else:
+						# THIS IS NOT A BUG!
+						# Use Unicode in the Context object if you are not using Ascii
 						escapedAttVal = unicode (resultVal, 'ascii')
 				else:
 					if (not self.escapeAttributes):
 						# XML will get escaped automatically, HTML will not...
+						# THIS IS NOT A BUG!
+						# Use Unicode in the Context object if you are not using Ascii
 						escapedAttVal = cgi.escape (unicode (str (resultVal), 'ascii'), quote=1)
 					else:
+						# THIS IS NOT A BUG!
+						# Use Unicode in the Context object if you are not using Ascii
 						escapedAttVal = unicode (str (resultVal), 'ascii')
 				
 				newAtts.append ((attName,escapedAttVal))
@@ -408,15 +427,23 @@ class TemplateInterpreter:
 					if (type (resultVal) == type (u"")):
 						self.file.write (resultVal)
 					elif (type (resultVal) == type ("")):
+						# THIS IS NOT A BUG!
+						# Use Unicode in the Context object if you are not using Ascii
 						self.file.write (unicode (resultVal, 'ascii'))
 					else:
+						# THIS IS NOT A BUG!
+						# Use Unicode in the Context object if you are not using Ascii
 						self.file.write (unicode (str (resultVal), 'ascii'))
 			else:
 				if (type (resultVal) == type (u"")):
 					self.file.write (cgi.escape (resultVal))
 				elif (type (resultVal) == type ("")):
+					# THIS IS NOT A BUG!
+					# Use Unicode in the Context object if you are not using Ascii
 					self.file.write (cgi.escape (unicode (resultVal, 'ascii')))
 				else:
+					# THIS IS NOT A BUG!
+					# Use Unicode in the Context object if you are not using Ascii
 					self.file.write (cgi.escape (unicode (str (resultVal), 'ascii')))
 					
 		if (self.outputTag and not args[1]):
@@ -550,8 +577,8 @@ class Template:
 		try:
 			ourInterpreter.execute (self)
 		except UnicodeError, unierror:
-			logging.error ("UnicodeError most likely caused by placing a non-Unicode string in the Context object.")
-			raise unierror
+			logging.error ("UnicodeError caused by placing a non-Unicode string in the Context object.")
+			raise simpleTALES.ContextContentException ("Found non-unicode string in Context!")
 			
 	def getProgram (self):
 		""" Returns a tuple of (commandList, startPoint, endPoint, symbolTable) """
@@ -660,7 +687,12 @@ class XMLTemplate (Template):
 			ourInterpreter.initialise (context, outputFile)
 		else:
 			ourInterpreter = interpreter
-		ourInterpreter.execute (self, escapeAttributes=1)
+		try:
+			ourInterpreter.execute (self, escapeAttributes=1)
+		except UnicodeError, unierror:
+			logging.error ("UnicodeError caused by placing a non-Unicode string in the Context object.")
+			raise simpleTALES.ContextContentException ("Found non-unicode string in Context!")
+			
 	
 class TemplateCompiler:
 	def __init__ (self, attributesEscaped=0):

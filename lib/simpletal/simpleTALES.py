@@ -47,6 +47,12 @@ DEFAULTVALUE = "This represents a Default value."
 class PathNotFoundException (Exception):
 	pass
 	
+class ContextContentException (Exception):
+	""" This is raised when invalid content has been placed into the Context object.
+		For example using non-ascii characters instead of Unicode strings.
+	"""
+	pass
+	
 PATHNOTFOUNDEXCEPTION = PathNotFoundException()
 
 class ContextVariable:
@@ -455,8 +461,12 @@ class Context:
 									if (type (pathResult) == type (u"")):
 										result += pathResult
 									elif (type (pathResult) == type ("")):
+										# THIS IS NOT A BUG!
+										# Use Unicode in Context if you aren't using Ascii!
 										result += unicode (pathResult, 'ascii')
 									else:
+										# THIS IS NOT A BUG!
+										# Use Unicode in Context if you aren't using Ascii!
 										result += unicode (str (pathResult), 'ascii')
 								skipCount = endPos - position 
 						else:
@@ -471,8 +481,12 @@ class Context:
 								if (type (pathResult) == type (u"")):
 										result += pathResult
 								elif (type (pathResult) == type ("")):
+									# THIS IS NOT A BUG!
+									# Use Unicode in Context if you aren't using Ascii!
 									result += unicode (pathResult, 'ascii')
 								else:
+									# THIS IS NOT A BUG!
+									# Use Unicode in Context if you aren't using Ascii!
 									result += unicode (str (pathResult), 'ascii')
 							skipCount = endPos - position - 1
 					except IndexError, e:

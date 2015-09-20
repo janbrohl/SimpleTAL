@@ -1,0 +1,21 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title tal:content="page/headers/title">Title</title>
+	<link type="text/css" tal:attributes="href string:${page/depth}../style/site.css" rel="stylesheet">
+</head>
+<body>
+<h1 tal:content="page/headers/title">Title</h1>
+  <p id="subject" tal:content="page/headers/subject">Subject</p>
+  <div tal:content="structure page/content">Body</div>
+	  <div tal:condition="page/footnotes" id="footnotes">
+		<p tal:repeat="footnote page/footnotes" tal:replace="structure footnote"></p>
+	</div>
+  <p id="version" tal:content="string: PubTal Version ${page/headers/version}">Version </p>
+  <div id="footer">
+  <p>File: <b tal:replace="page/sourcePath">file</b></p>
+  <p>Last modified: <b tal:replace="page/lastModifiedDate">Date</b></p>
+  <p tal:content="string: Copyright ${page/copyrightYear} Colin Stewart">Copyright</p>
+  <p tal:replace="structure pubtal/linkText">Pubtal info</p>
+  </div>
+</body>

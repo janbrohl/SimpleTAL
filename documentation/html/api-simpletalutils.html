@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>SimpleTAL API: simpleTALUtils Module.</title>
+	<link href="../style/site.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+<h1>SimpleTAL API: simpleTALUtils Module.</h1>
+  <p id="subject">Documentation on how to use the simpleTALUtils Module.</p>
+  <div><h2>simpleTALUtils</h2>
+<p>This module holds optional classes and functions that might be of use while using SimpleTAL, but are not required by SimpleTAL directly.</p>
+<h3>def ExpandMacros (context, template, outputEncoding="ISO-8859-1")</h3>
+<p>This function can be used to expand a template which contains METAL macros, while leaving in place all the TAL and METAL commands.  Doing this makes editing a template which uses METAL macros easier, because the results of the macro can be seen immediately.</p>
+<p>The macros referred to by the passed in template must be present in the context so that their contents can be referenced.  The outputEncoding determines the encoding of the returned string, which will contain the expanded macro.</p>
+<h3>FastStringOutput</h3>
+<p>This class implements a very restricted File type object that can return a string containing all data written into it.  Unlike StringIO, FastStringOutput only supports write operations, and so is faster.  Only two methods are supported: write and getvalue.</p>
+<h4>write (data)</h4>
+<p>Used by SimpleTAL to write the expanded template.</p>
+<h4>getvalue ()</h4>
+<p>Use this to retrieve a string with the resulting output.</p>
+<h3>TemplateCache</h3>
+<p>This class implements a cache for compiled templates which automatically invalidates entries when their template file changes.  The instance has one public method: getTemplate</p>
+<h4>getTemplate (name, inputEncoding="ISO-8859-1")</h4>
+<p>This method will return a compiled template from the file 'name'.  If the file ends in '.xml' it will be compiled using simpleTAL.compileXMLTemplate, otherwise it will be compiled as a HTML template.  If the method is called again it will check to see whether the file 'name' has changed since the last call, and if it has it will re-compile the template,otherwise it will return the cached version.</p>
+<p>HTML Templates will be taken as being stored in the "inputEncoding", XML templates ignore this parameter.</p>
+<h4>getXMLTemplate (name)</h4>
+<p>This method will return a compiled XML template from the file 'name'.  This works identically to getTemplate as described above, except that it always treats the template as XML.</p>
+<h3>HTMLStructureCleaner</h3>
+<p>This class can be used to encode any stray special characters within a given string or file-like object.  Its intended use is in preparing data that will be placed into a Context object and then included in a template using the 'structure' keyword.  The class uses the Python SGML parser to determine what tags are present, so any HTML markup will be left intact.  As an example, take the content:</p>
+<pre>
+<code>This is some &lt;b&gt;bad&lt;/b&gt; html that is &lt; than great!</code>
+</pre>
+<p>If this was included in a template in its current state the result would be bad markup.  Once cleaned by this class, the result would be:</p>
+<pre>
+<code>This is some &lt;b&gt;bad&lt;/b&gt; html that is &amp;lt; than great!</code>
+</pre>
+<p>The class has one external method:</p>
+<pre>
+<code>def clean (self, content, encoding=None)</code>
+</pre>
+<p>The content should be either a string or a file-like object.  If the string is a unicode string (u"") it will be cleaned as is.  If the string is an ordinary string then the encoding must be supplied, and it will first be converted to unicode.  If the content object is a file-like object then it will be converted only if the encoding is supplied.</p>
+<p>The call returns a unicode string that has the '&lt;', '&gt;' and '&amp;' characters encoded.</p>
+<p><a href="api.html">Back to SimpleTAL API</a></p>
+</div>
+	  
+  <p id="version"></p>
+  <div id="footer">
+  <p>File: api-simpletalutils.txt</p>
+  <p>Last modified: Wed, 28 Apr 2004 22:51:16 EDT</p>
+  <p>Copyright 2004 Colin Stewart</p>
+  <p title="PubTal is a template driven web site publisher.">Made with <a href="http://www.owlfish.com/software/PubTal/">PubTal</a> 3.1.1</p>
+  </div>
+</body>

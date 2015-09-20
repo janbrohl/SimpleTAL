@@ -1,0 +1,80 @@
+title: Notes on SimpleTAL
+subject: Notes, known limitations, and differences between SimpleTAL and Zope's ZPT.
+
+<h2>Notes</h2>
+Some notes on aspects of SimpleTAL that might require a little explanation.  If there is something you feel should be included in here, please let me know.
+
+<h3><a name="htmlTemplates">HTML and XHTML Templates</a></h3>
+As a bug fix version 2.1 of SimpleTAL now processes HTML templates slightly differently to XML templates.  In the HTML 4.01 specification there are several elements (e.g. &lt;img&gt;) for which end tags are forbidden.  This would normally cause a problem with TAL, because all tags that have TAL attributes on them must be closed.  To solve this problem SimpleTAL has been modified to:
+
+<ul>
+<li>Allow TAL attributes on all HTML elements that forbid close tags, and process them despite the lack of close tag</li>
+<li>When compiling a HTML template issue a warning if a close tag is present for elements that are forbidden to have close tags.  (Only supported if logging is installed)</li>
+<li>To suppress the output of close tags for elements that are forbidden to have close tags.</li>
+</ul>
+
+These changes ensure that a HTML template can still be a valid HTML document, even if TAL needs to be used on elements that forbid end tags.  Additionally the output from the expanded template will also be valid HTML, in that the end tags will be suppressed even if present in the template.
+
+As a consequence of this change it is important that any XHTML templates are handled as XML rather than HTML, i.e. by calling compileXMLTemplate to compile the template.
+
+<h3>Character set encoding</h3>
+SimpleTAL fully supports international character sets, providing all of the encoding options that Python supports.  To painlessly support the correct conversion between character sets, just follow these simple rules:
+
+<ul>
+<li>When calling compileHTMLTemplate pass in the character set encoding the template was written in.</li>
+<li>A template passed to compileXMLTemplate must be a well formed XML document.  If it's not in UTF-8 then ensure the prolog of the document specifies what format it is in.</li>
+<li>Convert to unicode all strings passed into SimpleTALES.Context</li>
+<li>When calling template.expand, pass in the encoding you would like the template output to be in.</li>
+</ul>
+
+<h3>Structured Content</h3>
+When content is included into a template using 'tal:content' or 'tal:replace' the content is by default treated as text.  This means that the '&lt;', '&gt;' and '&amp;' characters will be automatically escaped so that they appear in the rendered template correctly.
+
+When using the 'structure' keyword, however, SimpleTAL will pass the content straight through into the template with no escaping.  As such it's important to realise that the content placed into a template in such a way can affect the validity of the output.  For example if you take user input that contains HTML markup it's important to ensure that the markup is valid HTML, otherwise the resulting template output will not be valid.  In order to assist in doing this I've put together a class (HTMLStructureCleaner) in <a href="api-simpletalutils.html">simpleTALUtils</a> that will escape any stray  '&lt;', '&gt;' or '&amp;' characters present while leaving all elements and attributes intact.
+
+The restriction in SimpleTAL 1.x when including structured content into an XML template is now removed - the structure is not re-parsed, and so does not have to be valid XML.
+
+<h3>Object Attributes versus Key Values</h3>
+When adding a mapping object (e.g. a Dictionary) to the Context, care should be taken on the naming conventions used within the mapping.  When SimpleTAL/ES resolves a path, it will first look for attributes on the object with that name, before trying to treat the object as a mapping object.  What this means in practice is that paths which match object attributes (e.g. methods) will never select the values given in the mapping.  As an example of this consider the following:
+
+<pre>
+<code>
+Template:  &lt;p tal:repeat="item dict/items"&gt;&lt;b tal:replace="item"&gt;&lt;/b&gt;&lt;/p&gt;
+
+Context:  
+myDict = {'items': [1,2,3]}
+Context.addGlobal ("dict", myDict)
+
+</code>
+</pre>
+
+You would expect the output from this to be:
+
+<pre>
+<code>&lt;p&gt;123&lt;/p&gt;</code>
+</pre>
+
+However this is not what happens.  Instead the variable "item" will be set to the output of "myDict.items()" - i.e. it will call the Python dictionary method 'items()'.
+
+I have considered changing this so that mapping checks are made first in path resolution rather than attribute lookups.  When I checked the Zope 2.5 behaviour however, I found that it works the same way as SimpleTAL, so for now I've left it to be consistent with Zope.
+
+<h3>Using &lt; and &gt; in TAL Paths</h3>
+When using the 'python:' path type, care must be taken with the use of the less than (&lt;) and greater than (&gt;) signs.  These must be escaped in the same way as all other HTML markup.  For example:
+
+use: <code>&lt;div tal:condition="python: a &amp;lt; b"&gt;Conditional Text&lt;/div&gt;</code>
+instead of: <code>&lt;div tal:condition="python: a &lt; b"&gt;Conditional Text&lt;/div&gt;</code>
+
+<h2>Known limitations</h2>
+<ol>
+<li>In the Zope implementation of TAL any elements in the TAL or METAL namespace have no start or end tags written out.  This is supported in SimpleTAL version 3.0 onwards, but only for XML templates.  HTML templates can not have elements in anything other than the default namespace.  This is a limitation of the Python sgmllib implementation.</li>
+<li>Repeat Variables do not support 'first' and 'last'.</li>
+<li>When using 'not:' on an empty expression the result will be true rather than an error.</li>
+<li>Path type 'python:' is not supported by default.  You can enable this by passing allowPythonPath=1 to the Context constructor.  Note that this should only be used when the authors of the templates are completely trusted, the code included in the 'python:' path can do anything.</li>
+<li>TAL markup "on-error" is not yet supported.</li>
+<li>HTML Templates will have duplicate attributes if an attribute is added using "tal:attributes" and the name is in upper case.  The cause of this is the sgmllib implementation which always converts attributes to lower case.</li>
+</ol>
+
+<h2>Known differences</h2>
+Non-existent path types, e.g. '&lt;b tal:content="total: $totalAmount"&gt;&lt;/b&gt;' are not supported.  In Zope, this results in the path being interpreted as a string - in simpleTAL/ES the result will be an error.
+
+<a href="index.html">Back to SimpleTAL</a>

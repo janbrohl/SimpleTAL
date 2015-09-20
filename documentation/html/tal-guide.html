@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>TAL/TALES &amp; METAL Reference Guide</title>
+	<link href="../style/site.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+<h1>TAL/TALES &amp; METAL Reference Guide</h1>
+  <p id="subject">A guide to using TAL, TALES, and METAL.</p>
+  <div><h2>Introduction</h2>
+<p>This is a simple reference guide to the TAL and TALES languages. Formal language specifications are hosted by Zope: <a href="http://zope.org/Wikis/DevSite/Projects/ZPT/TAL%20Specification%201.4">TAL</a>, <a href="http://zope.org/Wikis/DevSite/Projects/ZPT/TALES%20Specification%201.3">TALES</a>, and <a href="http://zope.org/Wikis/DevSite/Projects/ZPT/METAL%20Specification%201.0">METAL</a>.</p>
+<h2>TAL Commands</h2>
+<p>TAL consists of seven different commands (highest priority first): define, condition, repeat, content, replace, attributes, and omit-tag. Commands are attributes on HTML or XML tags, e.g. <code>&lt;div tal:content="article"&gt;Article goes here&lt;/div&gt;</code></p>
+<h3>tal:define</h3>
+<p>Syntax: tal:define="[local | global] name expression [; define-expression...]</p>
+<p>Description: Sets the value of "name" to "expression". By default the name will be applicable in the "local" scope, which consists of this tag, and all other tags nested inside this tag. If the "global" keyword is used then this name will keep its value for the rest of the document.</p>
+<p>Example: <code>&lt;div tal:define="global title book/theTitle; local chapterTitle book/chapter/theTitle"&gt;</code></p>
+<h3>tal:condition</h3>
+<p>Syntax: tal:condition="expression"</p>
+<p>Description: If the expression evaluates to true then this tag and all its children will be output. If the expression evaluates to false then this tag and all its children will not be included in the output.</p>
+<p>Example: <code>&lt;h1 tal:condition="user/firstLogin"&gt;Welcome to this page!&lt;/h1&gt;</code></p>
+<h3>tal:repeat</h3>
+<p>Syntax: tal:repeat="name expression"</p>
+<p>Description: Evaluates "expression", and if it is a sequence, repeats this tag and all children once for each item in the sequence. The "name" will be set to the value of the item in the current iteration, and is also the name of the repeat variable. The repeat variable is accessible using the TAL path: repeat/name and has the following properties:</p>
+<ul><li><p>index - Iteration number starting from zero</p>
+</li><li><p>number - Iteration number starting from one</p>
+</li><li><p>even - True if this is an even iteration</p>
+</li><li><p>odd - True if this is an odd iteration</p>
+</li><li><p>start - True if this is the first item in the sequence</p>
+</li><li><p>end - True if this is the last item in the sequence</p>
+</li><li><p>length - The length of the sequence</p>
+</li><li><p>letter - The lower case letter for this iteration, starting at "a"</p>
+</li><li><p>Letter - Upper case version of letter</p>
+</li><li><p>roman - Iteration number in Roman numerals, starting at i</p>
+</li><li><p>Roman - Upper case version of roman</p>
+</li></ul>
+<p></p>
+<p>Example: </p>
+<pre><code>&lt;table&gt;</code></pre>
+<pre><code>&lt;tr tal:repeat="fruit basket"&gt;</code></pre>
+<pre><code>&lt;td tal:content="repeat/fruit/number"&gt;&lt;/td&gt;</code></pre>
+<pre><code>&lt;td tal:content="fruit/name"&gt;&lt;/td&gt;</code></pre>
+<pre><code>&lt;/tr&gt;</code></pre>
+<pre><code>&lt;/table&gt;</code></pre>
+<h3>tal:content</h3>
+<p>Syntax: tal:content="[text | structure] expression"</p>
+<p>Description: Replaces the contents of the tag with the value of "expression". By default, and if the "text" keyword is present, then the value of the expression will be escaped as required (i.e. characters "&amp;&lt;&gt; will be escaped). If the "structure" keyword is present then the value will be output with no escaping performed. </p>
+<p>Example: <code>&lt;h1 tal:content="user/firstName"&gt;&lt;/h1&gt;</code></p>
+<h3>tal:replace</h3>
+<p>Syntax: tal:replace="[text | structure] expression"</p>
+<p>Description: Behaves identically to tal:content, except that the tag is removed from the output (as if tal:omit-tag had been used).</p>
+<p>Example: <code>&lt;h1&gt;Welcome &lt;b tal:replace="user/firstName"&gt;&lt;/b&gt;&lt;/h1&gt;</code></p>
+<h3>tal:attributes</h3>
+<p>Syntax: tal:attributes="name expression[;attributes-expression]"</p>
+<p>Description: Evaluates each "expression" and replaces the tag's attribute "name". If the expression evaluates to Nothing then the attribute is removed from the tag. If the expression evaluates to Default then the original tag's attribute is kept. If the "expression" requires a semi-colon then it must be escaped by using ";;".</p>
+<p>Example: <code>&lt;a tal:attributes="href user/homepage;title user/fullname"&gt;Your Homepage&lt;/a&gt;</code></p>
+<h3>tal:omit-tag</h3>
+<p>Syntax: tal:omit-tag="expression"</p>
+<p>Description: Removes the tag (leaving the tags content) if the expression evaluates to true. If expression is empty then it is taken as true.</p>
+<p>Example: <code>&lt;p&gt;&lt;b tal:omit-tag="not:user/firstVisit"&gt;Welcome&lt;/b&gt; to this page!&lt;/h1&gt;</code></p>
+<h2>TALES Expressions</h2>
+<p>The expressions used in TAL are called TALES expressions. The simplest TALES expression is a path which references a value, e.g. page/body references the body property of the page object.</p>
+<h3>path</h3>
+<p>Syntax: [path:]string[|TALES Expression]</p>
+<p>Description: A path, optionally starting with the modifier 'path:', references a property of an object. The '/' delimiter is used to end the name of an object and the start of the property name. Properties themselves may be objects that in turn have properties. The '|' ("or") character is used to find an alternative value to a path if the first path evaluates to 'Nothing' or does not exist.</p>
+<p>Example: <code>&lt;p tal:content="book/chapter/title | string:Untitled"&gt;&lt;/p&gt;</code></p>
+<h3>exists</h3>
+<p>Syntax: exists:<span style="font-style:italic">path</span></p>
+<p>Description: Returns true if the <span style="font-style:italic">path</span> exists, false otherwise. This is particularly useful for removing tags from output when the tags will have no content.</p>
+<p>Example: <code>&lt;p tal:omit-tag="not:exists:book/chapter/title" tal:content="book/chapter/title"&gt;&lt;/p&gt;</code></p>
+<h3>nocall</h3>
+<p>Syntax: nocall:<span style="font-style:italic">path</span></p>
+<p>Description: Returns a reference to a path, but without evaluating the path. Useful when you wish to define a new name to reference a function, not the current value of a function.</p>
+<p>Example: <code>&lt;p tal:define="title titleFunction" tal:content="title"&gt;&lt;/p&gt;</code></p>
+<h3>not</h3>
+<p>Syntax: not:tales-<span style="font-style:italic">path</span></p>
+<p>Description: Returns the inverse of the tales-path. If the path returns true, not:path will return false.</p>
+<p>Example: <code>&lt;p tal:condition="not: user/firstLogin"&gt;Welcome to the site!&lt;/p&gt;</code></p>
+<h3>string</h3>
+<p>Syntax: string:<span style="font-style:italic">text</span></p>
+<p>Description: Evaluates to a literal string with value <span style="font-style:italic">text</span>.</p>
+<p>Example: Welcome &lt;b tal:content="user/name|string: Anonymous"&gt;&lt;/b&gt;</p>
+<h3>python</h3>
+<p>Syntax: python:<span style="font-style:italic">python-code</span></p>
+<p>Description: Evaluates the python-code and returns the result. The python code must be properly escaped, e.g. "python: 1 &lt; 2" must be written as "python: 1 &amp;lt; 2". The python code has access to all Python functions, including four extra functions that correspond to their TALES commands: path (string), string (string), exists (string), and nocall (string)</p>
+<p>Example: &lt;div tal:condition="python: path (basket/items) &amp;gt; 1"&gt;Checkout!&lt;/div&gt;</p>
+<h2>METAL Macro Language</h2>
+<p>METAL is a macro language commonly used with TAL &amp; TALES. METAL allows part of a template to be used as a macro in later parts of a template, or a separate template altogether.</p>
+<h3>metal:define-macro</h3>
+<p>Syntax: metal:define-macro="name"</p>
+<p>Description: Defines a new macro that can be reference later as "name".</p>
+<p>Example: <code>&lt;div metal:define-macro="footer"&gt;Copyright &lt;span tal:content="page/lastModified"&gt;2004&lt;/span&gt;&lt;/div&gt;</code></p>
+<h3>metal:use-macro</h3>
+<p>Syntax: metal:use-macro="expression"</p>
+<p>Description: Evaluates "expression" and uses this as a macro.</p>
+<p>Example: <code>&lt;div metal:use-macro="footer"&gt;&lt;/div&gt;</code></p>
+<h3>metal:define-slot</h3>
+<p>Syntax: metal:define-slot="name"</p>
+<p>Description: Defines a customisation point in a macro with the given name.</p>
+<p>Example: </p>
+<p><code>&lt;div metal:define-macro="footer"&gt;</code></p>
+<p><code>&lt;b&gt;Standard discliamer for the site.&lt;/b&gt;</code></p>
+<p><code>&lt;i metal:define-slot="Contact"&gt;Contact admin@site.com&lt;/i&gt;</code></p>
+<p><code>&lt;/div&gt;</code></p>
+<h3>metal:fill-slot</h3>
+<p>Syntax: metal:fill-slot="name"</p>
+<p>Description: Replaces the content of a slot with this element.</p>
+<p>Example: </p>
+<p><code>&lt;div metal:use-macro="footer"&gt;</code></p>
+<p><code>&lt;i metal:fill-slot="Contact"&gt;Contact someone else&lt;/i&gt;</code></p>
+<p><code>&lt;/div&gt;</code></p>
+<p><code></code></p>
+</div>
+	  
+  <p id="version"></p>
+  <div id="footer">
+  <p>File: tal-guide.sxw</p>
+  <p>Last modified: Tue, 27 Jul 2004 22:39:34 EDT</p>
+  <p>Copyright 2004 Colin Stewart</p>
+  <p title="PubTal is a template driven web site publisher.">Made with <a href="http://www.owlfish.com/software/PubTal/">PubTal</a> 3.1.1</p>
+  </div>
+</body>

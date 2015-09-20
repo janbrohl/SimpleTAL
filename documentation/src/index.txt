@@ -1,0 +1,14 @@
+title: SimpleTAL
+subject: Welcome to SimpleTAL
+
+SimpleTAL is a stand alone Python implementation of the TAL, TALES and <a href="http://www.zope.org/Wikis/DevSite/Projects/ZPT/METAL%20Specification%201.0">METAL</a> <a href="http://www.zope.org/Documentation/Books/ZopeBook/current/AppendixC.stx">specifications</a> used in Zope to power HTML and XML templates. SimpleTAL is an independent implementation of TAL; there are no dependencies on Zope nor is any of the Zope work re-used.
+
+A <a href="http://owlfish.com/mailman/listinfo/simpletal-list_owlfish.com">mailing list</a> exists for discussion of SimpleTAL and support questions.
+
+<ul class="linkList">
+<li><a href="api.html">API Documentation</a>  Documentation on the SimpleTAL API.</li>
+<li><a href="notes.html">Notes on SimpleTAL</a>  Notes, known limitations, and differences between SimpleTAL and Zope's ZPT</li>
+<li><a href="tal-guide.html">TAL Guide</a>  A quick reference guide to TAL/TALES/METAL.</li>
+</ul>
+
+Feedback, feature enhancements and bug fixes will all be gladly received! 

@@ -89,8 +89,8 @@ class TALAttributesTestCases (unittest.TestCase):
 										,"Setting multiple attributes at once, with spaces between semi-colons, failed.")
 
 	def testMultipleAttributesEscaped (self):
-		self._runTest_ ('<html old="still here" class="test" tal:attributes="href default ; class string: Semi-colon;;test;new test " href="owlfish.com">Hello</html>'
-										,'<html class="Semi-colon;test" new="testing" old="still here" href="owlfish.com">Hello</html>'
+		self._runTest_ ('<html old="still &quot; here" class="test" tal:attributes="href default ; class string: Semi-colon;;test;new test " href="owlfish.com">Hello</html>'
+										,'<html class="Semi-colon;test" new="testing" old="still &quot; here" href="owlfish.com">Hello</html>'
 										,"Setting multiple attributes at once, with spaces between semi-colons, failed.")
 
 	def testAttributeEscaping (self):
@@ -109,10 +109,12 @@ class TALAttributesTestCases (unittest.TestCase):
 						,"Escaping of new attributes failed.")
 						
 	# HTML Attributes are case insensitive.
-	def testAttributeCase (self):
-		self._runTest_ ('<html HREF2="Testing" tal:attributes="href test">Hello</html>'
-						,"""<html href="testing" href2="Testing">Hello</html>"""
-						,"Capitalised attributes not carried through template.")
+#=======================================
+#	def testAttributeCase (self):
+#		self._runTest_ ('<html HREF="Testing" tal:attributes="HREF test">Hello</html>'
+#						,"""<html href="testing">Hello</html>"""
+#						,"HTML Attributes not treated as case insensitive.")
+#=======================================
 	
 
 

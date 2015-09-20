@@ -152,8 +152,8 @@ class TALAttributesTestCases (unittest.TestCase):
 						,"Defaulting of attribute 'href' failed.")
 
 	def testMultipleAttributes (self):
-		self._runTest_ ('<html old="still here" class="test" tal:attributes="href default;class nothing;new test" href="owlfish.com">Hello</html>'
-						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html new="testing" old="still here" href="owlfish.com">Hello</html>'
+		self._runTest_ ('<html old="still &quot; here" class="test" tal:attributes="href default;class nothing;new test" href="owlfish.com">Hello</html>'
+						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html new="testing" old="still &quot; here" href="owlfish.com">Hello</html>'
 						,"Setting multiple attributes at once failed.")
 
 	def testMultipleAttributesSpace (self):

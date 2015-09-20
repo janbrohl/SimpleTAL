@@ -1,5 +1,13 @@
-simpleTAL / simpleTALES (Version 3.9)
+simpleTAL / simpleTALES (Version 3.10)
 -------------------------------------
+Version 3.10
+------------
+New features:
+ - Included API documentation and TAL reference guide with archive.
+ 
+Bug fixes:
+ - Attributes on repeat tags were not correctly kept for nested repeats.
+   (Thanks to Aadish Shrestha for the bug report)
 
 Version 3.9
 -----------

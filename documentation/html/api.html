@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>SimpleTAL API</title>
+	<link href="../style/site.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+<h1>SimpleTAL API</h1>
+  <p id="subject">Documentation on how to use the SimpleTAL API.</p>
+  <div><p>SimpleTAL consists of three different modules: simpleTAL, simpleTALES, and simpleTALUtils.  The API for each of these modules is documented separately:</p>
+<ul>
+	<li><a href="api-simpletal.html">simpleTAL</a> - contains functions to compile HTML and XML templates into objects ready for use.</li>
+	<li><a href="api-simpletales.html">simpleTALES</a> - contains the Context class which provides the environment in which templates are expanded.</li>
+	<li><a href="api-simpletalutils.html">simpleTALUtils</a> - optional utility functions for dealing with SimpleTAL templates.</li>
+</ul>
+<h2>International character support</h2>
+<p>SimpleTAL supports all character sets that Python supports.  To use non-ASCII characters first convert them to Unicode strings prior to placing them into the Context object.</p>
+<h2>Logging in SimpleTAL</h2>
+<p>SimpleTAL uses the <a href="http://www.red-dove.com/python_logging.html">logging library</a>, which is shipped as part of Python 2.3, to handle logging of debug messages, warnings, and errors.  When used on a system that has no logging library SimpleTAL will suppress all logging messages.</p>
+<p>To control the output of logging messages from SimpleTAL it is necessary to retrieve the logger objects for each module, which can be done using:</p>
+<pre><code>simpleTALLogger = logging.getLogger ("simpleTAL")
+simpleTALESLogger = logging.getLogger ("simpleTALES")
+</code></pre>
+<p>The configuration of these loggers can then be adjusted as described in the logging library documentation.  For example to stop warnings being logged:</p>
+<pre><code>simpleTALLogger.setLevel (logging.ERROR)
+simpleTALESLogger.setLevel (logging.ERROR)
+</code></pre>
+<p><a href="index.html">Back to SimpleTAL</a></p>
+</div>
+	  
+  <p id="version"></p>
+  <div id="footer">
+  <p>File: api.txt</p>
+  <p>Last modified: Tue, 27 Jul 2004 23:10:39 EDT</p>
+  <p>Copyright 2004 Colin Stewart</p>
+  <p title="PubTal is a template driven web site publisher.">Made with <a href="http://www.owlfish.com/software/PubTal/">PubTal</a> 3.1.1</p>
+  </div>
+</body>
