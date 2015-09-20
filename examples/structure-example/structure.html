@@ -1,0 +1,9 @@
+<html>
+	<body>
+		<h1 tal:content="title">The title</h1>
+		<div tal:repeat="chapters doc">
+		  <h2 tal:content="chapters/heading">Chapter Heading</h2>
+		  <p tal:content="structure chapters/text">Text</p>
+		</div>
+  </body>
+</html>

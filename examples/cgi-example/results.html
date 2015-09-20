@@ -1,0 +1,16 @@
+<!-- Example TAL HTML Template - this is used to show results -->
+<html>
+  <head>
+  <title tal:content="title">Title</title>
+  </head>
+  
+  <body>
+    <h1 tal:content="title">Title</h1>
+    <div>
+    	Name: <b tal:content="fieldValues/name">Your name</b><br>
+    	Occupation: <b tal:content="fieldValues/occupation">Your occupation</b><br>
+    	<div tal:condition="fieldValues/age">Age: 
+    		<b tal:content="fieldValues/age">Your age</b></div><br>
+    </div>
+  </body>
+</html>

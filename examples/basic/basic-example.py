@@ -1,0 +1,44 @@
+#!/usr/bin/python
+""" Example TAL program
+
+		Copyright 2003 Colin Stewart (http://www.owlfish.com/)
+		
+		This code is made freely available for commerical and non-commerical use.
+		No warranties, expressed or implied, are made as to the fitness of this
+		code for any purpose.
+		
+		If you make any bug fixes or feature enhancements please let me know!
+		
+		As simple as it gets:
+				1 - Create a context
+				2 - Open a template
+				3 - Expand the template
+				4 - Print out the result
+		
+		Module Dependencies: simpleTAL, simpleTALES
+"""
+
+import simpleTAL, simpleTALES
+
+# Creat the context that is used by the template
+context = simpleTALES.Context()
+
+# Add a string to the context under the variable title
+context.addGlobal ("title", "Colours of the rainbow")
+
+# A list of strings
+colours = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"]
+# Add the list to the context under the variable rainbow
+context.addGlobal ("rainbow", colours)
+
+# Open the template file
+templateFile = open ("basic.html", 'r')
+
+# Expand the template as HTML using this context
+result = simpleTAL.expandTemplate (templateFile, context)
+
+# Close the template file
+templateFile.close()
+
+# Print out the result
+print result

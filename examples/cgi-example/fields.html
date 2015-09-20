@@ -1,0 +1,23 @@
+<!-- Example TAL HTML Template - this is used to gather data -->
+<html>
+  <head>
+  <title tal:content="title">Title</title>
+  </head>
+  
+  <body>
+    <h1 tal:content="title">Title</h1>
+    <form action="simple-cgi.py">
+    <div>
+    	Name: <input name="name" tal:attributes="value fieldValues/name"></input>
+    		<b tal:condition="missingFields/name">(Please fill in)</b><br>
+    		
+    	Occupation: <input name="occupation" tal:attributes="value fieldValues/occupation"></input>
+    	  <b tal:condition="missingFields/occupation">(Please fill in)</b><br>
+    		
+    	Age: <input name="age" tal:attributes="value fieldValues/age"></input><br>
+    	
+    </div>
+    <input type="submit" name="submit" value="submit"></submit>
+    </form>
+  </body>
+</html>
