@@ -1,5 +1,14 @@
-simpleTAL / simpleTALES (Version 4.0)
+simpleTAL / simpleTALES (Version 4.1)
 -------------------------------------
+Version 4.1
+-----------
+
+New features:
+ - Processing Instructions are now supported in HTML templates.
+ 
+Bug fixes:
+ - The use of "&amp;" in attributes was broken in 4.0 - fixed (thanks to Alain Spineux for the bug report).
+
 Version 4.0
 ------------
 This version of SimpleTAL is not 100% backwards compatible with the 3.x series of releases.  Version 4.0 of SimpleTAL requires Python 2.2 or higher.

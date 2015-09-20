@@ -1,7 +1,6 @@
-#!/usr/bin/python
-""" Example TAL program
+""" Fixed up HTMLParser
 
-		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
+		Copyright (c) 2005 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -28,37 +27,19 @@
 		
 		If you make any bug fixes or feature enhancements please let me know!
 		
-		As simple as it gets:
-				1 - Create a context
-				2 - Compile a template
-				3 - Expand the template
 		
-		Module Dependencies: simpleTAL, simpleTALES
+		The classes in this module implement the TAL language, expanding
+		both XML and HTML templates.
+		
+		Module Dependencies: logging, simpleTALES, simpleTALTemplates
 """
 
-from simpletal import simpleTAL, simpleTALES
-import sys
+import simpletal
+import HTMLParser
 
-# Creat the context that is used by the template
-context = simpleTALES.Context(allowPythonPath=1)
 
-# Add a string to the context under the variable title
-context.addGlobal ("title", "Colours of the rainbow")
-
-# A list of strings
-colours = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"]
-# Add the list to the context under the variable rainbow
-context.addGlobal ("rainbow", colours)
-
-# Open the template file
-templateFile = open ("basic.html", 'r')
-
-# Compile a template
-template = simpleTAL.compileHTMLTemplate (templateFile)
-
-# Close the template file
-templateFile.close()
-
-# Expand the template as HTML using this context
-template.expand (context, sys.stdout, outputEncoding="utf-8")
-
+class HTMLParser (HTMLParser.HTMLParser):
+	def unescape(self, s):
+		# Just return the data - we don't partially unescaped data!
+		return s
+		

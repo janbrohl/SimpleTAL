@@ -103,6 +103,11 @@ class TALHandlerTestCases (unittest.TestCase):
 									,"""<html><!-- Tal content coming up.--><p>testing</p></html>"""
 									,"""Comment not output correctly."""
 									)
+									
+	def testProcessingInstructions (self):
+		self._runTest_ ("""<?xml version="1.0" encoding="iso-8859-1"?>\n<p>Some<?test testInstruction="yes" doNothing="yes"?><i>markup</i></p>"""
+							,"""<?xml version="1.0" encoding="iso-8859-1"?>\n<p>Some<?test testInstruction="yes" doNothing="yes"?><i>markup</i></p>"""
+							,"""Processing instructions not preserved.""")
 		
 
 if __name__ == '__main__':

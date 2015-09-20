@@ -118,6 +118,11 @@ class TALAttributesTestCases (unittest.TestCase):
 						,"""<html four="Value three" one="Value One" two="Value two" three="Value three">Value One</html>"""
 						,"Accessing multiple existing attributes failed.")
 						
+	def testAmpersandEscapeInAttributes (self):
+		self._runTest_ ('<html existingAtt="&amp;Testing&amp;" tal:attributes="newAtt attrs/existingatt" tal:content="attrs/existingatt">Hello</html>'
+						,"""<html newAtt="&amp;Testing&amp;" existingatt="&amp;Testing&amp;">&amp;Testing&amp;</html>"""
+						,"Accessing existing attributes failed.")
+						
 
 	#~ def testAttributeCase (self):
 		#~ self._runTest_ ('<html HREF="Testing" tal:attributes="HREF test">Hello</html>'

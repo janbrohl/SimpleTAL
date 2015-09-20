@@ -49,28 +49,31 @@ class TALSpecialCharsTestCases (unittest.TestCase):
 		self.context.addGlobal ('two', ["one", "two"])
 		self.context.addGlobal ('three', [1,"Two",3])
 		
-	def _runTest_ (self, txt, result, errMsg="Error"):
-		template = simpleTAL.compileHTMLTemplate (txt)
+	def _runTest_ (self, txt, result, errMsg="Error", allowTALInStructure=1):
+		template = simpleTAL.compileXMLTemplate (txt)
 		file = StringIO.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
-						
+		
 	def testLessThanGreaterThanAmpersand (self):
 		self._runTest_ ('<html tal:content="test">Hello</html>'
-						,"<html>&lt; testing &gt; experimenting &amp; twice as useful</html>"
+						,"""<?xml version="1.0" encoding="iso-8859-1"?>\n<html>&lt; testing &gt; experimenting &amp; twice as useful</html>"""
 						,"Less than, greater than or amperand were not encoded correctly")
 						
 	def testEscapedPythonPaths (self):
 		self._runTest_ ('<html tal:content="python: str (2000 &lt;&lt; 1)">Hello</html>'
-						,"<html>4000</html>"
+						,"""<?xml version="1.0" encoding="iso-8859-1"?>\n<html>4000</html>"""
 						,"Python bit shift failed.")
 						
 	def testAmpInTemplate (self):
-		#logging.getLogger().setLevel(logging.DEBUG)
-		NBSP = u"\xa0".encode ("iso-8859-1")
-		self._runTest_ ('<html test="&amp;nbsp;&nbsp;" tal:attributes="test2 string: Boo &nbsp; There ${test}">Hello Bye Bye</html>'
-							,"""<html test2="Boo """ + NBSP + """ There &lt; testing &gt; experimenting &amp; twice as useful" test="&amp;nbsp;""" + NBSP + """">Hello Bye Bye</html>"""
+		self._runTest_ ("""<!DOCTYPE html
+PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html test="&amp;" tal:attributes="test2 string: Boo There ${test}">Hello Bye Bye</html>"""
+							,"""<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html test2="Boo There &lt; testing &gt; experimenting &amp; twice as useful" test="&amp;">Hello Bye Bye</html>"""
 							,"&amp; in template failed.")
 						
 if __name__ == '__main__':

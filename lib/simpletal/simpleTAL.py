@@ -40,7 +40,8 @@ except:
 	import DummyLogger as logging
 	
 import xml.sax, cgi, StringIO, codecs, re, sgmlentitynames, types
-import simpletal, copy, sys, HTMLParser
+import simpletal, copy, sys
+import FixedHTMLParser
 
 __version__ = simpletal.__version__
 
@@ -1266,10 +1267,10 @@ class TemplateParseException (Exception):
 		return "[" + self.location + "] " + self.errorDescription
 
 
-class HTMLTemplateCompiler (TemplateCompiler, HTMLParser.HTMLParser):
+class HTMLTemplateCompiler (TemplateCompiler, FixedHTMLParser.HTMLParser):
 	def __init__ (self):
 		TemplateCompiler.__init__ (self)
-		HTMLParser.HTMLParser.__init__ (self)
+		FixedHTMLParser.HTMLParser.__init__ (self)
 		self.log = logging.getLogger ("simpleTAL.HTMLTemplateCompiler")
 		
 	def parseTemplate (self, file, encoding="iso-8859-1", minimizeBooleanAtts = 0):
@@ -1362,9 +1363,11 @@ class HTMLTemplateCompiler (TemplateCompiler, HTMLParser.HTMLParser):
 		
 	# These two methods are required so that we expand all character and entity references prior to parsing the template.
 	def handle_charref (self, ref):
+		self.log.debug ("Got Ref: %s", ref)
 		self.parseData (unichr (int (ref)))
 		
 	def handle_entityref (self, ref):
+		self.log.debug ("Got Ref: %s", ref)
 		# Use handle_data so that <&> are re-encoded as required.
 		self.handle_data( unichr (sgmlentitynames.htmlNameToUnicodeNumber.get (ref, 65533)))
 		
@@ -1375,6 +1378,10 @@ class HTMLTemplateCompiler (TemplateCompiler, HTMLParser.HTMLParser):
 	# Pass comments through un-affected.
 	def handle_comment (self, data):
 		self.parseData (u'<!--%s-->' % data)
+
+	def handle_pi (self, data):
+		self.log.debug ("Recieved processing instruction.")
+		self.parseData (u'<?%s>' % data)
 		
 	def report_unbalanced (self, tag):
 		self.log.warn ("End tag %s present with no corresponding open tag.")
