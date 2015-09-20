@@ -1,5 +1,5 @@
 #!/usr/bin/python
-"""		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
+"""		Copyright (c) 2009 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -31,8 +31,17 @@
 """
 
 import unittest, os
-import StringIO
+import io
 import logging, logging.config
+
+try:
+    # check to see if pyxml is installed
+    from xml.sax.saxlib import LexicalHandler
+    use_lexical_handler = 1
+except ImportError:
+    use_lexical_handler = 0
+    class LexicalHandler:
+        pass
 
 from simpletal import simpleTAL, simpleTALES
 
@@ -51,7 +60,7 @@ class TALSpecialCharsTestCases (unittest.TestCase):
 		
 	def _runTest_ (self, txt, result, errMsg="Error", allowTALInStructure=1):
 		template = simpleTAL.compileXMLTemplate (txt)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		template.expand (self.context, file, outputEncoding="iso-8859-1")
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
@@ -67,13 +76,19 @@ class TALSpecialCharsTestCases (unittest.TestCase):
 						,"Python bit shift failed.")
 						
 	def testAmpInTemplate (self):
+		if use_lexical_handler:
+			expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html test2="Boo There &lt; testing &gt; experimenting &amp; twice as useful" test="&amp;">Hello Bye Bye</html>"""
+		else:
+			expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>
+<html test2="Boo There &lt; testing &gt; experimenting &amp; twice as useful" test="&amp;">Hello Bye Bye</html>"""
+
 		self._runTest_ ("""<!DOCTYPE html
 PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html test="&amp;" tal:attributes="test2 string: Boo There ${test}">Hello Bye Bye</html>"""
-							,"""<?xml version="1.0" encoding="iso-8859-1"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html test2="Boo There &lt; testing &gt; experimenting &amp; twice as useful" test="&amp;">Hello Bye Bye</html>"""
+							,expectedResult
 							,"&amp; in template failed.")
 						
 if __name__ == '__main__':

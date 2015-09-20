@@ -1,4 +1,4 @@
-"""		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
+"""		Copyright (c) 2009 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,7 @@
 """
 from simpletal import simpleTAL, simpleTALES, simpleTALUtils
 
-import time, StringIO, cStringIO, sys
+import time, io, sys
 
 performanceTemplate = """<html>
 <head>
@@ -121,23 +121,23 @@ context.addGlobal ("title", "Performance testing!")
 context.addGlobal ("myList", ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight"])
 
 def NGTemplates (count):
-	tempFile = StringIO.StringIO (performanceTemplate)
+	tempFile = io.StringIO (performanceTemplate)
 	compiler = simpleTAL.HTMLTemplateCompiler()
 	compiler.parseTemplate (tempFile)
 	template = compiler.getTemplate()
-	file = simpleTALUtils.FastStringOutput()
+	file = io.StringIO()
 	start = time.clock()
-	for attempt in xrange (count):
+	for attempt in range (count):
 		template.expand (context, file)
 	end = time.clock()
 	#print "Resuling file: " + file.getvalue()
 	return (end - start)
 	
 def NGTemplateOverhead (count):
-	file = simpleTALUtils.FastStringOutput()
+	file = io.StringIO()
 	start = time.clock()
-	for attempt in xrange (count):
-		tempFile = StringIO.StringIO (performanceTemplate)
+	for attempt in range (count):
+		tempFile = io.StringIO (performanceTemplate)
 		compiler = simpleTAL.HTMLTemplateCompiler()
 		compiler.parseTemplate (tempFile)
 		template = compiler.getTemplate()
@@ -147,11 +147,11 @@ def NGTemplateOverhead (count):
 	return (end - start)
 
 
-print "Timing TAL templates"
+print("Timing TAL templates")
 result = NGTemplates (10000)
-print "Result: " + str(result) + " for 10000 template expansions"
+print("Result: " + str(result) + " for 10000 template expansions")
 
-print "Timing TAL templates (with template parsing)"
+print("Timing TAL templates (with template parsing)")
 result = NGTemplateOverhead (1000)
-print "Result: " + str(result) + " for 1000 template expansions"
+print("Result: " + str(result) + " for 1000 template expansions")
 

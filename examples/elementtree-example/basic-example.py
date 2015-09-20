@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """ Example TAL program
 
-		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
+		Copyright (c) 2009 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,8 @@
 """
 
 from simpletal import simpleTAL, simpleTALES, simpleElementTree
-import sys
+import sys, logging
+logging.basicConfig()
 
 xmlTree = simpleElementTree.parseFile (file="input.xml")
 # Create the context that is used by the template
@@ -47,7 +48,7 @@ context = simpleTALES.Context(allowPythonPath=1)
 context.addGlobal ("input", xmlTree)
 
 # Open the template file
-templateFile = open ("basic.xml", 'r')
+templateFile = open ("basic.xml", 'rb')
 
 # Compile a template
 template = simpleTAL.compileXMLTemplate (templateFile)

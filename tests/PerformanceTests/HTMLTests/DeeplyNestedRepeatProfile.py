@@ -1,4 +1,4 @@
-"""		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
+"""		Copyright (c) 2009 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -29,14 +29,14 @@
 """
 from simpletal import simpleTAL, simpleTALES, simpleTALUtils
 
-import time, StringIO, cStringIO, sys
+import time, io, sys
 
 #import hotshot, hotshot.stats
 
 import profile, pstats
 
 import gc
-print "Disabling garbage collection!"
+print("Disabling garbage collection!")
 
 gc.disable()
 
@@ -76,23 +76,23 @@ context.addGlobal ("title", "Performance testing!")
 context.addGlobal ("myList", firstLevelList )
 
 def NGTemplates (count):
-	tempFile = StringIO.StringIO (performanceTemplate)
+	tempFile = io.StringIO (performanceTemplate)
 	compiler = simpleTAL.HTMLTemplateCompiler()
 	compiler.parseTemplate (tempFile)
 	template = compiler.getTemplate()
-	file = simpleTALUtils.FastStringOutput()
+	file = io.StringIO()
 	start = time.clock()
-	for attempt in xrange (count):
+	for attempt in range (count):
 		template.expand (context, file)
 	end = time.clock()
 	#print "Resuling file: " + file.getvalue()
 	return (end - start)
 	
 def NGTemplateOverhead (count):
-	file = file = simpleTALUtils.FastStringOutput()
+	file = io.StringIO()
 	start = time.clock()
-	for attempt in xrange (count):
-		tempFile = StringIO.StringIO (performanceTemplate)
+	for attempt in range (count):
+		tempFile = io.StringIO (performanceTemplate)
 		compiler = simpleTAL.HTMLTemplateCompiler()
 		compiler.parseTemplate (tempFile)
 		template = compiler.getTemplate()
@@ -102,14 +102,14 @@ def NGTemplateOverhead (count):
 	return (end - start)
 
 
-print "Timing TAL templates"
+print("Timing TAL templates")
 #profiler = hotshot.Profile ("profile.data")
 profiler = profile.run("NGTemplates (20)", "profile.data")
 #profiler = profile.run("NGTemplateOverhead (20)", "profile.data")
 #profiler.runcall (NGTemplates, 20)
-print "Re-enabling garbage collection."
+print("Re-enabling garbage collection.")
 gc.enable()
-print "Loading profile data."
+print("Loading profile data.")
 
 #data = hotshot.stats.load ("profile.data")
 data = pstats.Stats("profile.data")

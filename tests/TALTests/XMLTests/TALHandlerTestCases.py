@@ -1,5 +1,5 @@
 #!/usr/bin/python
-"""		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
+"""		Copyright (c) 2009 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@
 """
 
 import unittest, os, sys
-import StringIO
+import io
 import logging, logging.config
 import xml.sax, xml.sax.handler
 from hashlib import md5
@@ -50,7 +50,24 @@ if (os.path.exists ("logging.ini")):
 	logging.config.fileConfig ("logging.ini")
 else:
 	logging.basicConfig()
-	
+
+class stringHasher:
+	def __init__ (self, encoding = 'utf-8'):
+		self.encoding = encoding
+		self.hasher = md5()
+		
+	def update (self, avalue):
+		if (isinstance (avalue, str)):
+			self.hasher.update(avalue.encode ('utf-8'))
+		else:
+			self.hasher.update (avalue)
+			
+	def digest (self):
+		return self.hasher.digest()
+		
+	def hexdigest (self):
+		return self.hasher.hexdigest()
+		
 class XMLChecksumHandler (xml.sax.handler.ContentHandler, xml.sax.handler.DTDHandler, xml.sax.handler.ErrorHandler, LexicalHandler):
 	def __init__ (self, parser):
 		xml.sax.handler.ContentHandler.__init__ (self)
@@ -60,7 +77,7 @@ class XMLChecksumHandler (xml.sax.handler.ContentHandler, xml.sax.handler.DTDHan
 		return self.digest.hexdigest()
 
 	def startDocument (self):
-		self.digest = md5()
+		self.digest = stringHasher()
 		
 	def startPrefixMapping (self, prefix, uri):
 		self.digest.update (prefix)
@@ -92,8 +109,8 @@ class XMLChecksumHandler (xml.sax.handler.ContentHandler, xml.sax.handler.DTDHan
 		
 	def skippedEntity (self, name):
 		self.digest.update (name)
-		
-   	# DTD Handler
+	
+	# DTD Handler
 	def notationDecl(self, name, publicId, systemId):
 		self.digest.update (name)
 		self.digest.update (publicId)
@@ -106,10 +123,10 @@ class XMLChecksumHandler (xml.sax.handler.ContentHandler, xml.sax.handler.DTDHan
 		self.digest.update (ndata)
 		
 	def error (self, excpt):
-		print "Error: %s" % str (excpt)
+		print("Error: %s" % str (excpt))
 		
 	def warning (self, excpt):
-		print "Warning: %s" % str (excpt)
+		print("Warning: %s" % str (excpt))
 		
 	def startDTD(self, name, publicId, systemId):
 		self.digest.update (name)
@@ -129,7 +146,7 @@ if use_lexical_handler:
     CHECKSUMPARSER.setProperty(xml.sax.handler.property_lexical_handler, CHECKSUMHANDLER) 
 
 def getXMLChecksum (doc):
-	CHECKSUMPARSER.parse (StringIO.StringIO (doc))
+	CHECKSUMPARSER.parse (io.StringIO (doc))
 	return CHECKSUMHANDLER.getDigest()
 
 class TALHandlerTestCases (unittest.TestCase):
@@ -142,13 +159,13 @@ class TALHandlerTestCases (unittest.TestCase):
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileXMLTemplate (txt)
-		fh = StringIO.StringIO ()
+		fh = io.StringIO ()
 		template.expand (self.context, fh, outputEncoding="iso-8859-1")
 		realResult = fh.getvalue()
 		expectedChecksum = getXMLChecksum (result)
 		try:
 			realChecksum = getXMLChecksum (realResult)
-		except Exception, e:
+		except Exception as e:
 			self.fail ("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s" % (str (e), realResult, str (template)))
 		
 		self.failUnless (expectedChecksum == realChecksum, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
@@ -201,7 +218,7 @@ class TALHandlerTestCases (unittest.TestCase):
 	def testDocumentTypeDeclaration (self):
 		txt = """<?xml version="1.0" encoding="iso-8859-1"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n<html><p>Test</p></html>"""
 		template = simpleTAL.compileXMLTemplate (txt)
-		fh = StringIO.StringIO ()
+		fh = io.StringIO ()
 		template.expand (self.context, fh, docType="""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3c.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">""", outputEncoding="iso-8859-1")
 		realResult = fh.getvalue()
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3c.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n<html><p>Test</p></html>"""
@@ -210,25 +227,28 @@ class TALHandlerTestCases (unittest.TestCase):
 	def testXMLDeclarationSuppressionWithDocType (self):
 		txt = """<?xml version="1.0" encoding="iso-8859-1"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n<html><p>Test</p></html>"""
 		template = simpleTAL.compileXMLTemplate (txt)
-		fh = StringIO.StringIO ()
+		fh = io.StringIO ()
 		template.expand (self.context, fh, docType="""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3c.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">""", suppressXMLDeclaration=1)
 		realResult = fh.getvalue()
 		expectedResult = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3c.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n<html><p>Test</p></html>"""
 		self.failUnless (realResult == expectedResult, "Doctype failed - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (txt, realResult, expectedResult, str(template)))
 
 	def testNBSPparsing (self):
-		txt = """<?xml version="1.0" encoding="iso-8859-1"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n<html><p>Test&nbsp;Space</p></html>"""
+		txt = """<?xml version="1.0" encoding="iso-8859-1"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n<html><p>Test&nbsp;Space</p></html>""".encode ("iso-8859-1")
 		template = simpleTAL.compileXMLTemplate (txt)
-		fh = StringIO.StringIO ()
+		fh = io.BytesIO ()
 		template.expand (self.context, fh)
 		realResult = fh.getvalue()
-		expectedResult = u"""<?xml version="1.0"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n<html><p>Test\xa0Space</p></html>""".encode ("utf-8")
+		if not use_lexical_handler:
+			expectedResult = """<?xml version="1.0"?>\n<html><p>Test\xa0Space</p></html>""".encode ("utf-8")
+		else:
+			expectedResult = """<?xml version="1.0"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n<html><p>Test\xa0Space</p></html>""".encode ("utf-8")
 		self.failUnless (realResult == expectedResult, "NBSP expansion failed - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (txt, realResult, expectedResult, template))
 
 	def testXMLDeclarationSuppressionWithNoDocType (self):
 		txt = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p>Test</p></html>"""
 		template = simpleTAL.compileXMLTemplate (txt)
-		fh = StringIO.StringIO ()
+		fh = io.StringIO ()
 		template.expand (self.context, fh, suppressXMLDeclaration=1)
 		realResult = fh.getvalue()
 		expectedResult = """<html><p>Test</p></html>"""

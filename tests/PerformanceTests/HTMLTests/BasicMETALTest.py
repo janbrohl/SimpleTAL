@@ -1,4 +1,6 @@
-"""		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
+#!/usr/bin/python
+# -*- coding: iso-8859-1 -*-
+"""		Copyright (c) 2009 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -30,7 +32,7 @@
 """
 from simpletal import simpleTAL, simpleTALES, simpleTALUtils
 
-import time, StringIO, cStringIO, sys
+import time, io, sys
 
 macroTemplate = """<html>
 <body>
@@ -99,12 +101,12 @@ macTemplate = simpleTAL.compileHTMLTemplate (macroTemplate)
 context.addGlobal ("macTemp", macTemplate)
 
 def METALTime (count, template):
-	file = simpleTALUtils.FastStringOutput()
+	file = io.StringIO()
 	start = time.clock()
-	for attempt in xrange (count):
+	for attempt in range (count):
 		template.expand (context, file)
 	end = time.clock()
-	#print "Resuling file: " + file.getvalue()
+	#print ("Resuling file: " + file.getvalue())
 	return (end - start)
 
 #print "Timing TAL templates"
@@ -116,6 +118,6 @@ expanded = simpleTALUtils.ExpandMacros (context, template)
 #print expanded
 realTemplate = simpleTAL.compileHTMLTemplate (expanded)
 
-print "Timing macro expansion..."
+print("Timing macro expansion...")
 result = METALTime (4000, realTemplate)
-print "Total time %s for 4000 itterations" % (str (result))
+print("Total time %s for 4000 itterations" % (str (result)))

@@ -1,6 +1,6 @@
 """ ElementTree integration for SimpleTAL 
 
-		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
+		Copyright (c) 2009 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -40,8 +40,8 @@
 		Module Dependencies: simpleTALES, elementtree
 """
 
-from elementtree import ElementTree
-import simpleTALES
+from xml.etree import ElementTree
+from . import simpleTALES
 
 class SimpleElementTreeVar (ElementTree._ElementInterface, simpleTALES.ContextVariable):
 	def __init__(self, tag, attrib):

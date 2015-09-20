@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """ Example TAL program
 
-		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
+		Copyright (c) 2009 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,7 @@ context = simpleTALES.Context()
 context.addGlobal ("title", "Simple METAL Example")
 
 # Compile the macro pages
-templateFile = open ("macro.html", 'r')
+templateFile = open ("macro.html", 'rt', encoding = 'utf-8')
 macros = simpleTAL.compileHTMLTemplate (templateFile)
 templateFile.close()
 
@@ -51,7 +51,7 @@ templateFile.close()
 context.addGlobal ("sitemacros", macros)
 
 # Now compile the page which will use the macros
-templateFile = open ("page.html", 'r')
+templateFile = open ("page.html", 'rt', encoding = 'utf-8')
 page = simpleTAL.compileHTMLTemplate (templateFile)
 templateFile.close()
 

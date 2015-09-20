@@ -1,5 +1,5 @@
 #!/usr/bin/python
-""" 	Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
+""" 	Copyright (c) 2009 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@
 """
 
 import unittest, os
-import StringIO
+import io
 import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
@@ -63,7 +63,7 @@ class DefineMacroTests (unittest.TestCase):
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		macroTemplate = simpleTAL.compileHTMLTemplate (txt)
 		self.context.addGlobal ("site", macroTemplate)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		pageTemplate.expand (self.context, file)
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, pageTemplate))
@@ -71,7 +71,7 @@ class DefineMacroTests (unittest.TestCase):
 	def _runTest2_ (self, txt, result, errMsg="Error"):
 		macroTemplate = simpleTAL.compileHTMLTemplate (txt)
 		self.context.addGlobal ("site", macroTemplate)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		pageTemplate2.expand (self.context, file)
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, pageTemplate))
@@ -79,7 +79,7 @@ class DefineMacroTests (unittest.TestCase):
 	def _runCompileTest_ (self, txt, result, errMsg="Error"):
 		try:
 			macroTemplate = simpleTAL.compileHTMLTemplate (txt)
-		except simpleTAL.TemplateParseException, e:
+		except simpleTAL.TemplateParseException as e:
 			self.failUnless (str (e) == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, str(e), result, pageTemplate))
 			return
 		self.fail ("Expected exception '%s' during compile - but got no exception" % result)				

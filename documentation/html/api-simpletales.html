@@ -49,7 +49,7 @@ context.addGlobal ("data", {"one": {"blue": ("Cat", "Dog", "Mouse"), "pink": ["O
 </code>
 </pre>
 <p>Prints out &lt;b&gt;CatDogMouse&lt;/b&gt;</p>
-<p>All strings placed into the context, and all strings returned by callable objects should be unicode strings.&nbsp; This allows the rendering of the template into different character sets&nbsp; without requiring any code changes.</p>
+<p>All text placed into the context, and text returned by callable objects should be strings rather than bytes.</p>
 <h3><a name="PathFunctionVariable">PathFunctionVariable (callableObject)</a></h3>
 <p>This class wraps a callable object (e.g. function) so that it can receive part of a TAL path as it's argument.&nbsp; To use this simply create a new instance of the PathFunctionVariable and then place this into the Context (see above).&nbsp; The path passed to the function is that part of the path not already used.&nbsp; For example if the function "helloFunc" is placed in the Context the path "helloFunc/an/example" results in the string "an/example" being passed to the function.</p>
 <h3>CachedFuncResult (callableObject)</h3>
@@ -62,8 +62,8 @@ context.addGlobal ("data", {"one": {"blue": ("Cat", "Dog", "Mouse"), "pink": ["O
   <p id="version">PubTal Version </p>
   <div id="footer">
   <p>File: api-simpletales.txt</p>
-  <p>Last modified: Fri, 14 Apr 2006 20:42:40 BST</p>
-  <p>Copyright 2006 Colin Stewart</p>
-  <p title="PubTal is a template driven web site publisher.">Made with <a href="http://www.owlfish.com/software/PubTal/">PubTal</a> 3.2.0</p>
+  <p>Last modified: Thu, 13 Aug 2009 18:28:21 BST</p>
+  <p>Copyright 2009 Colin Stewart</p>
+  <p title="PubTal is a template driven web site publisher.">Made with <a href="http://www.owlfish.com/software/PubTal/">PubTal</a> 3.3</p>
   </div>
 </body>

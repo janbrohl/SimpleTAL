@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """ Example TAL program
 
-		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
+		Copyright (c) 2009 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -51,7 +51,7 @@ colours = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"]
 context.addGlobal ("rainbow", colours)
 
 # Open the template file
-templateFile = open ("basic.html", 'r')
+templateFile = open ("basic.html", 'rt', encoding='utf-8')
 
 # Compile a template
 template = simpleTAL.compileHTMLTemplate (templateFile)

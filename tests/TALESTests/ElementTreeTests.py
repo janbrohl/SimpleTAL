@@ -1,5 +1,5 @@
 #!/usr/bin/python
-""" 	Copyright (c) 20045Colin Stewart (http://www.owlfish.com/)
+""" 	Copyright (c) 2009 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -31,16 +31,10 @@
 """
 
 import unittest, os
-import StringIO
+import io
 import logging, logging.config
 
-try:
-	from simpletal import simpleElementTree
-	
-	ELEMENT_TREE_SUPPORT = 1
-except:
-	ELEMENT_TREE_SUPPORT = 0
-
+from simpletal import simpleElementTree
 from simpletal import simpleTAL, simpleTALES
 
 if (os.path.exists ("logging.ini")):
@@ -58,11 +52,7 @@ class ElementTreeTestCases (unittest.TestCase):
 	def setUp (self):
 		pass
 			
-	def _runTest_ (self, txt, result, errMsg="Error", allowPythonPath=0):
-		if (not ELEMENT_TREE_SUPPORT):
-			logging.warn ("No ElementTree support found, skipping test.")
-			return
-			
+	def _runTest_ (self, txt, result, errMsg="Error", allowPythonPath=0):			
 		self.context = simpleTALES.Context(allowPythonPath=allowPythonPath)
 		self.context.addGlobal ('top', 'Hello from the top')
 		self.context.addGlobal ('helloFunc', simpleFunction)
@@ -74,11 +64,11 @@ class ElementTreeTestCases (unittest.TestCase):
 		self.context.addGlobal ('data', {'one': 1, 'zero': 0})
 		
 		testXML = '<?xml version="1.0" encoding="utf-8"?><root><title type="Example">This is a test</title></root>'
-		xmlTree = simpleElementTree.parseFile (StringIO.StringIO (testXML))
+		xmlTree = simpleElementTree.parseFile (io.StringIO (testXML))
 		self.context.addGlobal ("xml", xmlTree)
 		
 		template = simpleTAL.compileHTMLTemplate (txt)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))

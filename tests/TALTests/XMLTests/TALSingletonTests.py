@@ -1,5 +1,5 @@
 #!/usr/bin/python
-"""		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
+"""		Copyright (c) 2009 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@
 """
 
 import unittest, os
-import StringIO
+import io
 import logging, logging.config
 import xml.sax, xml.sax.handler
 from hashlib import md5
@@ -42,6 +42,24 @@ if (os.path.exists ("logging.ini")):
 	logging.config.fileConfig ("logging.ini")
 else:
 	logging.basicConfig()
+
+
+class stringHasher:
+	def __init__ (self, encoding = 'utf-8'):
+		self.encoding = encoding
+		self.hasher = md5()
+		
+	def update (self, avalue):
+		if (isinstance (avalue, str)):
+			self.hasher.update(avalue.encode ('utf-8'))
+		else:
+			self.hasher.update (avalue)
+			
+	def digest (self):
+		return self.hasher.digest()
+		
+	def hexdigest (self):
+		return self.hasher.hexdigest()
 	
 class XMLChecksumHandler (xml.sax.handler.ContentHandler, xml.sax.handler.DTDHandler, xml.sax.handler.ErrorHandler):
 	def __init__ (self, parser):
@@ -49,7 +67,7 @@ class XMLChecksumHandler (xml.sax.handler.ContentHandler, xml.sax.handler.DTDHan
 		self.ourParser = parser
 		
 	def startDocument (self):
-		self.digest = md5()
+		self.digest = stringHasher()
 		
 	def startPrefixMapping (self, prefix, uri):
 		self.digest.update (prefix)
@@ -92,10 +110,10 @@ class XMLChecksumHandler (xml.sax.handler.ContentHandler, xml.sax.handler.DTDHan
 		self.digest.update (ndata)
 		
 	def error (self, excpt):
-		print "Error: %s" % str (excpt)
+		print("Error: %s" % str (excpt))
 		
 	def warning (self, excpt):
-		print "Warning: %s" % str (excpt)
+		print("Warning: %s" % str (excpt))
 		
 	def getDigest (self):
 		return self.digest.hexdigest()
@@ -107,7 +125,7 @@ CHECKSUMPARSER.setDTDHandler (CHECKSUMHANDLER)
 CHECKSUMPARSER.setErrorHandler (CHECKSUMHANDLER)
 
 def getXMLChecksum (doc):
-	CHECKSUMPARSER.parse (StringIO.StringIO (doc))
+	CHECKSUMPARSER.parse (io.StringIO (doc))
 	return CHECKSUMHANDLER.getDigest()
 
 class TALSingletonTests (unittest.TestCase):
@@ -118,19 +136,31 @@ class TALSingletonTests (unittest.TestCase):
 		self.context.addGlobal ('two', ["one", "two"])
 		self.context.addGlobal ('three', ['1',"Two",'3'])
 		
+	def _runBasicTest_ (self, text, result, errMsg = "Error"):
+		""" Runs a basic test - i.e. does full string compare rather than
+			checksum.
+		"""
+		template = simpleTAL.compileXMLTemplate (text)
+		file = io.StringIO ()
+		template.expand (self.context, file, outputEncoding="iso-8859-1")
+		realResult = file.getvalue().encode ('iso-8859-1')
+		
+		self.failUnless (result == realResult, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, text, realResult, result, template))
+		
+		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileXMLTemplate (txt)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		template.expand (self.context, file, outputEncoding="iso-8859-1")
 		realResult = file.getvalue()
 		try:
 			expectedChecksum = getXMLChecksum (result)
-		except Exception, e:
+		except Exception as e:
 			self.fail ("Exception (%s) thrown parsing XML expected result: %s" % (str (e), result))
 			
 		try:
 			realChecksum = getXMLChecksum (realResult)
-		except Exception, e:
+		except Exception as e:
 			self.fail ("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s" % (str (e), realResult, str (template)))
 		
 		self.failUnless (expectedChecksum == realChecksum, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
@@ -140,21 +170,25 @@ class TALSingletonTests (unittest.TestCase):
 		pageTemplate = simpleTAL.compileXMLTemplate (page)
 		self.context.addGlobal ("site", macroTemplate)
 		self.context.addGlobal ("here", pageTemplate)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		pageTemplate.expand (self.context, file)
 		realResult = file.getvalue()
 		try:
 			expectedChecksum = getXMLChecksum (result)
-		except Exception, e:
+		except Exception as e:
 			self.fail ("Exception (%s) thrown parsing XML expected result: %s" % (str (e), result))
 			
 		try:
 			realChecksum = getXMLChecksum (realResult)
-		except Exception, e:
+		except Exception as e:
 			self.fail ("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s\nMacro Template: %s" % (str (e), realResult, str (pageTemplate), str (macroTemplate)))
 		
 		self.failUnless (expectedChecksum == realChecksum, "%s - \npassed in macro: %s \n and page: %s\ngot back %s \nexpected %s\n\nPage Template: %s" % (errMsg, macros,page, realResult, result, pageTemplate))
 		
+	def testBasicPassThrough (self):
+		self._runBasicTest_ ("""<?xml version="1.0" encoding="iso-8859-1"?><html><br /><p>Hello</p><hr /></html>""".encode ("iso-8859-1")
+						,"""<?xml version="1.0" encoding="iso-8859-1"?>\n<html><br /><p>Hello</p><hr /></html>""".encode ('iso-8859-1')
+						,"""Local define followed by attributes and global tes""")
 		
 	def testDefineAttributes (self):
 		self._runTest_ ("""<html><br tal:define="temp test" tal:attributes="href temp"/><br tal:attributes="href temp"/></html>"""

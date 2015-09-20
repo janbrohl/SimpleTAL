@@ -15,20 +15,16 @@ found test suites into one big test suite and run them all at once.
 """
 import sys, os, re, unittest, imp
 
-# If logging is available, suppress it to avoid confusion.
-try:
-	import logging
-	rootLogger = logging.getLogger ()
-	rootLogger.setLevel (logging.CRITICAL)
-except:
-	pass
+import logging
+rootLogger = logging.getLogger ()
+rootLogger.setLevel (logging.CRITICAL)
 
 #ensure that the module in this directory is used instead of the system one
 #or else we would be testing the system one and not the one with the changes :)
 import sys
 sys.path.insert(0, os.path.join(os.getcwd(),'lib'))
-print "System path is: " + str (sys.path)
-def path_vistor(files, dirname, names):
+print("System path is: " + str (sys.path))
+def path_visitor(files, dirname, names):
 	"""Visits each file in the and appends the filename to the given list"""
 	if (dirname.find ("PerformanceTests") > 0):
 		return
@@ -38,9 +34,11 @@ def path_vistor(files, dirname, names):
 def regressionTest():
 	#Find all the files to run
 	files = []
-	os.path.walk("tests", path_vistor, files)					
+	for curdir, dirlist, filelist in os.walk ("tests"):
+		path_visitor (files, curdir, filelist)
+	
 	test = re.compile(".*\.py$", re.IGNORECASE)
-	files = filter(test.search, files)
+	files = list(filter(test.search, files))
 	
 	#load each test into the testsuite	 
 	modules = []

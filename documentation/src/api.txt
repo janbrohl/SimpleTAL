@@ -1,20 +1,15 @@
 title: SimpleTAL API
 subject: Documentation on how to use the SimpleTAL API.
 
-SimpleTAL consists of three different modules: simpleTAL, simpleTALES, and simpleTALUtils.  The API for each of these modules is documented separately:
+SimpleTAL consists of four different modules: simpleTAL, simpleTALES, and simpleTALUtils.  The API for each of these modules is documented separately:
 <ul>
 	<li><a href="api-simpletal.html">simpleTAL</a> - contains functions to compile HTML and XML templates into objects ready for use.</li>
 	<li><a href="api-simpletales.html">simpleTALES</a> - contains the Context class which provides the environment in which templates are expanded.</li>
 	<li><a href="api-simpletalutils.html">simpleTALUtils</a> - optional utility functions for dealing with SimpleTAL templates.</li>
-	<li><a href="api-simpleelementtree.html">simpleElementTree</a> - optional integration with <a href="http://effbot.org/zone/element-index.htm" title="ElementTree XML parsing library">ElementTree</a> allowing XML documents to be parsed and placed directly into the Context instance.</li>
+	<li><a href="api-simpleelementtree.html">simpleElementTree</a> - integration with ElementTree allowing XML documents to be parsed and placed directly into the Context instance.</li>
 </ul>
 
-<h2>International character support</h2>
-SimpleTAL supports all character sets that Python supports.  To use non-ASCII characters first convert them to Unicode strings prior to placing them into the Context object.
-
 <h2>Logging in SimpleTAL</h2>
-SimpleTAL uses the <a href="http://www.red-dove.com/python_logging.html">logging library</a>, which is shipped as part of Python 2.3, to handle logging of debug messages, warnings, and errors.  When used on a system that has no logging library SimpleTAL will suppress all logging messages.
-
 To control the output of logging messages from SimpleTAL it is necessary to retrieve the logger objects for each module, which can be done using:
 
 <pre><code>simpleTALLogger = logging.getLogger ("simpleTAL")

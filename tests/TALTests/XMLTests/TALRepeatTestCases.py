@@ -1,5 +1,5 @@
 #!/usr/bin/python
-"""		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
+"""		Copyright (c) 2009 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@
 """
 
 import unittest, os
-import StringIO
+import io
 import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
@@ -48,7 +48,7 @@ class TALRepeatTestCases (unittest.TestCase):
 		self.context.addGlobal ('one', [1])
 		self.context.addGlobal ('two', ["one", "two"])
 		self.context.addGlobal ('three', [1,"Two",3])
-		self.context.addGlobal ('bigList', range (1,100))
+		self.context.addGlobal ('bigList', list(range(1,100)))
 		self.context.addGlobal ('fourList', ["zero", "one", "two", "three"])
 		self.context.addGlobal ('nested', [{'title': 'Image 1', 'catList': [1,2,3]}
 										  ,{'title': 'Image 2', 'catList': [5,2,3]}
@@ -57,7 +57,7 @@ class TALRepeatTestCases (unittest.TestCase):
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileXMLTemplate (txt)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		template.expand (self.context, file, outputEncoding="iso-8859-1")
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
@@ -107,7 +107,7 @@ class TALRepeatTestCases (unittest.TestCase):
 				
 	def testRepeatVarIndex (self):
 		expectedResult = "<html>"
-		for num in xrange (0,99):
+		for num in range (0,99):
 			expectedResult += str (num)
 		expectedResult += "</html>"
 		

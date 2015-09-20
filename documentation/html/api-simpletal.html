@@ -9,23 +9,21 @@
   <p id="subject">Documentation on how to use the simpleTAL Module.</p>
   <div><h2>simpleTAL</h2>
 <p>Two helper functions are provided for convenience, one for compiling HTML templates, and one for compiling XML templates.&nbsp; If an error is encountered during compilation (for example mismatched TAL tags or bad syntax) an TemplateParseException will be thrown.</p>
-<h3>compileHTMLTemplate (template, inputEncoding="ISO-8859-1", minimizeBooleanAtts=0)</h3>
-<p>Compiles the passed in HTML template into an instance of the 'Template' class.&nbsp; The template object should be either a string containing the template, or a file-like object.&nbsp; The inputEncoding specifies the encoding that the template was written using and deafults to iso-8859-1.&nbsp; The minimizeBooleanAtts flag controls whether HTML boolean attributes (e.g. &lt;img ismap&gt;) should be written out in minimized form.&nbsp; See below for details of how to use the Template class.</p>
+<h3>compileHTMLTemplate (template, minimizeBooleanAtts=0)</h3>
+<p>Compiles the passed in HTML template into an instance of the 'Template' class.&nbsp; The template object should be either a string containing the template, or a file-like object that returns strings.&nbsp; The minimizeBooleanAtts flag controls whether HTML boolean attributes (e.g. &lt;img ismap&gt;) should be written out in minimized form.&nbsp; See below for details of how to use the Template class.</p>
 <h3>compileXMLTemplate (template)</h3>
-<p>Compiles the passed in XML template into an instance of the 'Template' class.&nbsp; The template object should be either a string containing the template, or a file-like object.&nbsp; The XML template must be a well formed XML document.&nbsp; The character set will be determined from the prolog of the template or be assumed to be utf-8.&nbsp; See below for details of how to use the Template class.</p>
-<h3>compileDOMTemplate (dom)</h3>
-<p>Compiles an XML template that is stored as a DOM tree.&nbsp; This requires PyXML to be installed to function.&nbsp; </p>
+<p>Compiles the passed in XML template into an instance of the 'Template' class.&nbsp; The template object should be a string or bytes object containing the template, or a file-like object that returns strings or bytes.&nbsp; The XML template must be a well formed XML document.&nbsp; See below for details of how to use the Template class.</p>
 <h3>Template Instances</h3>
-<p>The compiled templates contain all of the logic required to be able to expand themselves for a given context.&nbsp; They can be kept around and reused as often as required, there is no need or benefit to re-compiling them unless the underlying template changes.&nbsp; They have one method of interest as part of the external API:</p>
+<p>The compiled templates contain all of the logic required to be able to expand themselves for a given context.&nbsp; They can be kept around and reused as often as required, there is no need to re-compile them unless the underlying template changes.&nbsp; They have one method of interest as part of the external API:</p>
 <pre>
 <code>
-def expand (self, context, outputFile[,outputEncoding] [,docType][,suppressXMLDeclaration])
+def expand (self, context, outputFile [,outputEncoding='utf-8'] [,docType=None] [,suppressXMLDeclaration=False])
 </code>
 </pre>
-<p>This method will expand the template, using the simpleTALES.Context object provided, and write the output into the given file-like object.&nbsp; If the template is a HTML template then the result will, by default, be encoded in iso-8859-1.&nbsp; If no outputEncoding is specified and the template is an XML template then it will default to utf-8.</p>
-<p>The docType and suppressXMLDeclaration variables apply only to XML Templates.&nbsp; </p>
-<p>Python's support for XML does not currently extend to the LexicalHandler API, which is required for an application to be able to read an XML documents DOCTYPE.&nbsp; If <a href="http://pyxml.sourceforge.net/">pyXML</a> is installed SimpleTAL will make use of it to determine the XML DOCTYPE, otherwise the doctype must be passed as a named variable to the expand method.</p>
-<p>For example to produce a valid strict XHTML document without pyXML use:</p>
+<p>This method will expand the template, using the simpleTALES.Context object provided, and write the output into the given file-like object.&nbsp; If the outputFile is an instance of io.TextIOBase or codecs.StreamWriter then strings are written to the file, otherwise the output is encoded in outputEncoding.&nbsp; XML Templates will output the appropriate XML declaration for the outputEncoding, independently of whether strings or bytes are written out.&nbsp; </p>
+<p>The docType and suppressXMLDeclaration arguments only apply to XML Templates.&nbsp; </p>
+<p>Python's support for XML does not currently extend to the LexicalHandler API, which is required for an application to be able to read an XML documents DOCTYPE.&nbsp; The doctype must be passed as a named variable to the expand method.</p>
+<p>For example to produce a valid strict XHTML document use:</p>
 <pre>
 <code>
 template.expand (context, outputFile, docType='&lt;!DOCTYPE html&nbsp; PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"&gt;')
@@ -38,8 +36,8 @@ template.expand (context, outputFile, docType='&lt;!DOCTYPE html&nbsp; PUBLIC "-
   <p id="version">PubTal Version </p>
   <div id="footer">
   <p>File: api-simpletal.txt</p>
-  <p>Last modified: Sun, 23 Oct 2005 21:35:10 BST</p>
-  <p>Copyright 2006 Colin Stewart</p>
-  <p title="PubTal is a template driven web site publisher.">Made with <a href="http://www.owlfish.com/software/PubTal/">PubTal</a> 3.2.0</p>
+  <p>Last modified: Thu, 13 Aug 2009 18:25:50 BST</p>
+  <p>Copyright 2009 Colin Stewart</p>
+  <p title="PubTal is a template driven web site publisher.">Made with <a href="http://www.owlfish.com/software/PubTal/">PubTal</a> 3.3</p>
   </div>
 </body>

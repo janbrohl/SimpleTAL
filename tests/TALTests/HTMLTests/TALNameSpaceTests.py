@@ -1,5 +1,5 @@
 #!/usr/bin/python
-"""		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
+"""		Copyright (c) 2009 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@
 """
 
 import unittest, os
-import StringIO
+import io
 import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
@@ -51,7 +51,7 @@ class TALNameSpaceTests (unittest.TestCase):
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileHTMLTemplate (txt)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
@@ -59,7 +59,7 @@ class TALNameSpaceTests (unittest.TestCase):
 	def _runErrTest_ (self, txt, result, errMsg="Error"):
 		try:
 			template = simpleTAL.compileHTMLTemplate (txt)
-		except simpleTAL.TemplateParseException, e:
+		except simpleTAL.TemplateParseException as e:
 			realResult = str (e)
 			self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back exception %s \nexpected exception %s\n" % (errMsg, txt, realResult, result))
 			return

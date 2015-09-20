@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """ Example TAL based CGI
 
-		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
+		Copyright (c) 2009 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -39,7 +39,9 @@
 """
 
 from simpletal import simpleTAL, simpleTALES
-import cgi, sys
+import cgi, sys, logging
+
+logging.basicConfig()
 		
 class ExampleCGI:
 	def __init__ (self):
@@ -55,14 +57,14 @@ class ExampleCGI:
 		self.context.addGlobal ("title", title)
 		
 	def getValue (self, name, mandatory=1):
-		if (self.form.has_key (name)):
+		if (name in self.form):
 			self.fieldValues [name] = self.form [name].value
 		elif (mandatory):
 			self.missingFields [name] = 1
 			self.formValid = 0
 			
 	def main (self):
-		if (self.form.has_key ("submit")):
+		if ("submit" in self.form):
 			# Recieved the posting, get the name, occupation, and (optional) age
 			self.getValue ("username")
 			self.getValue ("occupation")
@@ -85,7 +87,7 @@ class ExampleCGI:
 		sys.stdout.write ("\n")                            # blank line, end of headers
 		
 		# Expand the template and print it out
-		templateFile = open (templateName, 'r')
+		templateFile = open (templateName, 'rt', encoding = "utf-8")
 		template = simpleTAL.compileHTMLTemplate (templateFile)
 
 		# Close the template file

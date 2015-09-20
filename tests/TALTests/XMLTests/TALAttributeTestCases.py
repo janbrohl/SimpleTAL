@@ -1,5 +1,6 @@
 #!/usr/bin/python
-"""		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
+# -*- coding: utf-8 -*-
+"""		Copyright (c) 2009 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -31,7 +32,7 @@
 """
 
 import unittest, os
-import StringIO
+import io
 import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
@@ -44,13 +45,30 @@ if (os.path.exists ("logging.ini")):
 else:
 	logging.basicConfig()
 	
+class stringHasher:
+	def __init__ (self, encoding = 'utf-8'):
+		self.encoding = encoding
+		self.hasher = md5()
+		
+	def update (self, avalue):
+		if (isinstance (avalue, str)):
+			self.hasher.update(avalue.encode ('utf-8'))
+		else:
+			self.hasher.update (avalue)
+			
+	def digest (self):
+		return self.hasher.digest()
+		
+	def hexdigest (self):
+		return self.hasher.hexdigest()
+	
 class XMLChecksumHandler (xml.sax.handler.ContentHandler, xml.sax.handler.DTDHandler, xml.sax.handler.ErrorHandler):
 	def __init__ (self, parser):
 		xml.sax.handler.ContentHandler.__init__ (self)
 		self.ourParser = parser
 		
 	def startDocument (self):
-		self.digest = md5()
+		self.digest = stringHasher()
 		
 	def startPrefixMapping (self, prefix, uri):
 		self.digest.update (prefix)
@@ -71,7 +89,7 @@ class XMLChecksumHandler (xml.sax.handler.ContentHandler, xml.sax.handler.DTDHan
 		self.digest.update (name)
 		
 	def characters (self, data):
-		self.digest.update (data)
+		self.digest.update (data.encode ('utf-8'))
 		
 	def processingInstruction (self, target, data):
 		self.digest.update (target)
@@ -93,10 +111,10 @@ class XMLChecksumHandler (xml.sax.handler.ContentHandler, xml.sax.handler.DTDHan
 		self.digest.update (ndata)
 		
 	def error (self, excpt):
-		print "Error: %s" % str (excpt)
+		print("Error: %s" % str (excpt))
 		
 	def warning (self, excpt):
-		print "Warning: %s" % str (excpt)
+		print("Warning: %s" % str (excpt))
 		
 	def getDigest (self):
 		return self.digest.hexdigest()
@@ -108,7 +126,7 @@ CHECKSUMPARSER.setDTDHandler (CHECKSUMHANDLER)
 CHECKSUMPARSER.setErrorHandler (CHECKSUMHANDLER)
 
 def getXMLChecksum (doc):
-	CHECKSUMPARSER.parse (StringIO.StringIO (doc))
+	CHECKSUMPARSER.parse (io.StringIO (doc))
 	return CHECKSUMHANDLER.getDigest()
 	
 class TALAttributesTestCases (unittest.TestCase):
@@ -118,21 +136,21 @@ class TALAttributesTestCases (unittest.TestCase):
 		self.context.addGlobal ('link', 'www.owlfish.com')
 		self.context.addGlobal ('needsQuoting', """Does "this" work?""")
 		self.context.addGlobal ('number', '5')
-		self.context.addGlobal ('uniQuote', u'Does "this" work?')
+		self.context.addGlobal ('uniQuote', 'Does "this" work?')
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileXMLTemplate (txt)
-		file = StringIO.StringIO ()
-		template.expand (self.context, file, outputEncoding="iso-8859-1")
+		file = io.StringIO ()
+		template.expand (self.context, file)
 		realResult = file.getvalue()
 		try:
 			expectedChecksum = getXMLChecksum (result)
-		except Exception, e:
+		except Exception as e:
 			self.fail ("Exception (%s) thrown parsing XML expected result: %s" % (str (e), result))
 		
 		try:
 			realChecksum = getXMLChecksum (realResult)
-		except Exception, e:
+		except Exception as e:
 			self.fail ("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s" % (str (e), realResult, str (template)))
 		
 		self.failUnless (expectedChecksum == realChecksum, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))

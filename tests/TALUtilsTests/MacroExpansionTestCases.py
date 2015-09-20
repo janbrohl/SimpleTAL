@@ -1,5 +1,5 @@
 #!/usr/bin/python
-"""		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
+"""		Copyright (c) 2009 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@
 """
 
 import unittest, os, codecs
-import StringIO
+import io
 import logging, logging.config
 
 from simpletal import simpleTALUtils, simpleTALES, simpleTAL
@@ -73,7 +73,7 @@ class MacroExpansionTestCases (unittest.TestCase):
 		template = simpleTAL.compileXMLTemplate (txt)
 		self._runTest_ (template
 						 ,txt
-						 ,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body metal:use-macro="mac/macros/one">World is <b metal:fill-slot="blue">Blue</b></body></html>'
+						 ,'<?xml version="1.0"?>\n<html><body metal:use-macro="mac/macros/one">World is <b metal:fill-slot="blue">Blue</b></body></html>'
 						 ,'Expasion with slots failed.')
 		
 if __name__ == '__main__':

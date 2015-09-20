@@ -1,5 +1,5 @@
 #!/usr/bin/python
-""" 	Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
+""" 	Copyright (c) 2009 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@
 """
 
 import unittest, os
-import StringIO
+import io
 import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
@@ -55,7 +55,7 @@ class METALNameSpaceTests (unittest.TestCase):
 		pageTemplate = simpleTAL.compileHTMLTemplate (page)
 		self.context.addGlobal ("site", macroTemplate)
 		self.context.addGlobal ("here", pageTemplate)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		pageTemplate.expand (self.context, file)
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in macro: %s \npage: %s\ngot back %s \nexpected %s\n" % (errMsg, macros, page, realResult, result))

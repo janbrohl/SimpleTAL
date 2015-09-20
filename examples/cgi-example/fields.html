@@ -8,13 +8,13 @@
     <h1 tal:content="title">Title</h1>
     <form action="simple-cgi.py">
     <div>
-    	Name: <input name="username" tal:attributes="value fieldValues/username"></input>
+    	Name: <input name="username" tal:attributes="value fieldValues/username">
     		<b tal:condition="missingFields/username">(Please fill in)</b><br>
     		
-    	Occupation: <input name="occupation" tal:attributes="value fieldValues/occupation"></input>
+    	Occupation: <input name="occupation" tal:attributes="value fieldValues/occupation">
     	  <b tal:condition="missingFields/occupation">(Please fill in)</b><br>
     		
-    	Age: <input name="age" tal:attributes="value fieldValues/age"></input><br>
+    	Age: <input name="age" tal:attributes="value fieldValues/age"><br>
     	
     </div>
     <input type="submit" name="submit" value="submit">

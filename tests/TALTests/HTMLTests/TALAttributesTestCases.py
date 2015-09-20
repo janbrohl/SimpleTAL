@@ -1,5 +1,5 @@
 #!/usr/bin/python
-"""		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
+"""		Copyright (c) 2009 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@
 """
 
 import unittest, os
-import StringIO
+import io
 import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
@@ -48,12 +48,12 @@ class TALAttributesTestCases (unittest.TestCase):
 		self.context.addGlobal ('link', 'www.owlfish.com')
 		self.context.addGlobal ('needsQuoting', """Does "this" work?""")
 		self.context.addGlobal ('number', 5)
-		self.context.addGlobal ('uniQuote', u'Does "this" work?')
+		self.context.addGlobal ('uniQuote', 'Does "this" work?')
 		self.context.addGlobal ('anotherdefault', {'inhere': simpleTALES.DEFAULTVALUE})
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileHTMLTemplate (txt)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))

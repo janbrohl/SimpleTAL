@@ -1,7 +1,7 @@
-simpleTAL / simpleTALES (Version 4.2)
+simpleTAL / simpleTALES (Version 5.0)
 -------------------------------------
-This is an implementation of the TAL and TALES specifications
-see (http://www.zope.org/Documentation/Books/ZopeBook/current/AppendixC.stx)
+This is an implementation of the TAL and TALES specifications for Python 3.1
+and higher.  
 
 Installation
 ------------
@@ -22,18 +22,14 @@ Notes
 This code is made freely available under a BSD style license, see 
 LICENSE.txt for more details.
 
-The DummyLogger.py module is used if you do not have either Python 2.3 
-or the logging code from
-http://www.red-dove.com/python_logging.html installed.
-
-Note that the unit test cases (under tests) require logging to be installed
-to run.
+The API of SimpleTAL 5.x is very similar to earlier releases, but is not 
+fully backwards compatible.
 
 Unit Tests
 ----------
-All unit tests can be run with the "runtests.py" command.  For all tests to
-pass the PyXML library must be installed.
+All unit tests can be run with the "runtests.py" command.
 
 Documentation
 -------------
 Documentation on the SimpleTAL API can be found in documentation/html/
+
