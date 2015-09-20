@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """ Copyright 2003 Colin Stewart (http://www.owlfish.com/)
 		
-		This code is made freely available for commerical and non-commerical use.
+		This code is made freely available for commercial and non-commercial use.
 		No warranties, expressed or implied, are made as to the fitness of this
 		code for any purpose.
 		
@@ -60,7 +60,8 @@ class TALContentTestCases (unittest.TestCase):
 	def testContentStructure (self):
 		# This test has specific needs - i.e. wrap the weblog/entry in a template...		
 		entry = """Some structure: <b tal:content="weblog/subject"></b>"""
-		weblog = {'subject': 'Test subject', 'entry': simpleTAL.compileHTMLTemplate(entry)}
+		entryTemplate = simpleTAL.compileHTMLTemplate(entry)
+		weblog = {'subject': 'Test subject', 'entry': entryTemplate}
 		self.context.addGlobal ('weblog', weblog)
 		
 		self._runTest_ ('<html><p tal:content="structure weblog/entry">Original</p></html>'

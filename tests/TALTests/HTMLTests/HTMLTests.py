@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """ Copyright 2003 Colin Stewart (http://www.owlfish.com/)
 		
-		This code is made freely available for commerical and non-commerical use.
+		This code is made freely available for commercial and non-commercial use.
 		No warranties, expressed or implied, are made as to the fitness of this
 		code for any purpose.
 		
@@ -15,7 +15,7 @@ import unittest, os
 import StringIO
 import logging
 
-import TALConditionTestCases,TALDefineTestCases,TALHandlerTestCases,TALContentTestCases,TALReplaceTestCases,TALRepeatTestCases,TALSpecialCharsTestCases,TALEncodingTestCases,TALAttributesTestCases,TALOmitTagTestCases,TALForbiddenEndTagTestCases
+import TALConditionTestCases,TALDefineTestCases,TALHandlerTestCases,TALContentTestCases,TALReplaceTestCases,TALRepeatTestCases,TALSpecialCharsTestCases,TALEncodingTestCases,TALAttributesTestCases,TALOmitTagTestCases,TALForbiddenEndTagTestCases,TALNameSpaceTests
 
 def getAllTests ():
 	allTestCases = unittest.TestSuite()
@@ -30,6 +30,7 @@ def getAllTests ():
 							,TALAttributesTestCases
 							,TALOmitTagTestCases
 							,TALForbiddenEndTagTestCases
+							,TALNameSpaceTests
 				   ]:
 		talesSuite = unittest.defaultTestLoader.loadTestsFromModule (mod)
 		allTestCases.addTest (talesSuite)

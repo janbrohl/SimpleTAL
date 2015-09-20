@@ -1,9 +1,9 @@
-simpleTAL / simpleTALES (Version 2.3)
+simpleTAL / simpleTALES (Version 3.0)
 -------------------------------------
 This is an implementation of the TAL and TALES specifications
 see (http://www.zope.org/Documentation/Books/ZopeBook/current/AppendixC.stx)
 
-This code is made freely available for commerical and non-commerical use. No
+This code is made freely available for commercial and non-commercial use. No
 warranties, expressed or implied, are made as to the fitness of this code
 for any purpose.
 

@@ -15,21 +15,20 @@ import unittest, os
 import StringIO
 import logging
 
-import PathTests, ExistsTests, NoCallTests, NotTests, StringTests
+import DefineMacroTests, DefineSlotsTests, METALNameSpaceTests
 
 def getAllTests ():
 	allTestCases = unittest.TestSuite()
-	for mod in [PathTests
-				   ,ExistsTests
-				   ,NoCallTests
-				   ,NotTests
-				   ,StringTests
-				   ]:
-		talesSuite = unittest.defaultTestLoader.loadTestsFromModule (mod)
-		allTestCases.addTest (talesSuite)
+	for mod in [DefineMacroTests
+						 ,DefineSlotsTests
+						 ,METALNameSpaceTests
+					   ]:
+		metalSuite = unittest.defaultTestLoader.loadTestsFromModule (mod)
+		allTestCases.addTest (metalSuite)
 	return allTestCases
 
 if __name__ == '__main__':
-	print "Running all TALES tests."
+	print "Running all METAL XML tests."
 	runner = unittest.TextTestRunner(verbosity='-v')
 	runner.run(getAllTests())
+

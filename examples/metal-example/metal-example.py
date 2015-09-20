@@ -9,11 +9,8 @@
 		
 		If you make any bug fixes or feature enhancements please let me know!
 		
-		As simple as it gets:
-				1 - Create a context
-				2 - Compile a template
-				3 - Expand the template
-		
+		An example of how to use METAL.
+				
 		Module Dependencies: simpleTAL, simpleTALES
 """
 
@@ -24,22 +21,21 @@ import sys
 context = simpleTALES.Context()
 
 # Add a string to the context under the variable title
-context.addGlobal ("title", "Colours of the rainbow")
+context.addGlobal ("title", "Simple METAL Example")
 
-# A list of strings
-colours = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"]
-# Add the list to the context under the variable rainbow
-context.addGlobal ("rainbow", colours)
-
-# Open the template file
-templateFile = open ("basic.html", 'r')
-
-# Compile a template
-template = simpleTAL.compileHTMLTemplate (templateFile)
-
-# Close the template file
+# Compile the macro pages
+templateFile = open ("macro.html", 'r')
+macros = simpleTAL.compileHTMLTemplate (templateFile)
 templateFile.close()
 
-# Expand the template as HTML using this context
-template.expand (context, sys.stdout)
+# Add the macros page to the Context
+context.addGlobal ("sitemacros", macros)
+
+# Now compile the page which will use the macros
+templateFile = open ("page.html", 'r')
+page = simpleTAL.compileHTMLTemplate (templateFile)
+templateFile.close()
+
+# Expand the page using this context
+page.expand (context, sys.stdout)
 

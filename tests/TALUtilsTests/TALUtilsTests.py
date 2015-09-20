@@ -15,21 +15,19 @@ import unittest, os
 import StringIO
 import logging
 
-import PathTests, ExistsTests, NoCallTests, NotTests, StringTests
+import HTMLStructureCleanerTestCases, MacroExpansionTestCases
 
 def getAllTests ():
 	allTestCases = unittest.TestSuite()
-	for mod in [PathTests
-				   ,ExistsTests
-				   ,NoCallTests
-				   ,NotTests
-				   ,StringTests
-				   ]:
-		talesSuite = unittest.defaultTestLoader.loadTestsFromModule (mod)
-		allTestCases.addTest (talesSuite)
+	for mod in [HTMLStructureCleanerTestCases
+						 ,MacroExpansionTestCases
+					   ]:
+		utilsSuite = unittest.defaultTestLoader.loadTestsFromModule (mod)
+		allTestCases.addTest (utilsSuite)
 	return allTestCases
 
 if __name__ == '__main__':
-	print "Running all TALES tests."
+	print "Running all Utils tests."
 	runner = unittest.TextTestRunner(verbosity='-v')
 	runner.run(getAllTests())
+

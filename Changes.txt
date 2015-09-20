@@ -1,5 +1,13 @@
-simpleTAL / simpleTALES (Version 2.3)
+simpleTAL / simpleTALES (Version 3.0)
 -------------------------------------
+
+Version 3.0
+-----------
+New features:
+  - METAL Support added
+  - The TAL and METAL name-spaces can now be bound to any prefix
+  - When using XML Templates any elements in the TAL or METAL name-space
+    have their start and end tags suppressed.
 
 Version 2.3
 -----------

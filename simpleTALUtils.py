@@ -2,7 +2,7 @@
 
 		Copyright 2003 Colin Stewart (http://www.owlfish.com/)
 		
-		This code is made freely available for commerical and non-commerical
+		This code is made freely available for commercial and non-commercial
 		use.  No warranties, expressed or implied, are made as to the
 		fitness of this code for any purpose.
 		
@@ -15,10 +15,12 @@
 		Module Dependencies: None
 """
 
-__version__ = "2.3"
+__version__ = "3.0"
 
 
 import StringIO, os, sys, codecs, sgmllib, cgi, re
+
+import simpleTAL
 
 # This is used to check for already escaped attributes.
 ESCAPED_TEXT_REGEX=re.compile (r"\&\S+?;")
@@ -82,4 +84,110 @@ def tagAsText (tag,atts):
 			result += ' %s="%s"' % (name, cgi.escape (value))
 	result += ">"
 	return result
+
+class MacroExpansionInterpreter (simpleTAL.TemplateInterpreter):
+	def __init__ (self):
+		simpleTAL.TemplateInterpreter.__init__ (self)
+		# Override the standard interpreter way of doing things.
+		self.macroStateStack = []
+		self.commandHandler [simpleTAL.TAL_DEFINE] = self.cmdNoOp
+		self.commandHandler [simpleTAL.TAL_CONDITION] = self.cmdNoOp
+		self.commandHandler [simpleTAL.TAL_REPEAT] = self.cmdNoOp
+		self.commandHandler [simpleTAL.TAL_CONTENT] = self.cmdNoOp
+		self.commandHandler [simpleTAL.TAL_ATTRIBUTES] = self.cmdNoOp
+		self.commandHandler [simpleTAL.TAL_OMITTAG] = self.cmdNoOp
+		self.commandHandler [simpleTAL.TAL_START_SCOPE] = self.cmdStartScope
+		self.commandHandler [simpleTAL.TAL_OUTPUT] = self.cmdOutput
+		self.commandHandler [simpleTAL.TAL_STARTTAG] = self.cmdOutputStartTag
+		self.commandHandler [simpleTAL.TAL_ENDTAG_ENDSCOPE] = self.cmdEndTagEndScope
+		self.commandHandler [simpleTAL.METAL_USE_MACRO] = self.cmdUseMacro
+		self.commandHandler [simpleTAL.METAL_DEFINE_SLOT] = self.cmdDefineSlot
+		self.commandHandler [simpleTAL.TAL_NOOP] = self.cmdNoOp
+		
+		self.inMacro = None
+		self.macroArg = None
+	# Original cmdOutput
+	# Original cmdEndTagEndScope
+		
+	def popProgram (self):
+		self.inMacro = self.macroStateStack.pop()
+		simpleTAL.TemplateInterpreter.popProgram (self)
+		
+	def pushProgram (self):
+		self.macroStateStack.append (self.inMacro)
+		simpleTAL.TemplateInterpreter.pushProgram (self)
+		
+	def cmdOutputStartTag (self, command, args):
+		newAtts = []
+		for att in self.originalAttributes:
+			if (self.macroArg is not None and att[0] == "metal:define-macro"):
+				newAtts.append (("metal:use-macro",self.macroArg))
+			elif (self.inMacro and att[0]=="metal:define-slot"):
+				newAtts.append (("metal:fill-slot", att[1]))
+			else:
+				newAtts.append (att)
+		self.macroArg = None
+		self.currentAttributes = newAtts
+		simpleTAL.TemplateInterpreter.cmdOutputStartTag (self, command, args)
+		
+	def cmdUseMacro (self, command, args):
+		simpleTAL.TemplateInterpreter.cmdUseMacro (self, command, args)
+		if (self.tagContent is not None):
+			# We have a macro, add the args to the in-macro list
+			self.inMacro = 1
+			self.macroArg = args[0]
+			
+	def cmdEndTagEndScope (self, command, args):
+		# Args: tagName, omitFlag
+		if (self.tagContent is not None):
+			contentType, resultVal = self.tagContent
+			if (contentType):
+				if (isinstance (resultVal, simpleTAL.Template)):
+					# We have another template in the context, evaluate it!
+					# Save our state!
+					self.pushProgram()
+					resultVal.expandInline (self.context, self.file, self)
+					# Restore state
+					self.popProgram()
+					# End of the macro expansion (if any) so clear the parameters
+					self.slotParameters = {}
+					# End of the macro
+					self.inMacro = 0
+				else:
+					if (type (resultVal) == type (u"")):
+						self.file.write (resultVal)
+					elif (type (resultVal) == type ("")):
+						self.file.write (unicode (resultVal, 'ascii'))
+					else:
+						self.file.write (unicode (str (resultVal), 'ascii'))
+			else:
+				if (type (resultVal) == type (u"")):
+					self.file.write (cgi.escape (resultVal))
+				elif (type (resultVal) == type ("")):
+					self.file.write (cgi.escape (unicode (resultVal, 'ascii')))
+				else:
+					self.file.write (cgi.escape (unicode (str (resultVal), 'ascii')))
+					
+		if (self.outputTag and not args[1]):
+			self.file.write ('</' + args[0] + '>')
+		
+		if (self.movePCBack is not None):
+			self.programCounter = self.movePCBack
+			return
+			
+		if (self.localVarsDefined):
+			self.context.popLocals()
+			
+		self.movePCForward,self.movePCBack,self.outputTag,self.originalAttributes,self.currentAttributes,self.repeatVariable,self.repeatIndex,self.repeatSequence,self.tagContent,self.localVarsDefined = self.scopeStack.pop()			
+		self.programCounter += 1
+			
+def ExpandMacros (context, template, outputEncoding="ISO8859-1"):
+	out = StringIO.StringIO()
+	interp = MacroExpansionInterpreter()
+	interp.initialise (context, out)
+	template.expand (context, out, outputEncoding, interp)
+	# StringIO returns unicode, so we need to turn it back into native string
+	result = out.getvalue()
+	reencoder = codecs.lookup (outputEncoding)[0]
+	return reencoder (result)[0]
 

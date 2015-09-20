@@ -2,12 +2,11 @@
 
 		Copyright 2003 Colin Stewart (http://www.owlfish.com/)
 		
-		This code is made freely available for commerical and non-commerical
+		This code is made freely available for commercial and non-commercial
 		use.  No warranties, expressed or implied, are made as to the
 		fitness of this code for any purpose.
 		
-		If you make any bug fixes or feature enhancements please let me
-		know!
+		If you make any bug fixes or feature enhancements please let me know!
 		
 		The classes in this module implement the TALES specification, used
 		by the simpleTAL module.
@@ -15,7 +14,7 @@
 		Module Dependencies: logging
 """
 
-__version__ = "2.3"
+__version__ = "3.0"
 
 import copy, string
 
