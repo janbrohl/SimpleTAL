@@ -1,5 +1,5 @@
 #!/usr/bin/python
-"""		Copyright (c) 2003 Colin Stewart (http://www.owlfish.com/)
+"""		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -52,9 +52,10 @@ class TALRepeatTestCases (unittest.TestCase):
 		self.context.addGlobal ('bigList', range (1,100))
 		self.context.addGlobal ('fourList', ["zero", "one", "two", "three"])
 		self.context.addGlobal ('nested', [{'title': 'Image 1', 'catList': [1,2,3]}
-												  ,{'title': 'Image 2', 'catList': [5,2,3]}
-												  ,{'title': 'Image 3', 'catList': [8,9,1]}
-												  ])
+										  ,{'title': 'Image 2', 'catList': [5,2,3], 'selected': simpleTALES.DefaultVariable()}
+										  ,{'title': 'Image 3', 'catList': [8,9,1]}
+										  ])
+		self.context.addGlobal ('defList', ["Hello", simpleTALES.DefaultVariable(), "World"])
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileHTMLTemplate (txt)
@@ -87,9 +88,24 @@ class TALRepeatTestCases (unittest.TestCase):
 		
 	def testTwoCmndsOneTagListRepeat (self):
 		self._runTest_ ('<html><p tal:repeat="word two" tal:content="word"></p></html>'
-									 ,'<html><p>one</p><p>two</p></html>'
-									 ,'Itteration over list with both content and repeat on same element failed.')
-		
+						 ,'<html><p>one</p><p>two</p></html>'
+						 ,'Itteration over list with both content and repeat on same element failed.')
+
+	def testAttributesInRepeat (self):
+		self._runTest_ ('<html><p tal:repeat="words nested" tal:content="words/title" tal:attributes="selected words/selected" selected></p></html>'
+						 ,'<html><p>Image 1</p><p selected="">Image 2</p><p>Image 3</p></html>'
+						 ,'Accessing attributes in repeat loop failed.')
+						 
+	def testDefaultInContentInRepeat (self):
+		self._runTest_ ('<html><p tal:repeat="words defList" tal:content="words">Default Word</p></html>'
+						 ,'<html><p>Hello</p><p>Default Word</p><p>World</p></html>'
+						 ,'Using default content in repeat loop failed.')
+						 
+	def testDefaultInReplaceInRepeat (self):
+		self._runTest_ ('<html><p tal:repeat="words defList" tal:replace="words">Default Word</p></html>'
+						 ,'<html>Hello<p>Default Word</p>World</html>'
+						 ,'Using default content in repeat loop failed.')
+
 	def testNestedRepeat (self):
 		self._runTest_ ('<html><p tal:repeat="image nested"><h2 tal:content="image/title"></h2><b tal:omit-tag tal:repeat="category image/catList"><i tal:content="category"></i></b></p></html>'
 					   ,'<html><p><h2>Image 1</h2><i>1</i><i>2</i><i>3</i></p><p><h2>Image 2</h2><i>5</i><i>2</i><i>3</i></p><p><h2>Image 3</h2><i>8</i><i>9</i><i>1</i></p></html>'

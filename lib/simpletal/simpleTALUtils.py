@@ -1,6 +1,6 @@
 """ simpleTALUtils
 
-		Copyright (c) 2003 Colin Stewart (http://www.owlfish.com/)
+		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without

@@ -1,5 +1,5 @@
 #!/usr/bin/python
-"""		Copyright (c) 2003 Colin Stewart (http://www.owlfish.com/)
+"""		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -36,10 +36,79 @@ import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
 
+import xml.sax, xml.sax.handler, md5
+
 if (os.path.exists ("logging.ini")):
 	logging.config.fileConfig ("logging.ini")
 else:
 	logging.basicConfig()
+	
+class XMLChecksumHandler (xml.sax.handler.ContentHandler, xml.sax.handler.DTDHandler, xml.sax.handler.ErrorHandler):
+	def __init__ (self, parser):
+		xml.sax.handler.ContentHandler.__init__ (self)
+		self.ourParser = parser
+		
+	def startDocument (self):
+		self.digest = md5.new()
+		
+	def startPrefixMapping (self, prefix, uri):
+		self.digest.update (prefix)
+		self.digest.update (uri)
+		
+	def endPrefixMapping (self, prefix):
+		self.digest.update (prefix)
+		
+	def startElement (self, name, atts):
+		self.digest.update (name)
+		allAtts = atts.getNames()
+		allAtts.sort()
+		for att in allAtts:
+			self.digest.update (att)
+			self.digest.update (atts [att])
+			
+	def endElement (self, name):
+		self.digest.update (name)
+		
+	def characters (self, data):
+		self.digest.update (data)
+		
+	def processingInstruction (self, target, data):
+		self.digest.update (target)
+		self.digest.update (data)
+		
+	def skippedEntity (self, name):
+		self.digest.update (name)
+		
+	# DTD Handler
+	def notationDecl(self, name, publicId, systemId):
+		self.digest.update (name)
+		self.digest.update (publicId)
+		self.digest.update (systemId)
+		
+	def unparsedEntityDecl(name, publicId, systemId, ndata):
+		self.digest.update (name)
+		self.digest.update (publicId)
+		self.digest.update (systemId)
+		self.digest.update (ndata)
+		
+	def error (self, excpt):
+		print "Error: %s" % str (excpt)
+		
+	def warning (self, excpt):
+		print "Warning: %s" % str (excpt)
+		
+	def getDigest (self):
+		return self.digest.hexdigest()
+
+CHECKSUMPARSER = xml.sax.make_parser()
+CHECKSUMHANDLER = XMLChecksumHandler(CHECKSUMPARSER)
+CHECKSUMPARSER.setContentHandler (CHECKSUMHANDLER)
+CHECKSUMPARSER.setDTDHandler (CHECKSUMHANDLER)
+CHECKSUMPARSER.setErrorHandler (CHECKSUMHANDLER)
+
+def getXMLChecksum (doc):
+	CHECKSUMPARSER.parse (StringIO.StringIO (doc))
+	return CHECKSUMHANDLER.getDigest()
 	
 class TALAttributesTestCases (unittest.TestCase):
 	def setUp (self):
@@ -55,7 +124,17 @@ class TALAttributesTestCases (unittest.TestCase):
 		file = StringIO.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
-		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		try:
+			expectedChecksum = getXMLChecksum (result)
+		except Exception, e:
+			self.fail ("Exception (%s) thrown parsing XML expected result: %s" % (str (e), result))
+		
+		try:
+			realChecksum = getXMLChecksum (realResult)
+		except Exception, e:
+			self.fail ("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s" % (str (e), realResult, str (template)))
+		
+		self.failUnless (expectedChecksum == realChecksum, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 						
 	def testAddingAnAttribute (self):
 		self._runTest_ ('<html tal:attributes="link link" href="owlfish.com">Hello</html>'

@@ -1,6 +1,6 @@
 """ simpleTALES Implementation
 
-		Copyright (c) 2003 Colin Stewart (http://www.owlfish.com/)
+		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -308,13 +308,17 @@ class Context:
 		self.false = ContextVariable (0)
 		self.pythonPathFuncs = PythonPathFunctions (self)
 		
-	def addRepeat (self, name, var):
+	def addRepeat (self, name, var, initialValue):
 		# Pop the current repeat map onto the stack
 		self.repeatStack.append (self.repeatMap)
 		self.repeatMap = copy.copy (self.repeatMap)
 		self.repeatMap [name] = var
 		# Map this repeatMap into the global space
 		self.addGlobal ('repeat', self.repeatMap)
+		
+		# Add in the locals
+		self.pushLocals()
+		self.setLocal (name, initialValue)
 		
 	def removeRepeat (self, name):
 		# Bring the old repeat map back
@@ -328,15 +332,10 @@ class Context:
 		else:
 			self.globals[name] = ContextVariable (value)
 		
-	def addLocals (self, localVarList):
-		# Pop the current locals onto the stack
+	def pushLocals (self):
+		# Push the current locals onto a stack so that we can safely over-ride them.
 		self.localStack.append (self.locals)
 		self.locals = copy.copy (self.locals)
-		for name,value in localVarList:
-			if (isinstance (value, ContextVariable)):
-				self.locals [name] = value
-			else:
-				self.locals [name] = ContextVariable (value)
 				
 	def setLocal (self, name, value):
 		# Override the current local if present with the new one

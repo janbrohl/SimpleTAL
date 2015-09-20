@@ -1,5 +1,5 @@
 #!/usr/bin/python
-"""		Copyright (c) 2003 Colin Stewart (http://www.owlfish.com/)
+"""		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -69,7 +69,7 @@ class MacroExpansionTestCases (unittest.TestCase):
 									 ,'Expasion with slots failed.')
 									 
 	def testXMLMacroExpansionSlots (self):
-		txt = '<?xml version="1.0" encoding="utf8"?>\n<html><div metal:use-macro="mac/macros/one">Hello<b metal:fill-slot="blue">Blue</b></div></html>'
+		txt = '<?xml version="1.0" encoding="utf-8"?>\n<html><div metal:use-macro="mac/macros/one">Hello<b metal:fill-slot="blue">Blue</b></div></html>'
 		template = simpleTAL.compileXMLTemplate (txt)
 		self._runTest_ (template
 						 ,txt

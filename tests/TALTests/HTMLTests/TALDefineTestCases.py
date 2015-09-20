@@ -1,5 +1,5 @@
 #!/usr/bin/python
-""" 	Copyright (c) 2003 Colin Stewart (http://www.owlfish.com/)
+""" 	Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -91,7 +91,10 @@ class TALDefineTestCases (unittest.TestCase):
 		self._runTest_ ('<html><div tal:define="firstVar test;global secondVar string:This is a semi;;colon;thirdVar string:Test"><p tal:content="test">Testing</p><p tal:content="secondVar"></p><p tal:content="thirdVar"></p></div><b tal:content="secondVar"></b></html>'
 						, '<html><div><p>testing</p><p>This is a semi;colon</p><p>Test</p></div><b>This is a semi;colon</b></html>', 'Multiple defines failed.')
 
-		
+	def testDefineMultipleLocalRef (self):
+		self._runTest_ ('<html><div tal:define="firstVar test;secondVar firstVar"><p tal:content="test">Testing</p><p tal:content="secondVar"></p></div></html>'
+						, '<html><div><p>testing</p><p>testing</p></div></html>', 'Multiple local defines with references to earlier define failed.')
+			
 if __name__ == '__main__':
 	unittest.main()
 

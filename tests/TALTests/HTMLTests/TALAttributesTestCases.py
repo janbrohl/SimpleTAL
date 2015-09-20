@@ -1,5 +1,5 @@
 #!/usr/bin/python
-"""		Copyright (c) 2003 Colin Stewart (http://www.owlfish.com/)
+"""		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -49,6 +49,7 @@ class TALAttributesTestCases (unittest.TestCase):
 		self.context.addGlobal ('needsQuoting', """Does "this" work?""")
 		self.context.addGlobal ('number', 5)
 		self.context.addGlobal ('uniQuote', u'Does "this" work?')
+		self.context.addGlobal ('anotherdefault', {'inhere': simpleTALES.DefaultVariable()})
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileHTMLTemplate (txt)
@@ -69,6 +70,11 @@ class TALAttributesTestCases (unittest.TestCase):
 						
 	def testDefaultAttribute (self):
 		self._runTest_ ('<html class="test" tal:attributes="href default" href="owlfish.com">Hello</html>'
+										,'<html class="test" href="owlfish.com">Hello</html>'
+										,"Defaulting of attribute 'href' failed.")
+										
+	def testAnotherDefaultAttribute (self):
+		self._runTest_ ('<html class="test" tal:attributes="href anotherdefault/inhere" href="owlfish.com">Hello</html>'
 										,'<html class="test" href="owlfish.com">Hello</html>'
 										,"Defaulting of attribute 'href' failed.")
 

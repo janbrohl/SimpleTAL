@@ -1,5 +1,5 @@
 #!/usr/bin/python
-"""		Copyright (c) 2003 Colin Stewart (http://www.owlfish.com/)
+"""		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -51,6 +51,7 @@ class TALEncodingTestCases (unittest.TestCase):
 		self.context.addGlobal ('one', [1])
 		self.context.addGlobal ('two', ["one", "two"])
 		self.context.addGlobal ('three', [1,"Two",3])
+		self.context.addGlobal ('badascii', 'This costs nothing, yep £0')
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileHTMLTemplate (txt)
@@ -83,6 +84,14 @@ class TALEncodingTestCases (unittest.TestCase):
 		result = file.getvalue()
 		expectedResult = "<html>£3.12?  This cost nothing, yep £0!</html>"
 		self.failUnless (result == expectedResult, "UTF8 -> ISO Encoding failed.  \nResult was: " + result + "\nExpected result: " + expectedResult)
+	
+#	def testBadAscii (self):
+#		template = simpleTAL.compileHTMLTemplate ('<html><p tal:replace="badascii"></p></html>')
+#		file = StringIO.StringIO()
+#		template.expand (self.context, file, 'iso-8859-1')
+#		result = file.getvalue()
+#		expectedResult = "<html>£3.12?  This cost nothing, yep £0!</html>"
+#		self.failUnless (result == expectedResult, "ISO Encoding failed.  \nResult was: " + result + "\nExpected result: " + expectedResult)
 		
 if __name__ == '__main__':
 	unittest.main()

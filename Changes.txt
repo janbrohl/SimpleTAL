@@ -1,5 +1,19 @@
-simpleTAL / simpleTALES (Version 3.6)
+simpleTAL / simpleTALES (Version 3.7)
 -------------------------------------
+
+Version 3.7
+-----------
+New features:
+  - When non-ascii, non-Unicode strings are present in the Context a Unicode
+    error is thrown.  Now an ERROR log message indicates that this is the most
+    likely cause of the problem.
+    
+Bug fixes:
+  - Correction to cgi-example (thanks to Frank Wierzbicki for the patch).
+  - Local defines that reference earlier local defines on one tag now work.
+  - Using default values in a repeat list now work as expected.
+  - Errors during codec conversions will now use 'replace' rather than 'strict'
+  
 
 Version 3.6
 -----------

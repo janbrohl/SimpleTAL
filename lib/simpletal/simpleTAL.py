@@ -1,6 +1,6 @@
 """ simpleTAL Interpreter
 
-		Copyright (c) 2003 Colin Stewart (http://www.owlfish.com/)
+		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@ except:
 	import DummyLogger as logging
 	
 import sgmllib, xml.sax, cgi, StringIO, codecs, re, htmlentitydefs
-import simpletal
+import simpletal, copy
 
 __version__ = simpletal.__version__
 
@@ -203,16 +203,17 @@ class TemplateInterpreter:
 		""" args: [(isLocalFlag (Y/n), variableName, variablePath),...]
 				Define variables in either the local or global context
 		"""
-		localVarList = []
+		foundLocals = 0
 		for isLocal, varName, varPath in args:
 			result = self.context.evaluate (varPath, self.originalAttributes)
 			if (isLocal):
-				localVarList.append ((varName, result.value()))
+				if (not foundLocals):
+					foundLocals = 1
+					self.context.pushLocals ()
+				self.context.setLocal (varName, result.value())
 			else:
 				self.context.addGlobal (varName, result.value())
-		if (len (localVarList) > 0):
-			self.localVarsDefined = 1
-			self.context.addLocals (localVarList)
+		self.localVarsDefined = foundLocals
 		self.programCounter += 1
 		
 	def cmdCondition (self, command, args):
@@ -235,11 +236,17 @@ class TemplateInterpreter:
 		"""		
 		if (self.repeatVariable is not None):
 			# We are already part way through a repeat
+			# Restore any attributes that might have been changed.
+			self.currentAttributes = copy.copy (self.repeatAttributesCopy)
+			self.outputTag = 1
+			self.tagContent = None
+			self.movePCForward = None
 			self.repeatIndex += 1
 			if (self.repeatIndex == len (self.repeatSequence)):
 				# We have finished the repeat
 				self.repeatVariable = None
 				self.context.removeRepeat (args[0])
+				# The locals were pushed in context.addRepeat
 				self.context.popLocals()
 				self.movePCBack = None
 				# Suppress the final close tag and content
@@ -268,8 +275,9 @@ class TemplateInterpreter:
 		self.repeatSequence = result.value()
 		self.movePCBack = self.programCounter
 		self.repeatVariable = simpleTALES.RepeatVariable (self.repeatSequence)
-		self.context.addRepeat (args[0], self.repeatVariable)
-		self.context.addLocals ([(args[0], self.repeatSequence[self.repeatIndex])])
+		self.context.addRepeat (args[0], self.repeatVariable, self.repeatSequence[self.repeatIndex])
+		# Keep a copy of the current attributes for this tag
+		self.repeatAttributesCopy = copy.copy (self.currentAttributes)
 		self.programCounter += 1
 	
 	def cmdContent (self, command, args):
@@ -524,8 +532,12 @@ class Template:
 			ourInterpreter.initialise (context, outputFile)
 		else:
 			ourInterpreter = interpreter
-		ourInterpreter.execute (self)
-
+		try:
+			ourInterpreter.execute (self)
+		except UnicodeError, unierror:
+			logging.error ("UnicodeError most likely caused by placing a non-Unicode string in the Context object.")
+			raise unierror
+			
 	def getProgram (self):
 		""" Returns a tuple of (commandList, startPoint, endPoint, symbolTable) """
 		return (self.commandList, 0, len (self.commandList), self.symbolTable)
@@ -592,7 +604,7 @@ class HTMLTemplate (Template):
 		# This method must wrap outputFile if required by the encoding, and write out
 		# any template pre-amble (DTD, Encoding, etc)
 		
-		encodingFile = codecs.lookup (outputEncoding)[3](outputFile)
+		encodingFile = codecs.lookup (outputEncoding)[3](outputFile, 'replace')
 		self.expandInline (context, encodingFile, interpreter)
 		
 class XMLTemplate (Template):
@@ -612,7 +624,7 @@ class XMLTemplate (Template):
 		# any template pre-amble (DTD, Encoding, etc)
 		
 		# Write out the XML prolog
-		encodingFile = codecs.lookup (outputEncoding)[3](outputFile)
+		encodingFile = codecs.lookup (outputEncoding)[3](outputFile, 'replace')
 		if (not suppressXMLDeclaration):
 			if (outputEncoding.lower() != "utf-8"):
 				encodingFile.write ('<?xml version="1.0" encoding="%s"?>\n' % outputEncoding.lower())
@@ -1229,7 +1241,7 @@ class HTMLTemplateCompiler (TemplateCompiler, sgmllib.SGMLParser):
 		self.log = logging.getLogger ("simpleTAL.HTMLTemplateCompiler")
 		
 	def parseTemplate (self, file, encoding="iso-8859-1"):
-		encodedFile = codecs.lookup (encoding)[2](file)
+		encodedFile = codecs.lookup (encoding)[2](file, 'replace')
 		self.encoding = encoding
 		self.feed (encodedFile.read())
 		self.close()
