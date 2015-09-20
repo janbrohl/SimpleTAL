@@ -28,7 +28,7 @@
 		Performance test cases.
 		
 """
-from simpletal import simpleTAL, simpleTALES
+from simpletal import simpleTAL, simpleTALES, simpleTALUtils
 
 import time, StringIO, cStringIO, sys
 
@@ -125,7 +125,7 @@ def NGTemplates (count):
 	compiler = simpleTAL.HTMLTemplateCompiler()
 	compiler.parseTemplate (tempFile)
 	template = compiler.getTemplate()
-	file = StringIO.StringIO ()
+	file = simpleTALUtils.FastStringOutput()
 	start = time.clock()
 	for attempt in xrange (count):
 		template.expand (context, file)
@@ -134,7 +134,7 @@ def NGTemplates (count):
 	return (end - start)
 	
 def NGTemplateOverhead (count):
-	file = StringIO.StringIO ()
+	file = simpleTALUtils.FastStringOutput()
 	start = time.clock()
 	for attempt in xrange (count):
 		tempFile = StringIO.StringIO (performanceTemplate)

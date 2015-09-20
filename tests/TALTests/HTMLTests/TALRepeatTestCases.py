@@ -52,10 +52,10 @@ class TALRepeatTestCases (unittest.TestCase):
 		self.context.addGlobal ('bigList', range (1,100))
 		self.context.addGlobal ('fourList', ["zero", "one", "two", "three"])
 		self.context.addGlobal ('nested', [{'title': 'Image 1', 'catList': [1,2,3]}
-										  ,{'title': 'Image 2', 'catList': [5,2,3], 'selected': simpleTALES.DefaultVariable()}
+										  ,{'title': 'Image 2', 'catList': [5,2,3], 'selected': simpleTALES.DEFAULTVALUE}
 										  ,{'title': 'Image 3', 'catList': [8,9,1]}
 										  ])
-		self.context.addGlobal ('defList', ["Hello", simpleTALES.DefaultVariable(), "World"])
+		self.context.addGlobal ('defList', ["Hello", simpleTALES.DEFAULTVALUE, "World"])
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileHTMLTemplate (txt)
@@ -79,9 +79,9 @@ class TALRepeatTestCases (unittest.TestCase):
 	
 	def testEmptyList (self):
 		self._runTest_ ('<html><p tal:repeat="short emptyList"><b tal:replace="short">Empty</b></p></html>'
-									,'<html></html>'
-									,'Empty list repeat failed.'
-									)
+								,'<html></html>'
+								,'Empty list repeat failed.'
+								)
 		
 	def testListRepeat (self):
 		self._runTest_ ('<html><p tal:repeat="word two"><b tal:replace="word"></b></p></html>', '<html><p>one</p><p>two</p></html>', 'Itteration over list failed.')

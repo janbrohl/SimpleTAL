@@ -1,4 +1,4 @@
-SimpleTAL 3.8
+SimpleTAL 3.9
 --------------------------------------------------------------------
 Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
 All rights reserved.

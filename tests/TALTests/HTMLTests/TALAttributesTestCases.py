@@ -49,7 +49,7 @@ class TALAttributesTestCases (unittest.TestCase):
 		self.context.addGlobal ('needsQuoting', """Does "this" work?""")
 		self.context.addGlobal ('number', 5)
 		self.context.addGlobal ('uniQuote', u'Does "this" work?')
-		self.context.addGlobal ('anotherdefault', {'inhere': simpleTALES.DefaultVariable()})
+		self.context.addGlobal ('anotherdefault', {'inhere': simpleTALES.DEFAULTVALUE})
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileHTMLTemplate (txt)

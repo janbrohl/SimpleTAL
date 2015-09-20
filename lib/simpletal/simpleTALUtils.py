@@ -90,6 +90,20 @@ class HTMLStructureCleaner (sgmllib.SGMLParser):
 	def handle_entityref (self, ref):
 		self.outputFile.write (u'&%s;' % ref)
 		
+
+class FastStringOutput:
+	""" A very simple StringIO replacement that only provides write() and getvalue()
+		and is around 6% faster than StringIO.
+	"""
+	def __init__ (self):
+		self.data = []
+		
+	def write (self, data):
+		self.data.append (data)
+		
+	def getvalue (self):
+		return "".join (self.data)
+
 class TemplateCache:
 	""" A TemplateCache is a multi-thread safe object that caches compiled templates.
 			This cache only works with file based templates, the ctime of the file is 

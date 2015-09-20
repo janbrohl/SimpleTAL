@@ -210,9 +210,9 @@ class TemplateInterpreter:
 				if (not foundLocals):
 					foundLocals = 1
 					self.context.pushLocals ()
-				self.context.setLocal (varName, result.value())
+				self.context.setLocal (varName, result)
 			else:
-				self.context.addGlobal (varName, result.value())
+				self.context.addGlobal (varName, result)
 		self.localVarsDefined = foundLocals
 		self.programCounter += 1
 		
@@ -222,7 +222,19 @@ class TemplateInterpreter:
 				by it.
 		"""
 		result = self.context.evaluate (args[0], self.originalAttributes)
-		if (result is None or not result.isTrue()):
+		#~ if (result is None or (not result)):
+		conditionFalse = 0
+		if (result is None):
+			conditionFalse = 1
+		else:
+			if (not result): conditionFalse = 1
+			try:
+				temp = len (result)
+				if (temp == 0): conditionFalse = 1
+			except:
+				# Result is not a sequence.
+				pass
+		if (conditionFalse):
 			# Nothing to output - evaluated to false.
 			self.outputTag = 0
 			self.tagContent = None
@@ -237,7 +249,8 @@ class TemplateInterpreter:
 		if (self.repeatVariable is not None):
 			# We are already part way through a repeat
 			# Restore any attributes that might have been changed.
-			self.currentAttributes = copy.copy (self.repeatAttributesCopy)
+			if (self.currentAttributes != self.repeatAttributesCopy):
+				self.currentAttributes = copy.copy (self.repeatAttributesCopy)
 			self.outputTag = 1
 			self.tagContent = None
 			self.movePCForward = None
@@ -261,18 +274,22 @@ class TemplateInterpreter:
 		
 		# The first time through this command
 		result = self.context.evaluate (args[1], self.originalAttributes)
-		if (result is not None and result.isDefault()):
+		if (result is not None and result == simpleTALES.DEFAULTVALUE):
 			# Leave everything un-touched.
 			self.programCounter += 1
 			return
-		if (result is None or result.isNothing() or not result.isSequence()):
+		try:
+			isSequence = len (result)
+		except:
+			isSequence = 0
+		if (result is None or not isSequence):
 			# Delete the tags and their contents
 			self.outputTag = 0
 			self.programCounter = self.symbolTable [args[2]]
 			return
 		
 		# We really do want to repeat - so lets do it
-		self.repeatSequence = result.value()
+		self.repeatSequence = result
 		self.movePCBack = self.programCounter
 		self.repeatVariable = simpleTALES.RepeatVariable (self.repeatSequence)
 		self.context.addRepeat (args[0], self.repeatVariable, self.repeatSequence[self.repeatIndex])
@@ -285,7 +302,7 @@ class TemplateInterpreter:
 				Expands content
 		"""		
 		result = self.context.evaluate (args[2], self.originalAttributes)
-		if (result is None or result.isNothing()):
+		if (result is None):
 			if (args[0]):
 				# Only output tags if this is a content not a replace
 				self.outputTag = 0
@@ -293,11 +310,11 @@ class TemplateInterpreter:
 			self.movePCForward = self.symbolTable [args[3]]
 			self.programCounter += 1
 			return
-		elif (not result.isDefault()):
+		elif (not result == simpleTALES.DEFAULTVALUE):
 			# We have content, so let's suppress the natural content and output this!
 			if (args[0]):
 				self.outputTag = 0
-			self.tagContent = (args[1], result.value())
+			self.tagContent = (args[1], result)
 			self.movePCForward = self.symbolTable [args[3]]
 			self.programCounter += 1
 			return
@@ -313,14 +330,13 @@ class TemplateInterpreter:
 		attsToRemove = {}
 		newAtts = []
 		for attName, attExpr in args:
-			result = self.context.evaluate (attExpr, self.originalAttributes)
-			if (result is None or result.isNothing()):
+			resultVal = self.context.evaluate (attExpr, self.originalAttributes)
+			if (resultVal is None):
 				# Remove this attribute from the current attributes
 				attsToRemove [attName]=1
-			elif (not result.isDefault()):
+			elif (not resultVal == simpleTALES.DEFAULTVALUE):
 				# We have a value - let's use it!
 				attsToRemove [attName]=1
-				resultVal = result.value()
 				if (type (resultVal) == type (u"")):
 					if (not self.escapeAttributes):
 						# XML will get escaped automatically, HTML will not...
@@ -354,7 +370,7 @@ class TemplateInterpreter:
 				Conditionally turn off tag output
 		"""
 		result = self.context.evaluate (args, self.originalAttributes)
-		if (result is not None and result.isTrue()):
+		if (result is not None and result):
 			# Turn tag output off
 			self.outputTag = 0
 		self.programCounter += 1
@@ -458,16 +474,15 @@ class TemplateInterpreter:
 				Evaluates the expression, if it resolves to a SubTemplate it then places
 				the slotParams into currentSlots and then jumps to the end tag
 		"""
-		result = self.context.evaluate (args[0], self.originalAttributes)
-		if (result is None or result.isNothing()):
+		value = self.context.evaluate (args[0], self.originalAttributes)
+		if (value is None):
 			# Don't output anything
 			self.outputTag = 0
 			# Output none of our content or the existing content
 			self.movePCForward = self.symbolTable [args[2]]
 			self.programCounter += 1
 			return
-		value = result.value()
-		if (not result.isDefault() and isinstance (value, SubTemplate)):
+		if (not value == simpleTALES.DEFAULTVALUE and isinstance (value, SubTemplate)):
 			# We have a macro, so let's use it
 			self.outputTag = 0
 			self.slotParameters = args[1]

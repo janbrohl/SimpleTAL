@@ -1,5 +1,31 @@
-simpleTAL / simpleTALES (Version 3.8)
+simpleTAL / simpleTALES (Version 3.9)
 -------------------------------------
+
+Version 3.9
+-----------
+This is release is focused on improving performance.  Compared to version 3.8
+the performance of expanding templates is ~45-70% faster.  The performance of parsing
+templates is unchanged.
+
+WARNING: IF you rely on the internal workings of SimpleTALES in your application then
+there will be changes that are required to make use of this version of SimpleTAL.  The API
+for SimpleTAL is however unchanged.
+
+New features:
+  - Introduced simpleTALUtils.FastStringOutput which can be used to capture the 
+    output of SimpleTAL in a faster manner than StringIO.
+  - Introduced simpleTALES.CachedFuncResult which can be used to wrap functions in
+    the Context, and which cache's the result of the function call to ensure that
+	the function is only called once during template expansion.
+  - TALES no longer wraps all results in ContextVariable instances when returning
+    values to TAL.
+  - Changed copy.copy to {}.copy for performance improvement.
+  - Removed logging.debug() calls from performance critical paths.
+  - Replaced DefaultVariable class with simpleTALES.DEFAULTVALUE
+  - Replaced NothingVariable class with None
+  - Removed NoCallVariable
+  - Removed isDefault, isNothing, isSequence, isCallable, and isTrue from ContextVariable.
+  
 
 Version 3.8
 -----------

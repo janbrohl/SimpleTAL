@@ -117,9 +117,9 @@ class TALRepeatTestCases (unittest.TestCase):
 								   )
 	def testRepeatVarEvenOdd (self):
 		self._runTest_ ('<html><p tal:repeat="var fourList"><i tal:replace="var"></i> - <b tal:condition="repeat/var/odd">Odd</b><b tal:condition="repeat/var/even">Even</b></p></html>'
-								   ,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p>zero - <b>Even</b></p><p>one - <b>Odd</b></p><p>two - <b>Even</b></p><p>three - <b>Odd</b></p></html>'
-								   ,'Repeat variables odd and even failed.'
-								   )
+					   ,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p>zero - <b>Even</b></p><p>one - <b>Odd</b></p><p>two - <b>Even</b></p><p>three - <b>Odd</b></p></html>'
+					   ,'Repeat variables odd and even failed.'
+					   )
 
 	def testRepeatVarStartEnd (self):
 		self._runTest_ ('<html><p tal:repeat="var fourList"><b tal:condition="repeat/var/start">Start</b><i tal:replace="var"></i><b tal:condition="repeat/var/end">End</b></p></html>'

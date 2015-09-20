@@ -99,7 +99,7 @@ macTemplate = simpleTAL.compileHTMLTemplate (macroTemplate)
 context.addGlobal ("macTemp", macTemplate)
 
 def METALTime (count, template):
-	file = StringIO.StringIO ()
+	file = simpleTALUtils.FastStringOutput()
 	start = time.clock()
 	for attempt in xrange (count):
 		template.expand (context, file)

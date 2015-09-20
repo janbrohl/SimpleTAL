@@ -50,15 +50,25 @@ def nestedFunction ():
 def pathFunction (thePath):
 	return thePath
 	
+class CallRecorder:
+	def __init__ (self):
+		self.called = 0
+		
+	def simpleFunction (self):
+		self.called += 1
+		return "Hello"
+	
 class PathTests (unittest.TestCase):
 	def setUp (self):
 		self.context = simpleTALES.Context()
+		self.recorder = CallRecorder()
 		self.context.addGlobal ('top', 'Hello from the top')
 		self.context.addGlobal ('alt', 'Wobble the way')
 		self.context.addGlobal ('theMap', {'top': 'Hello', 'onelevel': {'top': 'Bye'}})
 		self.context.addGlobal ('funcMap', {'simple': simpleFunction, 'nested': nestedFunction, 'pathFunc': simpleTALES.PathFunctionVariable (pathFunction)})
 		self.context.addGlobal ('topFunc', simpleFunction)
 		self.context.addGlobal ('pathFunc', simpleTALES.PathFunctionVariable (pathFunction))
+		self.context.addGlobal ('cacheFunc', simpleTALES.CachedFuncResult (self.recorder.simpleFunction))
 		self.context.addGlobal ('alist', [{'a': 'An A', 'b': 'A B'},"Hello!"])
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
@@ -67,6 +77,14 @@ class PathTests (unittest.TestCase):
 		template.expand (self.context, file)
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		
+	def _runCacheTest_ (self, txt, result, errMsg="Error"):
+		template = simpleTAL.compileHTMLTemplate (txt)
+		file = StringIO.StringIO ()
+		template.expand (self.context, file)
+		realResult = file.getvalue()
+		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.failUnless (self.recorder.called == 1, 'Recorder shows function was called %s times!' % str (self.recorder.called))
 			
 	def testSimpleTopPath (self):
 		self._runTest_ ('<html tal:replace="top">Top</html>'
@@ -181,6 +199,12 @@ class PathTests (unittest.TestCase):
 						,'<html></html>'
 						,'Index past end of list failed.'
 						)
+						
+	def testCachedFuction (self):
+		self._runCacheTest_ ('<b tal:content="cacheFunc"></b><i tal:replace="cacheFunc"></i>'
+							,'<b>Hello</b>Hello'
+							,"Cached function didn't return as expected."
+							)
 
 if __name__ == '__main__':
 	unittest.main()
