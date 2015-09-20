@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 """		Copyright (c) 2009 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
@@ -70,7 +70,7 @@ class TALContentTestCases (unittest.TestCase):
 		"""
 		# Create a temporary file manually
 		try:
-			fileHandle, fileName = tempfile.mkstemp ()
+			fileName = tempfile.mktemp ()
 			with open (fileName, mode='b+w') as templateFile:
 				# Write out the XML in UTF-8
 				txt = '<?xml version="1.0" encoding="utf-8"?>\n<html><p>Somethings cost £3</p><p tal:content="one">Two</p></html>'
@@ -84,7 +84,7 @@ class TALContentTestCases (unittest.TestCase):
 			os.remove (fileName)
 			
 		try:
-			fileHandle, fileName = tempfile.mkstemp ()
+			fileName = tempfile.mktemp ()
 			with open (fileName, mode="b+w") as outputFile:
 				# Now expand the template into a destination file that is binary
 				template.expand (self.context,outputFile)
@@ -104,7 +104,7 @@ class TALContentTestCases (unittest.TestCase):
 		"""
 		# Create a temporary file manually
 		try:
-			fileHandle, fileName = tempfile.mkstemp ()
+			fileName = tempfile.mktemp ()
 			with open (fileName, mode='t+w', encoding = "utf-8") as templateFile:
 				# Write out the XML in UTF-8
 				txt = '<?xml version="1.0" encoding="utf-8"?>\n<html><p>Somethings cost £3</p><p tal:content="one">Two</p></html>'
@@ -118,8 +118,8 @@ class TALContentTestCases (unittest.TestCase):
 			os.remove (fileName)
 		
 		try:
-			fileHandle, fileName = tempfile.mkstemp ()
-			with open (fileName, mode="t+w", encoding = "utf-8") as outputFile:
+			fileName = tempfile.mktemp ()
+			with open (fileName, mode="t+w") as outputFile:
 				# Now expand the template into a destination file that is binary
 				template.expand (self.context,outputFile)
 				
