@@ -1,5 +1,23 @@
-simpleTAL / simpleTALES (Version 3.4)
+simpleTAL / simpleTALES (Version 3.5)
 -------------------------------------
+Version 3.5
+-----------
+New features:
+  - The 'test' function is now available to code used in 'python:' paths.
+    Usage is the same as zope: test (test1,val1[,test2,val2][,default]).
+	(Thanks to Mark McEahern for the feature request)
+  - Uses PyXML (http://pyxml.sourceforge.net/) to determine the DOCTYPE of
+    XML templates (if installed).  (Thanks to Myers Carpenter for the 
+    implementation)
+Bug fixes:
+  - CGI Example fixes.
+  - XML Templates containing attributes with character entities are now
+    output correctly.
+  - HTML Templates with special characters as part of TAL or METAL commands
+    are now handled correctly.
+  - Default encoding is now iso-8859-1 rather than iso8859-1
+
+
 Version 3.4
 -----------
 New features:

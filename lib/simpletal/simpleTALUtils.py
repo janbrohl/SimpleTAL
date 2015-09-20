@@ -34,7 +34,7 @@
 		Module Dependencies: None
 """
 
-__version__ = "3.3"
+__version__ = "3.5"
 
 
 import StringIO, os, stat, threading, sys, codecs, sgmllib, cgi, re
@@ -103,7 +103,7 @@ class TemplateCache:
 		self.hits = 0
 		self.misses = 0
 		
-	def getTemplate (self, name, inputEncoding='ISO8859-1'):
+	def getTemplate (self, name, inputEncoding='ISO-8859-1'):
 		""" Name should be the path of a template file.  If the path ends in 'xml' it is treated
 			as an XML Template, otherwise it's treated as an HTML Template.  If the template file
 			has changed since the last cache it will be re-compiled.
@@ -127,7 +127,7 @@ class TemplateCache:
 			tempFile = open (name, 'r')
 			firstline = tempFile.readline()
 			tempFile.seek(0)
-			if (name [-3:] == "xml") or (firstline.strip ()[:5] == '<?xml'):
+			if (name [-3:] == "xml") or (firstline.strip ()[:5] == '<?xml') or (firstline [:9] == '<!DOCTYPE' and firstline.find('XHTML') != -1):
 				template = simpleTAL.compileXMLTemplate (tempFile)
 			else:
 				template = simpleTAL.compileHTMLTemplate (tempFile, inputEncoding)
@@ -248,7 +248,7 @@ class MacroExpansionInterpreter (simpleTAL.TemplateInterpreter):
 		self.movePCForward,self.movePCBack,self.outputTag,self.originalAttributes,self.currentAttributes,self.repeatVariable,self.repeatIndex,self.repeatSequence,self.tagContent,self.localVarsDefined = self.scopeStack.pop()			
 		self.programCounter += 1
 			
-def ExpandMacros (context, template, outputEncoding="ISO8859-1"):
+def ExpandMacros (context, template, outputEncoding="ISO-8859-1"):
 	out = StringIO.StringIO()
 	interp = MacroExpansionInterpreter()
 	interp.initialise (context, out)

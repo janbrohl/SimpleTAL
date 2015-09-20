@@ -63,17 +63,17 @@ class TALContentTestCases (unittest.TestCase):
 						
 	def testContentNothing (self):
 		self._runTest_ ('<html><p tal:content="nothing"></p></html>'
-						,'<?xml version="1.0" encoding="iso8859-1"?>\n<html><p></p></html>'
+						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p></p></html>'
 						,'Content of nothing did not evaluate to empty tag.')
 						
 	def testContentDefault (self):
 		self._runTest_ ('<html><p tal:content="default">Original</p></html>'
-						,'<?xml version="1.0" encoding="iso8859-1"?>\n<html><p>Original</p></html>'
+						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p>Original</p></html>'
 						,'Content of default did not evaluate to existing content')
 	
 	def testContentString (self):
 		self._runTest_ ('<html><p tal:content="test">Original</p></html>'
-						,'<?xml version="1.0" encoding="iso8859-1"?>\n<html><p>testing</p></html>'
+						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p>testing</p></html>'
 						,'Content of string did not evaluate to contain string')
 						
 	def testContentStructure (self):
@@ -83,12 +83,12 @@ class TALContentTestCases (unittest.TestCase):
 		self.context.addGlobal ('weblog', weblog)
 		
 		self._runTest_ ('<html><p tal:content="structure weblog/entry">Original</p></html>'
-						,'<?xml version="1.0" encoding="iso8859-1"?>\n<html><p><insertedData>Some structure: <b>Test subject</b></insertedData></p></html>'
+						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p><insertedData>Some structure: <b>Test subject</b></insertedData></p></html>'
 						,'Content of Structure did not evaluate to expected result')   
 
 	def testTALDisabledContentStructure (self):
 		self._runTest_ ('<html><p tal:content="structure weblog/entry">Original</p></html>'
-						,'<?xml version="1.0" encoding="iso8859-1"?>\n<html><p><insertedData>Some structure: <b tal:content="weblog/subject"></b></insertedData></p></html>'
+						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p><insertedData>Some structure: <b tal:content="weblog/subject"></b></insertedData></p></html>'
 						,'Content of Structure did not evaluate to expected result'
 						,allowTALInStructure=0)  
 						

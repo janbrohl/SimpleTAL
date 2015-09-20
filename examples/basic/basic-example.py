@@ -40,7 +40,7 @@ from simpletal import simpleTAL, simpleTALES
 import sys
 
 # Creat the context that is used by the template
-context = simpleTALES.Context()
+context = simpleTALES.Context(allowPythonPath=1)
 
 # Add a string to the context under the variable title
 context.addGlobal ("title", "Colours of the rainbow")

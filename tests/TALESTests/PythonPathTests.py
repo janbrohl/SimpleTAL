@@ -62,8 +62,9 @@ class PythonPathTests (unittest.TestCase):
 		self.context.addGlobal ('helloPath', simpleTALES.PathFunctionVariable(simpleFunction))
 		self.context.addGlobal ('helloFunction', helloFunction)
 		self.context.addGlobal ('myList', [1,2,3,4,5,6])
-		self.context.addGlobal ('test', 'testing')
+		self.context.addGlobal ('testing', 'testing')
 		self.context.addGlobal ('map', {'test': 'maptest'})
+		self.context.addGlobal ('data', {'one': 1, 'zero': 0})
 		
 		template = simpleTAL.compileHTMLTemplate (txt)
 		file = StringIO.StringIO ()
@@ -100,8 +101,8 @@ class PythonPathTests (unittest.TestCase):
 					   )
 					   
 	def testPythonStringCompare (self):
-		self._runTest_ ("""<html tal:content="python: test=='testing'">Passed.</html>"""
-						,'<html>1</html>'
+		self._runTest_ ("""<html tal:condition="python: testing=='testing'">Passed.</html>"""
+						,'<html>Passed.</html>'
 						,'Python string compare failed.'
 						,allowPythonPath=1
 						)
@@ -154,6 +155,34 @@ class PythonPathTests (unittest.TestCase):
 						,'Python path function wrapped in a PathFunctionVariable failed'
 						,allowPythonPath=1
 						)
-		
+						
+	def testTestFunctionDefault (self):
+		self._runTest_ ("""<html tal:condition="python: test (path ('data/one'))">Passed.</html>"""
+						,'<html>Passed.</html>'
+						,'Test function failed to use default.'
+						,allowPythonPath=1
+						)
+
+	def testTestFunctionTwoArgs (self):
+		self._runTest_ ("""<html tal:condition="python: test (0,1)">Passed.</html>"""
+						,''
+						,'Test function failed to use default of false.'
+						,allowPythonPath=1
+						)
+						
+	def testTestFunctionThreeArgs (self):
+		self._runTest_ ("""<html tal:content="python: test (0,1,2)">Passed.</html>"""
+						,'<html>2</html>'
+						,'Test function failed to use default.'
+						,allowPythonPath=1
+						)
+						
+	def testTestFunctionFiveArgs (self):
+		self._runTest_ ("""<html tal:content="python: test (0,1,0,2,5)">Passed.</html>"""
+						,'<html>5</html>'
+						,'Test function failed to use default.'
+						,allowPythonPath=1
+						)
+						
 if __name__ == '__main__':
 	unittest.main()

@@ -63,17 +63,17 @@ class TALReplaceTestCases (unittest.TestCase):
 						
 	def testContentNothing (self):
 		self._runTest_ ('<html><p tal:replace="nothing"></p></html>'
-						,'<?xml version="1.0" encoding="iso8859-1"?>\n<html></html>'
+						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html></html>'
 						,'Content of nothing did not remove tag.')
 						
 	def testContentDefault (self):
 		self._runTest_ ('<html><p tal:replace="default">Original</p></html>'
-						,'<?xml version="1.0" encoding="iso8859-1"?>\n<html><p>Original</p></html>'
+						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p>Original</p></html>'
 						,'Content of default did not evaluate to existing content without tags')
 	
 	def testContentString (self):
 		self._runTest_ ('<html><p tal:replace="test">Original</p></html>'
-						,'<?xml version="1.0" encoding="iso8859-1"?>\n<html>testing</html>'
+						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html>testing</html>'
 						,'Content of string did not evaluate to contain string')
 						
 	def testContentStructure (self):
@@ -83,7 +83,7 @@ class TALReplaceTestCases (unittest.TestCase):
 		self.context.addGlobal ('weblog', weblog)
 
 		self._runTest_ ('<html><p tal:replace="structure weblog/entry">Original</p></html>'
-						,'<?xml version="1.0" encoding="iso8859-1"?>\n<html><anEntry>Some structure: <b>Test subject</b></anEntry></html>'
+						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html><anEntry>Some structure: <b>Test subject</b></anEntry></html>'
 						,'Content of Structure did not evaluate to expected result')    
 
 if __name__ == '__main__':

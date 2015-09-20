@@ -3,6 +3,7 @@
 		<h1 tal:content="title">The title</h1>
 		<ul tal:repeat="colour rainbow">
 		  <li tal:content="colour">Colour of the rainbow</li>
+		  <p tal:content="python: str (colour) + ' is the colour'"></p>
 		</ul>
   </body>
 </html>

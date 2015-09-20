@@ -38,8 +38,8 @@ from simpletal import simpleTALUtils, simpleTALES, simpleTAL
 
 HTMLTemplate1 = """<html><body><h1 tal:content="title">Title</h1></body></html>"""
 HTMLTemplate2 = """<html><body><h1 tal:content="title">Title</h1><p tal:content="message">Message</p></body></html>"""
-XMLTemplate1 = """<?xml version="1.0" encoding="iso8859-1"?>\n<html><body><h1 tal:content="title">Title</h1></body></html>"""
-XMLTemplate2 = """<?xml version="1.0" encoding="iso8859-1"?>\n<html><body><h1 tal:content="title">Title</h1><p tal:content="message">Message</p></body></html>"""
+XMLTemplate1 = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1 tal:content="title">Title</h1></body></html>"""
+XMLTemplate2 = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1 tal:content="title">Title</h1><p tal:content="message">Message</p></body></html>"""
 TEMP_DIR="/tmp/"
 HTML_TEMPLATE_NAME='TemplateCacheTestCasesHtmlTemplate.html'
 XML_TEMPLATE_NAME='TemplateCacheTestCasesXmlTemplate.xml'
@@ -159,7 +159,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		template = self.cache.getTemplate (name)
 		outputFile = StringIO.StringIO ()
 		template.expand (self.context, outputFile)
-		expectedResult = """<?xml version="1.0" encoding="iso8859-1"?>\n<html><body><h1>Cache Test</h1></body></html>"""
+		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1></body></html>"""
 		self.failUnless (outputFile.getvalue() == expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
 		self.failUnless (self.cache.misses == 1, "Cache miss not recorded!")
@@ -167,7 +167,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		template = self.cache.getTemplate (name)
 		outputFile = StringIO.StringIO ()
 		template.expand (self.context, outputFile)
-		expectedResult = """<?xml version="1.0" encoding="iso8859-1"?>\n<html><body><h1>Cache Test</h1></body></html>"""
+		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1></body></html>"""
 		self.failUnless (outputFile.getvalue() == expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
 		self.failUnless (self.cache.hits == 1, "Cache hit not recorded!")
@@ -183,7 +183,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		template = self.cache.getTemplate (name)
 		outputFile = StringIO.StringIO ()
 		template.expand (self.context, outputFile)
-		expectedResult = """<?xml version="1.0" encoding="iso8859-1"?>\n<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
+		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
 		self.failUnless (outputFile.getvalue() == expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
 		self.failUnless (self.cache.misses == 2, "Cache miss not recorded!")
@@ -191,7 +191,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		template = self.cache.getTemplate (name)
 		outputFile = StringIO.StringIO ()
 		template.expand (self.context, outputFile)
-		expectedResult = """<?xml version="1.0" encoding="iso8859-1"?>\n<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
+		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
 		self.failUnless (outputFile.getvalue() == expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
 		self.failUnless (self.cache.hits == 2, "Cache hit not recorded!")

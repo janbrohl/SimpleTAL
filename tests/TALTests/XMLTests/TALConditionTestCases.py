@@ -57,19 +57,19 @@ class TALConditionTestCases (unittest.TestCase):
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 						
 	def testConditionDefault (self):
-		self._runTest_ ('<html tal:condition="default">Hello</html>', '<?xml version="1.0" encoding="iso8859-1"?>\n<html>Hello</html>', "Condition 'default' did not evaluate to true")
+		self._runTest_ ('<html tal:condition="default">Hello</html>', '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>Hello</html>', "Condition 'default' did not evaluate to true")
 		
 	def testConditionExists (self):
 		self._runTest_ ('<html tal:condition="test">Hello</html>'
-						, '<?xml version="1.0" encoding="iso8859-1"?>\n<html>Hello</html>', 'Condition for something that exists evaluated false')
+						, '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>Hello</html>', 'Condition for something that exists evaluated false')
 						
 	def testConditionNothing (self):
 		self._runTest_ ('<html tal:condition="nothing">Hello</html>'
-						, '<?xml version="1.0" encoding="iso8859-1"?>\n', 'Condition nothing evaluated to true')
+						, '<?xml version="1.0" encoding="iso-8859-1"?>\n', 'Condition nothing evaluated to true')
 
 	def testConditionMissing (self):
 		self._runTest_ ('<html tal:condition="thisdoesnotexists">Hello</html>'
-						, '<?xml version="1.0" encoding="iso8859-1"?>\n', 'Condition for something that does not exist evaluated to true')
+						, '<?xml version="1.0" encoding="iso-8859-1"?>\n', 'Condition for something that does not exist evaluated to true')
 						
 
 if __name__ == '__main__':

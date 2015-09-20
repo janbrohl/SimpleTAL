@@ -64,7 +64,7 @@ class ExampleCGI:
 	def main (self):
 		if (self.form.has_key ("submit")):
 			# Recieved the posting, get the name, occupation, and (optional) age
-			self.getValue ("name")
+			self.getValue ("username")
 			self.getValue ("occupation")
 			self.getValue ("age", mandatory=0)
 			

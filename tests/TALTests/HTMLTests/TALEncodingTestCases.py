@@ -41,7 +41,7 @@ if (os.path.exists ("logging.ini")):
 else:
 	logging.basicConfig()
 	
-isoDecoder = codecs.lookup ("iso8859-1")[1]
+isoDecoder = codecs.lookup ("iso-8859-1")[1]
 	
 class TALEncodingTestCases (unittest.TestCase):
 	def setUp (self):
@@ -61,7 +61,7 @@ class TALEncodingTestCases (unittest.TestCase):
 						
 	def testISOToUTF8 (self):
 		utf8Pound = "\xc2\xa3"
-		template = simpleTAL.compileHTMLTemplate ('<html>£3.12?  <b tal:replace="HighBC"></b></html>', 'iso8859-1')
+		template = simpleTAL.compileHTMLTemplate ('<html>£3.12?  <b tal:replace="HighBC"></b></html>', 'iso-8859-1')
 		file = StringIO.StringIO()
 		template.expand (self.context, file, 'utf-8')
 		result = file.getvalue()
@@ -69,9 +69,9 @@ class TALEncodingTestCases (unittest.TestCase):
 		self.failUnless (result == expectedResult, "UTF8 Encoding failed.  \nResult was: " + result + "\nExpected result: " + expectedResult)
 		
 	def testISOToISO (self):
-		template = simpleTAL.compileHTMLTemplate ('<html>£3.12?  <b tal:replace="HighBC"></b></html>', 'iso8859-1')
+		template = simpleTAL.compileHTMLTemplate ('<html>£3.12?  <b tal:replace="HighBC"></b></html>', 'iso-8859-1')
 		file = StringIO.StringIO()
-		template.expand (self.context, file, 'iso8859-1')
+		template.expand (self.context, file, 'iso-8859-1')
 		result = file.getvalue()
 		expectedResult = "<html>£3.12?  This cost nothing, yep £0!</html>"
 		self.failUnless (result == expectedResult, "ISO Encoding failed.  \nResult was: " + result + "\nExpected result: " + expectedResult)
@@ -79,7 +79,7 @@ class TALEncodingTestCases (unittest.TestCase):
 	def testUTF8ToISO (self):
 		template = simpleTAL.compileHTMLTemplate ('<html>\xc2\xa33.12?  <b tal:replace="HighBC"></b></html>', 'utf-8')
 		file = StringIO.StringIO()
-		template.expand (self.context, file, 'iso8859-1')
+		template.expand (self.context, file, 'iso-8859-1')
 		result = file.getvalue()
 		expectedResult = "<html>£3.12?  This cost nothing, yep £0!</html>"
 		self.failUnless (result == expectedResult, "UTF8 -> ISO Encoding failed.  \nResult was: " + result + "\nExpected result: " + expectedResult)

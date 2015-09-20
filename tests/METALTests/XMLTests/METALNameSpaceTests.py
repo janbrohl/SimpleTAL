@@ -64,20 +64,20 @@ class METALNameSpaceTests (unittest.TestCase):
 	def testSingleBindNoCommands (self):
 		self._runTest_ ('<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><div metal:define-macro="one" class="funny">Before <b metal:define-slot="blue">blue</b> After</div></html>'
 										,'<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><body metal:use-macro="site/macros/one">Nowt <i metal:fill-slot="blue">white</i> here</body></html>'
-										,'<?xml version="1.0" encoding="iso8859-1"?>\n<html><body metal:use-macro="site/macros/one">Nowt <i metal:fill-slot="blue">white</i> here</body></html>'
+										,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body metal:use-macro="site/macros/one">Nowt <i metal:fill-slot="blue">white</i> here</body></html>'
 										,"Single Bind, commands, failed.")
 										
 	def testSingleBindCommands (self):
 		self._runTest_ ('<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><div newmetal:define-macro="one" class="funny">Before <b newmetal:define-slot="blue">blue</b> After</div></html>'
 										,'<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><body newmetal:use-macro="site/macros/one">Nowt <i newmetal:fill-slot="blue">white</i> here</body></html>'
-										,'<?xml version="1.0" encoding="iso8859-1"?>\n<html><div class="funny">Before <i>white</i> After</div></html>'
+										,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html><div class="funny">Before <i>white</i> After</div></html>'
 										,"Single Bind, commands, failed.")
 	
 	# Test to ensure that using elements in the metal namespace omits tags
 	def testMETALEmlement (self):
 		self._runTest_ ('<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><newmetal:div newmetal:define-macro="one" class="funny">Before <b newmetal:define-slot="blue">blue</b> After</newmetal:div></html>'
 										,'<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><body newmetal:use-macro="site/macros/one">Nowt <newmetal:block newmetal:fill-slot="blue">white</newmetal:block> here</body></html>'
-										,'<?xml version="1.0" encoding="iso8859-1"?>\n<html>Before white After</html>'
+										,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html>Before white After</html>'
 										,"Single Bind, commands, failed.")
 										
 if __name__ == '__main__':

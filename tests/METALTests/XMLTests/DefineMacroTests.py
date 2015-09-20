@@ -45,6 +45,7 @@ pageTemplate = simpleTAL.compileXMLTemplate ("""<html>
 <body metal:use-macro="site/macros/one">
 <h1 metal:fill-slot="title">Expansion of macro one</h1>
 </body>
+<br/>
 </html>""")
 
 class DefineMacroTests (unittest.TestCase):
@@ -72,28 +73,33 @@ class DefineMacroTests (unittest.TestCase):
 					
 	def testSingleMacroDefinition (self):
 		self._runTest_ ('<html><div metal:define-macro="one" class="funny">No slots here</div></html>'
-										,'<?xml version="1.0" encoding="iso8859-1"?>\n<html>\n<div class="funny">No slots here</div>\n</html>'
+										,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<div class="funny">No slots here</div>\n<br />\n</html>'
 										,"Single macro with no slots failed.")
 		
 	def testTwoMacroDefinition (self):
 		self._runTest_ ('<html><body metal:define-macro="two">A second macro</body><div metal:define-macro="one" class="funny">No slots here</div></html>'
-										,'<?xml version="1.0" encoding="iso8859-1"?>\n<html>\n<div class="funny">No slots here</div>\n</html>'
+										,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<div class="funny">No slots here</div>\n<br />\n</html>'
 										,"Two macros with no slots failed.")
 										
 	def testNestedMacroDefinition (self):
 		self._runTest_ ('<html><div metal:define-macro="two" class="funny"><body metal:define-macro="one">A second macro</body>No slots here</div></html>'
-										,'<?xml version="1.0" encoding="iso8859-1"?>\n<html>\n<body>A second macro</body>\n</html>'
+										,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<body>A second macro</body>\n<br />\n</html>'
 										,"Nested macro with no slots failed.")
 										
 	def testDuplicateMacroDefinition (self):
 		self._runCompileTest_ ('<html><div metal:define-macro="one" class="funny"><body metal:define-macro="one">A second macro</body>No slots here</div></html>'
-													,'[<body metal:define-macro="one">] Macro name one is already defined!'
-													,"Duplicate macro failed to error.")										
+								,'[<body metal:define-macro="one">] Macro name one is already defined!'
+								,"Duplicate macro failed to error.")										
 
 	def testMacroTALDefinition (self):
 		self._runTest_ ('<html><p metal:define-macro="one" tal:content="test">Wibble</p></html>'
-										,'<?xml version="1.0" encoding="iso8859-1"?>\n<html>\n<p>testing</p>\n</html>'
-										,"TAL Command on a macro failed.")
-										
+						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<p>testing</p>\n<br />\n</html>'
+						,"TAL Command on a macro failed.")
+						
+	def testSingletonMacros (self):
+		self._runTest_ ('<html><p metal:define-macro="one">Wibble<br/></p></html>'
+						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<p>Wibble<br /></p>\n<br />\n</html>'
+						,"Singleton inside slot failed.")
+	
 if __name__ == '__main__':
 	unittest.main()

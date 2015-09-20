@@ -34,14 +34,23 @@
 		Module Dependencies: logging, simpleTALES, simpleTALTemplates
 """
 
-__version__ = "3.3"
+__version__ = "3.5"
 
 try:
 	import logging
 except:
 	import DummyLogger as logging
 	
-import sgmllib, xml.sax, cgi, StringIO, codecs, re
+import sgmllib, xml.sax, cgi, StringIO, codecs, re, htmlentitydefs
+
+try:
+    # check to see if pyxml is installed
+    from xml.sax.saxlib import LexicalHandler
+    use_lexical_handler = 1
+except ImportError:
+    use_lexical_handler = 0
+    class LexicalHandler:
+        pass
 
 import simpleTALES
 
@@ -87,14 +96,15 @@ METAL_FILL_SLOT=16
 METAL_DEFINE_MACRO=17
 											
 METAL_NAME_REGEX = re.compile ("[a-zA-Z_][a-zA-Z0-9_]*")
-#SINGLETON_XML_REGEX = re.compile ('^<[^\s>]+?([\s]*?[^\s]+?=".+?")*?[\s]*?/>')
-SINGLETON_XML_REGEX = re.compile ('^<[^\s>]+?([\s]+?[^=]+?="[^"]+?")*?[\s]*?/>')
+SINGLETON_XML_REGEX = re.compile ('^<[^\s/>]+(?:\s*[^=>]+="[^">]+")*\s*/>')
+ESCAPED_ENTITIES_REGEX = re.compile ('(?:.*?)(&.*?;)')
 
 class TemplateInterpreter:
 	def __init__ (self):
 		self.programStack = []
 		self.commandList = None
 		self.symbolTable = None
+		self.escapeAttributes = 0
 		self.slotParameters = {}
 		self.commandHandler  = {}
 		self.commandHandler [TAL_DEFINE] = self.cmdDefine
@@ -110,6 +120,28 @@ class TemplateInterpreter:
 		self.commandHandler [METAL_USE_MACRO] = self.cmdUseMacro
 		self.commandHandler [METAL_DEFINE_SLOT] = self.cmdDefineSlot
 		self.commandHandler [TAL_NOOP] = self.cmdNoOp
+		
+	def tagAsText (self, (tag,atts), singletonFlag=0):
+		""" This returns a tag as text.
+			If self.escapeAttributes is true then the value of the attributes will be 
+			escaped.
+		"""
+		result = ["<"]
+		result.append (tag)
+		for att in atts:
+			result.append (' ')
+			result.append (att[0])
+			result.append ('="')
+			if (self.escapeAttributes):
+				result.append (cgi.escape (att[1], quote=1))
+			else:
+				result.append (att[1])
+			result.append ('"')
+		if (singletonFlag):
+			result.append (" />")
+		else:
+			result.append (">")
+		return "".join (result)
 	
 	def initialise (self, context, outputFile):
 		self.context = context
@@ -154,7 +186,9 @@ class TemplateInterpreter:
 					 ,self.localVarsDefined)
 		self.programStack.append ((vars,self.commandList, self.symbolTable))
 
-	def execute (self, template):
+	def execute (self, template, escapeAttributes=0):
+		oldState = self.escapeAttributes
+		self.escapeAttributes = escapeAttributes
 		self.cleanState()
 		self.commandList, self.programCounter, programLength, self.symbolTable = template.getProgram()
 		cmndList = self.commandList
@@ -162,6 +196,7 @@ class TemplateInterpreter:
 			cmnd = cmndList [self.programCounter]
 			#print "PC: %s  -  Executing command: %s" % (str (self.programCounter), str (cmnd))
 			self.commandHandler[cmnd[0]] (cmnd[0], cmnd[1])
+		self.escapeAttributes = oldState
 	
 	def cmdDefine (self, command, args):
 		""" args: [(isLocalFlag (Y/n), variableName, variablePath),...]
@@ -276,7 +311,26 @@ class TemplateInterpreter:
 			elif (not result.isDefault()):
 				# We have a value - let's use it!
 				attsToRemove [attName]=1
-				escapedAttVal = (cgi.escape (result.value())).replace ('"', '&quot;')
+				resultVal = result.value()
+				if (type (resultVal) == type (u"")):
+					if (not self.escapeAttributes):
+						# XML will get escaped automatically, HTML will not...
+						escapedAttVal = cgi.escape (resultVal, quote=1)
+					else:
+						escapedAttVal = resultVal
+				elif (type (resultVal) == type ("")):
+					if (not self.escapeAttributes):
+						# XML will get escaped automatically, HTML will not...
+						escapedAttVal = cgi.escape (unicode (resultVal, 'ascii'), quote=1)
+					else:
+						escapedAttVal = unicode (resultVal, 'ascii')
+				else:
+					if (not self.escapeAttributes):
+						# XML will get escaped automatically, HTML will not...
+						escapedAttVal = cgi.escape (unicode (str (resultVal), 'ascii'), quote=1)
+					else:
+						escapedAttVal = unicode (str (resultVal), 'ascii')
+				
 				newAtts.append ((attName,escapedAttVal))
 		# Copy over the old attributes 
 		for oldAtt in self.currentAttributes:
@@ -301,9 +355,9 @@ class TemplateInterpreter:
 		tagName, singletonTag = args
 		if (self.outputTag):
 			if (self.tagContent is None and singletonTag):
-				self.file.write (tagAsText ((tagName, self.currentAttributes), 1))
+				self.file.write (self.tagAsText ((tagName, self.currentAttributes), 1))
 			else:
-				self.file.write (tagAsText ((tagName, self.currentAttributes)))
+				self.file.write (self.tagAsText ((tagName, self.currentAttributes)))
 				
 		if (self.movePCForward is not None):
 			self.programCounter = self.movePCForward
@@ -435,10 +489,11 @@ class TemplateInterpreter:
 		return
 	
 class Template:
-	def __init__ (self, commands, macros, symbols):
+	def __init__ (self, commands, macros, symbols, doctype = None):
 		self.commandList = commands
 		self.macros = macros
 		self.symbolTable = symbols
+		self.doctype = doctype
 		
 		# Setup the macros
 		for macro in self.macros.values():
@@ -530,8 +585,8 @@ class HTMLTemplate (Template):
 	
 	def expand (self, context, outputFile, outputEncoding="ISO-8859-1",interpreter=None):
 		""" This method will write to the outputFile, using the encoding specified,
-				the expanded version of this template.  The context passed in is used to resolve
-				all expressions with the template.
+			the expanded version of this template.  The context passed in is used to resolve
+			all expressions with the template.
 		"""
 		# This method must wrap outputFile if required by the encoding, and write out
 		# any template pre-amble (DTD, Encoding, etc)
@@ -543,7 +598,11 @@ class XMLTemplate (Template):
 	"""A specialised form of a template that knows how to output XML
 	"""
 	
-	def expand (self, context, outputFile, outputEncoding="iso8859-1", docType=None, interpreter=None):
+	def __init__ (self, commands, macros, symbols, doctype = None):
+		Template.__init__ (self, commands, macros, symbols)
+		self.doctype = doctype
+	
+	def expand (self, context, outputFile, outputEncoding="iso-8859-1", docType=None, interpreter=None):
 		""" This method will write to the outputFile, using the encoding specified,
 			the expanded version of this template.  The context passed in is used to resolve
 			all expressions with the template.
@@ -557,34 +616,36 @@ class XMLTemplate (Template):
 			encodingFile.write ('<?xml version="1.0" encoding="%s"?>\n' % outputEncoding.lower())
 		else:
 			encodingFile.write ('<?xml version="1.0"?>\n')
-		if (docType is not None):
+		if not docType and self.doctype:
+			docType = self.doctype
+		if docType:
 			encodingFile.write (docType)
 			encodingFile.write ('\n')
 		self.expandInline (context, encodingFile, interpreter)
 		
-def tagAsText ((tag,atts), singletonFlag=0):
-	result = ["<"]
-	result.append (tag)
-	for att in atts:
-		result.append (' ')
-		result.append (att[0])
-		result.append ('="')
-		result.append (att[1])
-		result.append ('"')
-	if (singletonFlag):
-		result.append (" />")
-	else:
-		result.append (">")
-	return "".join (result)
+	def expandInline (self, context, outputFile, interpreter=None):
+		""" Internally used when expanding a template that is part of a context.
+			This version replaces the default so that escapeAttributes can be passed."""
+		if (interpreter is None):
+			ourInterpreter = TemplateInterpreter()
+			ourInterpreter.initialise (context, outputFile)
+		else:
+			ourInterpreter = interpreter
+		ourInterpreter.execute (self, escapeAttributes=1)
 	
 class TemplateCompiler:
-	def __init__ (self):
+	def __init__ (self, attributesEscaped=0):
+		""" Initialise a template compiler.  If attribute values are still in escaped
+		form (e.g. &lt;) then set attributesEscaped to true.
+		"""
 		self.commandList = []
 		self.tagStack = []
 		self.symbolLocationTable = {}
 		self.macroMap = {}
 		self.endTagSymbol = 1
 		
+		self.attributesEscaped=attributesEscaped
+
 		self.commandHandler  = {}
 		self.commandHandler [TAL_DEFINE] = self.compileCmdDefine
 		self.commandHandler [TAL_CONDITION] = self.compileCmdCondition
@@ -637,6 +698,64 @@ class TemplateCompiler:
 		newPrefix = self.metal_namespace_prefix_stack.pop()
 		self.setMETALPrefix (newPrefix)
 		
+	def tagAsText (self, (tag,atts), singletonFlag=0):
+		""" This returns a tag as text.
+		"""
+		result = ["<"]
+		result.append (tag)
+		for att in atts:
+			result.append (' ')
+			result.append (att[0])
+			result.append ('="')
+			result.append (att[1])
+			result.append ('"')
+		if (singletonFlag):
+			result.append (" />")
+		else:
+			result.append (">")
+		return "".join (result)
+		
+				
+	def convertAtt (self, theAtt):
+		""" This function takes a string which contains escaped characters, and returns
+			the expanded version of the string.  This is used to expand HTML attribute
+			values so that TALES can function correctly.
+		"""
+		lastHTMLEntity = 0
+		match = ESCAPED_ENTITIES_REGEX.match (theAtt)
+		result = []
+		while (match is not None):
+			defStart = match.start(1)
+			defEnd = match.end(1)
+			# Capture the rest of the string...
+			result.append (theAtt [lastHTMLEntity:defStart])
+			lastHTMLEntity = defEnd
+			convertedDef = None
+			# Knock the & and ; off the string
+			theEntityDef = theAtt [defStart+1:defEnd-1]
+			if (htmlentitydefs.entitydefs.has_key (theEntityDef)):
+				convertedDef = htmlentitydefs.entitydefs[theEntityDef]
+				# ConvertedDef is either a real character - or a hex string...
+				if (convertedDef.startswith ('&#')):
+					# We need to try and convert again...
+					theEntityDef = convertedDef [1:-1]
+					convertedDef = None
+			if (convertedDef is None):
+				# Are we hex or dec?
+				if (theEntityDef.startswith ('#x')):
+					# We are hex
+					base = 16
+					theNumber = theEntityDef [2:]
+				else:
+					# We are dec
+					base = 10
+					theNumber = theEntityDef [1:]
+				convertedDef = unichr (int (theNumber, base))
+			result.append (convertedDef)
+			match = ESCAPED_ENTITIES_REGEX.match (theAtt, lastHTMLEntity)
+		result.append (theAtt [lastHTMLEntity:])
+		return u"".join (result)
+		
 	def getTemplate (self):
 		template = Template (self.commandList, self.macroMap, self.symbolLocationTable)
 		return template
@@ -677,7 +796,7 @@ class TemplateCompiler:
 			self.addCommand(command)
 		else:
 			# It's just a straight output, so create an output command and append it
-			self.addCommand((TAL_OUTPUT, tagAsText (tag, singletonTag)))
+			self.addCommand((TAL_OUTPUT, self.tagAsText (tag, singletonTag)))
 	
 	def popTag (self, tag, omitTagFlag=0):
 		""" omitTagFlag is used to control whether the end tag should be included in the
@@ -719,7 +838,7 @@ class TemplateCompiler:
 					# ERROR
 					msg = "TAL/METAL Elements must be balanced - found close tag %s expecting %s" % (tag[0], oldTag[0])
 					self.log.error (msg)
-					raise TemplateParseException (tagAsText(oldTag), msg)
+					raise TemplateParseException (self.tagAsText(oldTag), msg)
 		self.log.error ("Close tag %s found with no corresponding open tag." % tag[0])
 		raise TemplateParseException ("</%s>" % tag[0], "Close tag encountered with no corresponding open tag.")
 					
@@ -775,7 +894,7 @@ class TemplateCompiler:
 					else:
 						# We don't allow METAL/TAL to be declared as a default
 						msg = "Can not use METAL name space by default, a prefix must be provided."
-						raise TemplateParseException (tagAsText (self.currentStartTag), msg)
+						raise TemplateParseException (self.tagAsText (self.currentStartTag), msg)
 				elif (value == TAL_NAME_URI):
 					# TAL this time
 					if (len (prefix) > 0):
@@ -786,7 +905,7 @@ class TemplateCompiler:
 					else:
 						# We don't allow METAL/TAL to be declared as a default
 						msg = "Can not use TAL name space by default, a prefix must be provided."
-						raise TemplateParseException (tagAsText (self.currentStartTag), msg)
+						raise TemplateParseException (self.tagAsText (self.currentStartTag), msg)
 				else:
 					# It's nothing special, just an ordinary namespace declaration
 					cleanAttributes.append ((att,value))
@@ -827,7 +946,12 @@ class TemplateCompiler:
 		firstTag = 1
 		for talAtt in allCommands:
 			# Parse and create a command for each 
-			cmnd = self.commandHandler [talAtt](foundCommandsArgs[talAtt])
+			if (self.attributesEscaped):
+				# We need to expand the attribute before we can safely compile it.
+				safeAttribute = self.convertAtt (foundCommandsArgs[talAtt])
+				cmnd = self.commandHandler [talAtt](safeAttribute)
+			else:
+				cmnd = self.commandHandler [talAtt](foundCommandsArgs[talAtt])
 			if (cmnd is not None):
 				if (firstTag):
 					# The first one needs to add the tag
@@ -872,7 +996,7 @@ class TemplateCompiler:
 				# Error, badly formed define command
 				msg = "Badly formed define command '%s'.  Define commands must be of the form: '[local|global] varName expression[;[local|global] varName expression]'" % argument
 				self.log.error (msg)
-				raise TemplateParseException (tagAsText (self.currentStartTag), msg)
+				raise TemplateParseException (self.tagAsText (self.currentStartTag), msg)
 			# Assume to start with that >2 elements means a local|global flag
 			if (len (stmtBits) > 2):
 				if (stmtBits[0] == 'global'):
@@ -902,7 +1026,7 @@ class TemplateCompiler:
 			# No argument passed
 			msg = "No argument passed!  condition commands must be of the form: 'path'"
 			self.log.error (msg)
-			raise TemplateParseException (tagAsText (self.currentStartTag), msg)
+			raise TemplateParseException (self.tagAsText (self.currentStartTag), msg)
 	
 		return (TAL_CONDITION, (argument, self.endTagSymbol))
 		
@@ -914,7 +1038,7 @@ class TemplateCompiler:
 			# Error, badly formed repeat command
 			msg = "Badly formed repeat command '%s'.  Repeat commands must be of the form: 'localVariable path'" % argument
 			self.log.error (msg)
-			raise TemplateParseException (tagAsText (self.currentStartTag), msg)
+			raise TemplateParseException (self.tagAsText (self.currentStartTag), msg)
 			
 		varName = attProps [0]
 		expression = " ".join (attProps[1:])
@@ -929,8 +1053,8 @@ class TemplateCompiler:
 			# No argument passed
 			msg = "No argument passed!  content/replace commands must be of the form: 'path'"
 			self.log.error (msg)
-			raise TemplateParseException (tagAsText (self.currentStartTag), msg)
-	  	
+			raise TemplateParseException (self.tagAsText (self.currentStartTag), msg)
+
 		structureFlag = 0
 		attProps = argument.split (' ')
 		if (len(attProps) > 1):
@@ -967,7 +1091,7 @@ class TemplateCompiler:
 				# Error, badly formed attributes command
 				msg = "Badly formed attributes command '%s'.  Attributes commands must be of the form: 'name expression[;name expression]'" % argument
 				self.log.error (msg)
-				raise TemplateParseException (tagAsText (self.currentStartTag), msg)
+				raise TemplateParseException (self.tagAsText (self.currentStartTag), msg)
 			attName = stmtBits[0]
 			attExpr = " ".join (stmtBits[1:])
 			commandArgs.append ((attName, attExpr))
@@ -990,7 +1114,7 @@ class TemplateCompiler:
 			# No argument passed
 			msg = "No argument passed!  use-macro commands must be of the form: 'use-macro: path'"
 			self.log.error (msg)
-			raise TemplateParseException (tagAsText (self.currentStartTag), msg)
+			raise TemplateParseException (self.tagAsText (self.currentStartTag), msg)
 		cmnd = (METAL_USE_MACRO, (argument, {}, self.endTagSymbol))
 		self.log.debug ("Returning METAL_USE_MACRO: %s" % str (cmnd))
 		return cmnd
@@ -1000,17 +1124,17 @@ class TemplateCompiler:
 			# No argument passed
 			msg = "No argument passed!  define-macro commands must be of the form: 'define-macro: name'"
 			self.log.error (msg)
-			raise TemplateParseException (tagAsText (self.currentStartTag), msg)
+			raise TemplateParseException (self.tagAsText (self.currentStartTag), msg)
 			
 		# Check that the name of the macro is valid
 		if (METAL_NAME_REGEX.match (argument).end() != len (argument)):
 			msg = "Macro name %s is invalid." % argument
 			self.log.error (msg)
-			raise TemplateParseException (tagAsText (self.currentStartTag), msg)
+			raise TemplateParseException (self.tagAsText (self.currentStartTag), msg)
 		if (self.macroMap.has_key (argument)):
 			msg = "Macro name %s is already defined!" % argument
 			self.log.error (msg)
-			raise TemplateParseException (tagAsText (self.currentStartTag), msg)
+			raise TemplateParseException (self.tagAsText (self.currentStartTag), msg)
 			
 		# The macro starts at the next command.
 		macro = SubTemplate (len (self.commandList), self.endTagSymbol)
@@ -1022,13 +1146,13 @@ class TemplateCompiler:
 			# No argument passed
 			msg = "No argument passed!  fill-slot commands must be of the form: 'fill-slot: name'"
 			self.log.error (msg)
-			raise TemplateParseException (tagAsText (self.currentStartTag), msg)
+			raise TemplateParseException (self.tagAsText (self.currentStartTag), msg)
 		
 		# Check that the name of the macro is valid
 		if (METAL_NAME_REGEX.match (argument).end() != len (argument)):
 			msg = "Slot name %s is invalid." % argument
 			self.log.error (msg)
-			raise TemplateParseException (tagAsText (self.currentStartTag), msg)
+			raise TemplateParseException (self.tagAsText (self.currentStartTag), msg)
 			
 		# Determine what use-macro statement this belongs to by working through the list backwards
 		ourMacroLocation = None
@@ -1042,7 +1166,7 @@ class TemplateCompiler:
 				if (location < 0):
 					msg = "metal:fill-slot must be used inside a metal:use-macro call"
 					self.log.error (msg)
-					raise TemplateParseException (tagAsText (self.currentStartTag), msg)
+					raise TemplateParseException (self.tagAsText (self.currentStartTag), msg)
 		
 		# Get the use-macro command we are going to adjust
 		cmnd, args = self.commandList [ourMacroLocation]
@@ -1053,12 +1177,12 @@ class TemplateCompiler:
 		if (METAL_NAME_REGEX.match (argument).end() != len (argument)):
 			msg = "Slot name %s is invalid." % argument
 			self.log.error (msg)
-			raise TemplateParseException (tagAsText (self.currentStartTag), msg)
+			raise TemplateParseException (self.tagAsText (self.currentStartTag), msg)
 		
 		if (slotMap.has_key (argument)):
 			msg = "Slot %s has already been filled!" % argument
 			self.log.error (msg)
-			raise TemplateParseException (tagAsText (self.currentStartTag), msg)
+			raise TemplateParseException (self.tagAsText (self.currentStartTag), msg)
 		
 		# The slot starts at the next command.
 		slot = SubTemplate (len (self.commandList), self.endTagSymbol)
@@ -1073,12 +1197,12 @@ class TemplateCompiler:
 			# No argument passed
 			msg = "No argument passed!  define-slot commands must be of the form: 'name'"
 			self.log.error (msg)
-			raise TemplateParseException (tagAsText (self.currentStartTag), msg)
+			raise TemplateParseException (self.tagAsText (self.currentStartTag), msg)
 		# Check that the name of the slot is valid
 		if (METAL_NAME_REGEX.match (argument).end() != len (argument)):
 			msg = "Slot name %s is invalid." % argument
 			self.log.error (msg)
-			raise TemplateParseException (tagAsText (self.currentStartTag), msg)
+			raise TemplateParseException (self.tagAsText (self.currentStartTag), msg)
 			
 		return (METAL_DEFINE_SLOT, (argument, self.endTagSymbol))
 
@@ -1093,16 +1217,16 @@ class TemplateParseException (Exception):
 # The list of elements in HTML that can not have end tags - done as a dictionary for fast
 # lookup.	
 HTML_FORBIDDEN_ENDTAG = {'AREA': 1, 'BASE': 1, 'BASEFONT': 1, 'BR': 1, 'COL': 1
-												,'FRAME': 1, 'HR': 1, 'IMG': 1, 'INPUT': 1, 'ISINDEX': 1
-												,'LINK': 1, 'META': 1, 'PARAM': 1}
+						,'FRAME': 1, 'HR': 1, 'IMG': 1, 'INPUT': 1, 'ISINDEX': 1
+						,'LINK': 1, 'META': 1, 'PARAM': 1}
 
 class HTMLTemplateCompiler (TemplateCompiler, sgmllib.SGMLParser):
 	def __init__ (self):
-		TemplateCompiler.__init__ (self)
+		TemplateCompiler.__init__ (self, attributesEscaped=1)
 		sgmllib.SGMLParser.__init__ (self)
 		self.log = logging.getLogger ("simpleTAL.HTMLTemplateCompiler")
 		
-	def parseTemplate (self, file, encoding="iso8859-1"):
+	def parseTemplate (self, file, encoding="iso-8859-1"):
 		encodedFile = codecs.lookup (encoding)[2](file)
 		self.encoding = encoding
 		self.feed (encodedFile.read())
@@ -1116,6 +1240,7 @@ class HTMLTemplateCompiler (TemplateCompiler, sgmllib.SGMLParser):
 				self.log.debug ("The attribute value is the same as the name, setting to empty string")
 				atts.append ((att[0], ""))
 			else:
+				self.log.debug ("HTML Attribute %s has value %s" % (att[0], att[1]))
 				atts.append (att)
 			
 		if (HTML_FORBIDDEN_ENDTAG.has_key (tag.upper())):
@@ -1161,18 +1286,49 @@ class HTMLTemplateCompiler (TemplateCompiler, sgmllib.SGMLParser):
 		template = HTMLTemplate (self.commandList, self.macroMap, self.symbolLocationTable)
 		return template
 			
-class XMLTemplateCompiler (TemplateCompiler, xml.sax.handler.ContentHandler):
+class XMLTemplateCompiler (TemplateCompiler, xml.sax.handler.ContentHandler, xml.sax.handler.DTDHandler, LexicalHandler):
 	def __init__ (self):
 		TemplateCompiler.__init__ (self)
 		xml.sax.handler.ContentHandler.__init__ (self)
+		self.doctype = None
 		self.log = logging.getLogger ("simpleTAL.XMLTemplateCompiler")
 		self.singletonElement = 0
 		
+	def tagAsText (self, (tag,atts), singletonFlag=0):
+		"""This escapes the attribute values - used because SAX expands the values"""
+		self.log.info ("XML tagAsText called.")
+		result = ["<"]
+		result.append (tag)
+		for att in atts:
+			result.append (' ')
+			result.append (att[0])
+			result.append ('="')
+			result.append (cgi.escape (att[1], quote=1))
+			result.append ('"')
+		if (singletonFlag):
+			result.append (" />")
+		else:
+			result.append (">")
+		return "".join (result)
+		
 	def parseTemplate (self, file):
 		self.ourParser = xml.sax.make_parser()
+		self.log.debug ("Setting features of parser")
 		self.ourParser.setFeature (xml.sax.handler.feature_external_ges, 0)
+		if use_lexical_handler:
+			self.ourParser.setProperty(xml.sax.handler.property_lexical_handler, self) 
+
 		self.ourParser.setContentHandler (self)
+		self.ourParser.setDTDHandler (self)
+		
 		self.ourParser.parse (file)
+
+	def startDTD(self, name, public_id, system_id):
+		self.log.debug ("Recieved DOCTYPE: " + name + " public_id: " + public_id + " system_id: " + system_id)
+		if public_id:
+			self.doctype = '<!DOCTYPE %s PUBLIC "%s" "%s">' % (name, public_id, system_id,)
+		else:
+			self.doctype = '<!DOCTYPE %s SYSTEM "%s">' % (name, system_id,)
 
 	def startElement (self, tag, attributes):
 		self.log.debug ("Recieved Real Start Tag: " + tag + " Attributes: " + str (attributes))
@@ -1187,6 +1343,7 @@ class XMLTemplateCompiler (TemplateCompiler, xml.sax.handler.ContentHandler):
 		# Convert attributes into a list of tuples
 		atts = []
 		for att in attributes.getNames():
+			self.log.debug ("Attribute name %s has value %s" % (att, attributes[att]))
 			atts.append ((att, attributes [att]))
 		self.parseStartTag (tag, atts, singletonElement=self.singletonElement)
 	
@@ -1205,10 +1362,10 @@ class XMLTemplateCompiler (TemplateCompiler, xml.sax.handler.ContentHandler):
 		self.parseData (u'<?%s %s?>' % (target, data))
 		
 	def getTemplate (self):
-		template = XMLTemplate (self.commandList, self.macroMap, self.symbolLocationTable)
+		template = XMLTemplate (self.commandList, self.macroMap, self.symbolLocationTable, self.doctype)
 		return template
 			
-def compileHTMLTemplate (template, inputEncoding="ISO8859-1"):
+def compileHTMLTemplate (template, inputEncoding="ISO-8859-1"):
 	""" Reads the templateFile and produces a compiled template.
 			To use the resulting template object call:
 				template.expand (context, outputFile)

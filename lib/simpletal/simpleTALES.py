@@ -33,7 +33,7 @@
 		Module Dependencies: logging
 """
 
-__version__ = "3.3"
+__version__ = "3.5"
 
 import copy
 
@@ -270,6 +270,28 @@ class PythonPathFunctions:
 			return result.value()
 		else:
 			return result
+			
+	def test (self, *arguments):
+		if (len (arguments) % 2):
+			# We have an odd number of arguments - which means the last one is a default
+			pairs = arguments[:-1]
+			defaultValue = arguments[-1]
+		else:
+			# No default - so use None
+			pairs = arguments
+			defaultValue = None
+			
+		index = 0
+		while (index < len (pairs)):
+			test = pairs[index]
+			index += 1
+			value = pairs[index]
+			index += 1
+			if (test):
+				return value
+				
+		return defaultValue
+		
 
 class Context:
 	def __init__ (self, options=None, allowPythonPath=0):
@@ -363,6 +385,7 @@ class Context:
 		globals ['string'] = self.pythonPathFuncs.string
 		globals ['exists'] = self.pythonPathFuncs.exists
 		globals ['nocall'] = self.pythonPathFuncs.nocall
+		globals ['test'] = self.pythonPathFuncs.test
 			
 		locals={}
 		for name, value in self.locals.items():
@@ -372,7 +395,7 @@ class Context:
 			result = eval(expr, globals, locals)
 		except Exception, e:
 			# An exception occured evaluating the template, return the exception as text
-			self.log.warn ("Exception occured evaluting python path, exception: " + str (e))
+			self.log.warn ("Exception occurred evaluating python path, exception: " + str (e))
 			return ContextVariable ("Exception: %s" % str (e))
 		return ContextVariable(result)
 

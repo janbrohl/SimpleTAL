@@ -72,9 +72,9 @@ class MacroExpansionTestCases (unittest.TestCase):
 		txt = '<?xml version="1.0" encoding="utf8"?>\n<html><div metal:use-macro="mac/macros/one">Hello<b metal:fill-slot="blue">Blue</b></div></html>'
 		template = simpleTAL.compileXMLTemplate (txt)
 		self._runTest_ (template
-									 ,txt
-									 ,'<?xml version="1.0" encoding="iso8859-1"?>\n<html><body metal:use-macro="mac/macros/one">World is <b metal:fill-slot="blue">Blue</b></body></html>'
-									 ,'Expasion with slots failed.')
+						 ,txt
+						 ,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body metal:use-macro="mac/macros/one">World is <b metal:fill-slot="blue">Blue</b></body></html>'
+						 ,'Expasion with slots failed.')
 		
 if __name__ == '__main__':
 	unittest.main()
