@@ -1,6 +1,22 @@
 simpleTAL / simpleTALES (Version 1.1)
 -------------------------------------
 
+Version 2.1
+-----------
+
+Bug fixes:
+	- HTML Templates will now suppress the output of close tags for elements
+		that are forbidden to have them in HTML 4.01.  Additionally tags that 
+		can have no close tag in HTML can still have TAL attributes.  This means
+		that HTML templates can still be valid HTML, and produce valid HTML.
+		For example:
+		'<html><img tal:attributes="src imgSrc"></html>' is now valid, and will only
+		output the <img> tag.
+	
+New features:
+  - A simplification of how local variables are handled brings a 5-10%
+    performance gain
+
 Version 2.0
 -----------
 Complete refactoring of simpleTAL leading to very significant performance

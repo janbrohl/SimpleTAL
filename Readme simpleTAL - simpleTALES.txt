@@ -1,4 +1,4 @@
-simpleTAL / simpleTALES (Version 2.0)
+simpleTAL / simpleTALES (Version 2.1)
 -------------------------------------
 This is an implementation of the TAL and TALES specifications
 see (http://www.zope.org/Documentation/Books/ZopeBook/current/AppendixC.stx)
@@ -19,7 +19,7 @@ work.
 Note that the unit test cases (under tests) require logging to be installed
 to run.
 
-Migrating between 1.x and 2.0
+Migrating between 1.x and 2.x
 -----------------------------
 Version 2.0 is a complete refactoring of SimpleTAL, with all of the
 internals to simpleTAL.py being re-written.  As such 2.0 is not directly

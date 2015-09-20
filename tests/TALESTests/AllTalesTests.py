@@ -17,13 +17,19 @@ import logging
 
 import PathTests, ExistsTests, NoCallTests, NotTests, StringTests
 
-print "Running all TALES tests."
-runner = unittest.TextTestRunner(verbosity='-v')
-for mod in [PathTests
-		   ,ExistsTests
-		   ,NoCallTests
-		   ,NotTests
-		   ,StringTests
-		   ]:
-	talesSuite = unittest.defaultTestLoader.loadTestsFromModule (mod)
-	runner.run(talesSuite)
+def getAllTests ():
+	allTestCases = unittest.TestSuite()
+	for mod in [PathTests
+				   ,ExistsTests
+				   ,NoCallTests
+				   ,NotTests
+				   ,StringTests
+				   ]:
+		talesSuite = unittest.defaultTestLoader.loadTestsFromModule (mod)
+		allTestCases.addTest (talesSuite)
+	return allTestCases
+
+if __name__ == '__main__':
+	print "Running all TALES tests."
+	runner = unittest.TextTestRunner(verbosity='-v')
+	runner.run(getAllTests())

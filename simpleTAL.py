@@ -15,7 +15,7 @@
 		Module Dependencies: logging, simpleTALES, simpleTALTemplates
 """
 
-__version__ = "2.0"
+__version__ = "2.1"
 
 try:
 	import logging
@@ -49,7 +49,7 @@ TAL_START_SCOPE = 8
 TAL_OUTPUT = 9
 # Argument: None
 TAL_STARTTAG = 10
-# Argument: None
+# Argument: Tag, omitTagFlag
 TAL_ENDTAG_ENDSCOPE = 11
 # Argument: None
 TAL_NOOP = 13
@@ -111,7 +111,8 @@ class Template:
 		self.programCounter = 0
 		
 	def execute (self, cmndList):
-		while (self.programCounter < len (cmndList)):
+		programLength = len (cmndList)
+		while (self.programCounter < programLength):
 			cmnd = cmndList [self.programCounter]
 			#print "Executing command: " + str (cmnd)
 			self.commandHandler[cmnd[0]] (cmnd[0], cmnd[1])
@@ -151,18 +152,18 @@ class Template:
 		"""		
 		if (self.repeatVariable is not None):
 			# We are already part way through a repeat
-			self.context.popLocals()
 			self.repeatIndex += 1
 			if (self.repeatIndex == len (self.repeatSequence)):
 				# We have finished the repeat
 				self.repeatVariable = None
 				self.context.removeRepeat (args[0])
+				self.context.popLocals()
 				self.movePCBack = None
 				# Suppress the final close tag
 				self.outputTag = 0
 				self.programCounter = self.symbolTable [args[2]]
 				return
-			self.context.addLocals ([(args[0], self.repeatSequence[self.repeatIndex])])
+			self.context.setLocal (args[0], self.repeatSequence[self.repeatIndex])
 			self.repeatVariable.increment()
 			self.programCounter += 1
 			return
@@ -280,9 +281,9 @@ class Template:
 		return
 	
 	def cmdEndTagEndScope (self, command, args):
-		# Args: tagName
-		if (self.outputTag):
-			self.file.write ('</' + args + '>')
+		# Args: tagName, omitFalg
+		if (self.outputTag and not args[1]):
+			self.file.write ('</' + args[0] + '>')
 		
 		if (self.movePCBack is not None):
 			self.programCounter = self.movePCBack
@@ -427,7 +428,12 @@ class TemplateCompiler:
 			# It's just a straight output, so create an output command and append it
 			self.addCommand((TAL_OUTPUT, tagAsText (tag)))
 	
-	def popTag (self, tag):
+	def popTag (self, tag, omitTagFlag=0):
+		""" omitTagFlag is used to control whether the end tag should be included in the
+				output or not.  In HTML 4.01 there are several tags which should never have
+				end tags, this flag allows the template compiler to specify that these
+				should not be output.
+		"""
 		while (len (self.tagStack) > 0):
 			oldTag, endTagSymbol = self.tagStack.pop()
 			self.log.debug ("Popped tag %s off stack" % oldTag[0])
@@ -439,11 +445,14 @@ class TemplateCompiler:
 					self.symbolLocationTable [endTagSymbol] = len (self.commandList)
 					
 					# We need a "close scope and tag" command
-					self.addCommand((TAL_ENDTAG_ENDSCOPE, tag[0]))
+					self.addCommand((TAL_ENDTAG_ENDSCOPE, (tag[0], omitTagFlag)))
 					return
-				else:
+				elif (omitTagFlag == 0):
 					# We are popping off an un-interesting tag, just add the close as text
 					self.addCommand((TAL_OUTPUT, '</' + tag[0] + '>'))
+					return
+				else:
+					# We are suppressing the output of this tag, so just return
 					return
 			else:	
 				# We have a different tag, which means something like <br> which never closes is in 
@@ -638,7 +647,13 @@ class TemplateParseException (Exception):
 		
 	def __str__ (self):
 		return "[" + self.location + "] " + self.errorDescription
-	
+
+# The list of elements in HTML that can not have end tags - done as a dictionary for fast
+# lookup.	
+HTML_FORBIDDEN_ENDTAG = {'AREA': 1, 'BASE': 1, 'BASEFONT': 1, 'BR': 1, 'COL': 1
+												,'FRAME': 1, 'HR': 1, 'IMG': 1, 'INPUT': 1, 'ISINDEX': 1
+												,'LINK': 1, 'META': 1, 'PARAM': 1}
+
 class HTMLTemplateCompiler (TemplateCompiler, sgmllib.SGMLParser):
 	def __init__ (self):
 		TemplateCompiler.__init__ (self)
@@ -653,11 +668,21 @@ class HTMLTemplateCompiler (TemplateCompiler, sgmllib.SGMLParser):
 		
 	def unknown_starttag (self, tag, attributes):
 		self.log.debug ("Recieved Start Tag: " + tag + " Attributes: " + str (attributes))
-		self.parseStartTag (tag, attributes)
+		if (HTML_FORBIDDEN_ENDTAG.has_key (tag.upper())):
+			# This should have no end tag, so we just do the start and suppress the end
+			self.parseStartTag (tag, attributes)
+			self.log.debug ("End tag forbidden, generating close tag with no output.")
+			self.popTag ((tag, None), omitTagFlag=1)
+		else:
+			self.parseStartTag (tag, attributes)
 		
 	def unknown_endtag (self, tag):
 		self.log.debug ("Recieved End Tag: " + tag)
-		self.parseEndTag (tag)
+		if (HTML_FORBIDDEN_ENDTAG.has_key (tag.upper())):
+			self.log.warn ("HTML 4.01 forbids end tags for the %s element" % tag)
+		else:
+			# Normal end tag
+			self.popTag ((tag, None))
 			
 	def handle_data (self, data):
 		self.log.debug ("Recieved Real Data: " + data)

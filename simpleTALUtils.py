@@ -15,7 +15,7 @@
 		Module Dependencies: None
 """
 
-__version__ = "2.0"
+__version__ = "2.1"
 
 
 import StringIO, os, sys, codecs, sgmllib, cgi

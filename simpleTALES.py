@@ -15,7 +15,7 @@
 		Module Dependencies: logging
 """
 
-__version__ = "2.0"
+__version__ = "2.1"
 
 import copy, string
 
@@ -226,21 +226,25 @@ class Context:
 			self.globals[name] = ContextVariable (value)
 		
 	def addLocals (self, localVarList):
-		varsToAdd = []
+		# Pop the current locals onto the stack
+		self.localStack.append (self.locals)
+		self.locals = copy.copy (self.locals)
 		for var in localVarList:
 			name, value = var
 			if (isinstance (value, ContextVariable)):
-				varsToAdd.append ((name, value))
+				self.locals [name] = value
 			else:
-				varsToAdd.append ((name, ContextVariable (value)))
-		
-		self.localStack.append (varsToAdd)
-		self._regenLocals_()
+				self.locals [name] = ContextVariable (value)
+				
+	def setLocal (self, name, value):
+		# Override the current local if present with the new one
+		if (isinstance (value, ContextVariable)):
+			self.locals [name] = value
+		else:
+			self.locals [name] = ContextVariable (value)
 		
 	def popLocals (self):
-		lastLocals = self.localStack.pop()
-		self._regenLocals_()
-		return lastLocals
+		self.locals = self.localStack.pop()
 		
 	def evaluate (self, expr, originalAtts = None):
 		# Returns a ContextVariable
@@ -419,12 +423,6 @@ class Context:
 			return NoCallVariable (val)
 		return val
 		
-	def _regenLocals_(self) :
-		self.locals = {}
-		for scope in self.localStack:
-			for var in scope:
-				self.locals [var[0]] = var[1]
-			
 	def __str__ (self):
 		return "Globals: " + str (self.globals) + "Locals: " + str (self.locals)
 		

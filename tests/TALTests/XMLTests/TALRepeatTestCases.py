@@ -132,6 +132,12 @@ class TALRepeatTestCases (unittest.TestCase):
 								   ,'<?xml version="1.0" encoding="iso8859-1"?>\n<html><p>I: 1</p><p>II: 2</p><p>III: 3</p><p>IV: 4</p><p>V: 5</p><p>VI: 6</p><p>VII: 7</p><p>VIII: 8</p><p>IX: 9</p><p>X: 10</p><p>XI: 11</p><p>XII: 12</p><p>XIII: 13</p><p>XIV: 14</p><p>XV: 15</p><p>XVI: 16</p><p>XVII: 17</p><p>XVIII: 18</p><p>XIX: 19</p><p>XX: 20</p><p>XXI: 21</p><p>XXII: 22</p><p>XXIII: 23</p><p>XXIV: 24</p><p>XXV: 25</p><p>XXVI: 26</p><p>XXVII: 27</p><p>XXVIII: 28</p><p>XXIX: 29</p><p>XXX: 30</p><p>XXXI: 31</p><p>XXXII: 32</p><p>XXXIII: 33</p><p>XXXIV: 34</p><p>XXXV: 35</p><p>XXXVI: 36</p><p>XXXVII: 37</p><p>XXXVIII: 38</p><p>XXXIX: 39</p><p>XL: 40</p><p>XLI: 41</p><p>XLII: 42</p><p>XLIII: 43</p><p>XLIV: 44</p><p>XLV: 45</p><p>XLVI: 46</p><p>XLVII: 47</p><p>XLVIII: 48</p><p>XLIX: 49</p><p>L: 50</p><p>LI: 51</p><p>LII: 52</p><p>LIII: 53</p><p>LIV: 54</p><p>LV: 55</p><p>LVI: 56</p><p>LVII: 57</p><p>LVIII: 58</p><p>LIX: 59</p><p>LX: 60</p><p>LXI: 61</p><p>LXII: 62</p><p>LXIII: 63</p><p>LXIV: 64</p><p>LXV: 65</p><p>LXVI: 66</p><p>LXVII: 67</p><p>LXVIII: 68</p><p>LXIX: 69</p><p>LXX: 70</p><p>LXXI: 71</p><p>LXXII: 72</p><p>LXXIII: 73</p><p>LXXIV: 74</p><p>LXXV: 75</p><p>LXXVI: 76</p><p>LXXVII: 77</p><p>LXXVIII: 78</p><p>LXXIX: 79</p><p>LXXX: 80</p><p>LXXXI: 81</p><p>LXXXII: 82</p><p>LXXXIII: 83</p><p>LXXXIV: 84</p><p>LXXXV: 85</p><p>LXXXVI: 86</p><p>LXXXVII: 87</p><p>LXXXVIII: 88</p><p>LXXXIX: 89</p><p>XC: 90</p><p>XCI: 91</p><p>XCII: 92</p><p>XCIII: 93</p><p>XCIV: 94</p><p>XCV: 95</p><p>XCVI: 96</p><p>XCVII: 97</p><p>XCVIII: 98</p><p>XCIX: 99</p></html>'
 								   ,'Repeat variable Roman failed.'
 								   )
+
+	def testLocalVarScope (self):
+		self._runTest_ ('<html><p tal:repeat="var fourList"><b tal:replace="var">bold</b></p><b tal:condition="exists:var">VAR EXISTS</b></html>'
+									 ,'<?xml version="1.0" encoding="iso8859-1"?>\n<html><p>zero</p><p>one</p><p>two</p><p>three</p></html>'
+									 ,'Local repeat variable remained accessible out of scope!'
+									 )
 		
 if __name__ == '__main__':
 	unittest.main()

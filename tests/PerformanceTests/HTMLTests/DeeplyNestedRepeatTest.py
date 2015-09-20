@@ -39,6 +39,7 @@ performanceTemplate = """<html>
 </html>
 """
 
+# 3 X 7 X 8 = 168 itterations per template expansion.
 thirdLevelList = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight"]
 secondLevelList = [{"colour": "red", "num": thirdLevelList}, {"colour": "orange", "num": thirdLevelList}, {"colour": "yellow", "num": thirdLevelList}, {"colour": "green", "num": thirdLevelList}, {"colour": "blue", "num": thirdLevelList}, {"colour": "indigo", "num": thirdLevelList}, {"colour": "violet", "num": thirdLevelList}]
 firstLevelList = [{"title": "First", "content": secondLevelList}, {"title": "Second", "content": secondLevelList}, {"title": "Third", "content": secondLevelList}]

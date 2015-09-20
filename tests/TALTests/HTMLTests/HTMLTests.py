@@ -15,19 +15,29 @@ import unittest, os
 import StringIO
 import logging
 
-import TALConditionTestCases,TALDefineTestCases,TALHandlerTestCases,TALContentTestCases,TALReplaceTestCases,TALRepeatTestCases,TALSpecialCharsTestCases,TALEncodingTestCases,TALAttributesTestCases,TALOmitTagTestCases
+import TALConditionTestCases,TALDefineTestCases,TALHandlerTestCases,TALContentTestCases,TALReplaceTestCases,TALRepeatTestCases,TALSpecialCharsTestCases,TALEncodingTestCases,TALAttributesTestCases,TALOmitTagTestCases,TALForbiddenEndTagTestCases
 
-print "Running all HTML tests."
-runner = unittest.TextTestRunner(verbosity='-v')
-for mod in [TALConditionTestCases
-			,TALDefineTestCases
-			,TALHandlerTestCases
-			,TALContentTestCases
-			,TALReplaceTestCases
-			,TALRepeatTestCases
-			,TALSpecialCharsTestCases
-			,TALEncodingTestCases
-			,TALAttributesTestCases
-			,TALOmitTagTestCases]:
-	htmlSuite = unittest.defaultTestLoader.loadTestsFromModule (mod)
-	runner.run(htmlSuite)
+def getAllTests ():
+	allTestCases = unittest.TestSuite()
+	for mod in [TALConditionTestCases
+							,TALDefineTestCases
+							,TALHandlerTestCases
+							,TALContentTestCases
+							,TALReplaceTestCases
+							,TALRepeatTestCases
+							,TALSpecialCharsTestCases
+							,TALEncodingTestCases
+							,TALAttributesTestCases
+							,TALOmitTagTestCases
+							,TALForbiddenEndTagTestCases
+				   ]:
+		talesSuite = unittest.defaultTestLoader.loadTestsFromModule (mod)
+		allTestCases.addTest (talesSuite)
+	return allTestCases
+
+if __name__ == '__main__':
+	print "Running all HTML tests."
+	runner = unittest.TextTestRunner(verbosity='-v')
+	runner.run(getAllTests())
+
+
