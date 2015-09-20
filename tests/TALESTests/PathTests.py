@@ -134,30 +134,6 @@ class PathTests (unittest.TestCase):
 					   ,'Second valid path was not selected.'
 					   )
 					   
-	def testImbalancedQuoteOne (self):
-		self._runTest_ ('<html tal:replace=alt">hmm</html>'
-					   ,'Wobble the way'
-					   ,'Trailing quote was not handled'
-					   )
-					   
-	def testImbalancedQuoteTwo (self):
-		self._runTest_ ('<html tal:replace="alt>hmm</html>'
-					   			,'Wobble the way'
-					   			,'Trailing quote was not handled'
-					   			)
-					   
-	def testImbalancedQuoteThree (self):
-		self._runTest_ ("<html tal:replace=alt'>hmm</html>"
-					   ,'Wobble the way'
-					   ,'Trailing quote was not handled'
-					   )
-					   
-	def testImbalancedQuoteFour (self):
-		self._runTest_ ("<html tal:replace='alt>hmm</html>"
-					   ,'Wobble the way'
-					   ,'Trailing quote was not handled'
-					   )
-					   
 	def testPathFunctionNoParams (self):
 		self._runTest_ ('<html tal:content="pathFunc">hmm</html>'
 						,'<html></html>'

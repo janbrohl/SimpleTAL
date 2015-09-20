@@ -84,7 +84,7 @@ class ElementTreeTestCases (unittest.TestCase):
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 
 	def testNormalTree (self):
-		self._runTest_ ("""<html tal:content="xml/title>Exists</html>"""
+		self._runTest_ ("""<html tal:content="xml/title">Exists</html>"""
 					   ,'<html>This is a test</html>'
 					   ,'Simple Element Tree test failed.'
 					   ,allowPythonPath=1

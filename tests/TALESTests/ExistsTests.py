@@ -99,7 +99,7 @@ class ExistsTests (unittest.TestCase):
 					   )					   
 					   
 	def testNothingExists (self):
-		self._runTest_ ("<html tal:condition=exists:nothing'>Top</html>"
+		self._runTest_ ('<html tal:condition=exists:nothing>Top</html>'
 					   ,'<html>Top</html>'
 					   ,'Nothing should exist!'
 					   )					   

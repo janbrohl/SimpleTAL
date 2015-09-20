@@ -117,5 +117,5 @@ expanded = simpleTALUtils.ExpandMacros (context, template)
 realTemplate = simpleTAL.compileHTMLTemplate (expanded)
 
 print "Timing macro expansion..."
-result = METALTime (400, realTemplate)
-print "Total time %s for 400 itterations" % (str (result))
+result = METALTime (4000, realTemplate)
+print "Total time %s for 4000 itterations" % (str (result))

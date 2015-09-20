@@ -142,3 +142,5 @@ class TALIteratorRepeatTestCases (unittest.TestCase):
 	def testRomanNumAct (self):
 		self._runTest_ ('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/Roman">Hello</p></html>', "<html><p>I</p><p>II</p></html>", "Repeat of two length actual iterator failed to generate roman numerals.")
 		
+if __name__ == '__main__':
+	unittest.main()

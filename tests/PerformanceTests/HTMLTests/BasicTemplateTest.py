@@ -148,10 +148,10 @@ def NGTemplateOverhead (count):
 
 
 print "Timing TAL templates"
-result = NGTemplates (2000)
-print "Result: " + str(result) + " for 2000 template expansions"
+result = NGTemplates (10000)
+print "Result: " + str(result) + " for 10000 template expansions"
 
 print "Timing TAL templates (with template parsing)"
-result = NGTemplateOverhead (200)
-print "Result: " + str(result) + " for 200 template expansions"
+result = NGTemplateOverhead (1000)
+print "Result: " + str(result) + " for 1000 template expansions"
 

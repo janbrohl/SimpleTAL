@@ -118,13 +118,12 @@ class TALAttributesTestCases (unittest.TestCase):
 						,"""<html four="Value three" one="Value One" two="Value two" three="Value three">Value One</html>"""
 						,"Accessing multiple existing attributes failed.")
 						
-	# HTML Attributes are case insensitive.
-#=======================================
-#	def testAttributeCase (self):
-#		self._runTest_ ('<html HREF="Testing" tal:attributes="HREF test">Hello</html>'
-#						,"""<html href="testing">Hello</html>"""
-#						,"HTML Attributes not treated as case insensitive.")
-#=======================================
+
+	#~ def testAttributeCase (self):
+		#~ self._runTest_ ('<html HREF="Testing" tal:attributes="HREF test">Hello</html>'
+						#~ ,"""<html href="testing">Hello</html>"""
+						#~ ,"HTML Attributes not treated as case insensitive.")
+						
 	
 
 

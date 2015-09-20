@@ -9,8 +9,8 @@
   <p id="subject">Documentation on how to use the simpleTAL Module.</p>
   <div><h2>simpleTAL</h2>
 <p>Two helper functions are provided for convenience, one for compiling HTML templates, and one for compiling XML templates.&nbsp; If an error is encountered during compilation (for example mismatched TAL tags or bad syntax) an TemplateParseException will be thrown.</p>
-<h3>compileHTMLTemplate (template, inputEncoding="ISO-8859-1")</h3>
-<p>Compiles the passed in HTML template into an instance of the 'Template' class.&nbsp; The template object should be either a string containing the template, or a file-like object.&nbsp; The inputEncoding specifies the encoding that the template was written using and deafults to iso-8859-1.&nbsp; See below for details of how to use the Template class.</p>
+<h3>compileHTMLTemplate (template, inputEncoding="ISO-8859-1", minimizeBooleanAtts=0)</h3>
+<p>Compiles the passed in HTML template into an instance of the 'Template' class.&nbsp; The template object should be either a string containing the template, or a file-like object.&nbsp; The inputEncoding specifies the encoding that the template was written using and deafults to iso-8859-1.&nbsp; The minimizeBooleanAtts flag controls whether HTML boolean attributes (e.g. &lt;img ismap&gt;) should be written out in minimized form.&nbsp; See below for details of how to use the Template class.</p>
 <h3>compileXMLTemplate (template)</h3>
 <p>Compiles the passed in XML template into an instance of the 'Template' class.&nbsp; The template object should be either a string containing the template, or a file-like object.&nbsp; The XML template must be a well formed XML document.&nbsp; The character set will be determined from the prolog of the template or be assumed to be utf-8.&nbsp; See below for details of how to use the Template class.</p>
 <h3>compileDOMTemplate (dom)</h3>
@@ -38,7 +38,7 @@ template.expand (context, outputFile, docType='&lt;!DOCTYPE html&nbsp; PUBLIC "-
   <p id="version">PubTal Version </p>
   <div id="footer">
   <p>File: api-simpletal.txt</p>
-  <p>Last modified: Sun, 07 Aug 2005 19:27:55 BST</p>
+  <p>Last modified: Sun, 23 Oct 2005 16:35:10 EDT</p>
   <p>Copyright 2005 Colin Stewart</p>
   <p title="PubTal is a template driven web site publisher.">Made with <a href="http://www.owlfish.com/software/PubTal/">PubTal</a> 3.1.3</p>
   </div>

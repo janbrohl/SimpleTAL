@@ -52,7 +52,7 @@
 <p>Example: <code>&lt;h1&gt;Welcome &lt;b tal:replace="user/firstName"&gt;&lt;/b&gt;&lt;/h1&gt;</code></p>
 <h3>tal:attributes</h3>
 <p>Syntax: tal:attributes="name expression[;attributes-expression]"</p>
-<p>Description:&nbsp; Evaluates each "expression" and replaces the tag's attribute "name".&nbsp; If the expression evaluates to Nothing then the attribute is removed from the tag.&nbsp; If the expression evaluates to Default then the original tag's attribute is kept.&nbsp; If the "expression" requires a semi-colon then it must be escaped by using ";;".</p>
+<p>Description:&nbsp; Evaluates each "expression" and replaces the tag's attribute "name".&nbsp; If the expression evaluates to nothing then the attribute is removed from the tag.&nbsp; If the expression evaluates to default then the original tag's attribute is kept.&nbsp; If the "expression" requires a semi-colon then it must be escaped by using ";;".</p>
 <p>Example: <code>&lt;a tal:attributes="href user/homepage;title user/fullname"&gt;Your Homepage&lt;/a&gt;</code></p>
 <h3>tal:omit-tag</h3>
 <p>Syntax: tal:omit-tag="expression"</p>
@@ -64,6 +64,14 @@
 <p>Syntax: [path:]string[|TALES Expression]</p>
 <p>Description: A path, optionally starting with the modifier 'path:', references a property of an object.&nbsp; The '/' delimiter is used to end the name of an object and the start of the property name.&nbsp; Properties themselves may be objects that in turn have properties.&nbsp; The '|' ("or") character is used to find an alternative value to a path if the first path evaluates to 'Nothing' or does not exist.</p>
 <p>Example: <code>&lt;p tal:content="book/chapter/title | string:Untitled"&gt;&lt;/p&gt;</code></p>
+<p><code>There are several built in paths that can be used in paths:</code></p>
+<ol><li><p><code>nothing - acts as None in Python</code></p>
+</li><li><p><code>default - keeps the existing value of the node (tag content or attribute value)</code></p>
+</li><li><p><code>options - the dictionary of values passed to the template (through the Context __init__ method)</code></p>
+</li><li><p><code>repeat - access the current repeat variable (see tal:repeat)</code></p>
+</li><li><p><code>attrs - a dictionary of original attributes of the current tag</code></p>
+</li><li><p><code>CONTEXTS - a dictionary containing all of the above</code></p>
+</li></ol>
 <h3>exists</h3>
 <p>Syntax: exists:<span style="font-style:italic">path</span></p>
 <p>Description: Returns true if the <span style="font-style:italic">path</span> exists, false otherwise.&nbsp; This is particularly useful for removing tags from output when the tags will have no content.</p>
@@ -115,7 +123,7 @@
   <p id="version">PubTal Version </p>
   <div id="footer">
   <p>File: tal-guide.sxw</p>
-  <p>Last modified: Sun, 07 Aug 2005 20:54:45 BST</p>
+  <p>Last modified: Sun, 23 Oct 2005 13:52:11 EDT</p>
   <p>Copyright 2005 Colin Stewart</p>
   <p title="PubTal is a template driven web site publisher.">Made with <a href="http://www.owlfish.com/software/PubTal/">PubTal</a> 3.1.3</p>
   </div>

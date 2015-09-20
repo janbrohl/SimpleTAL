@@ -66,12 +66,11 @@ instead of: <code>&lt;div tal:condition="python: a &lt; b"&gt;Conditional Text&l
 
 <h2>Known limitations</h2>
 <ol>
-<li>In the Zope implementation of TAL any elements in the TAL or METAL namespace have no start or end tags written out.  This is supported in SimpleTAL version 3.0 onwards, but only for XML templates.  HTML templates can not have elements in anything other than the default namespace.  This is a limitation of the Python sgmllib implementation.</li>
 <li>Repeat Variables do not support 'first' and 'last'.</li>
 <li>When using 'not:' on an empty expression the result will be true rather than an error.</li>
 <li>Path type 'python:' is not supported by default.  You can enable this by passing allowPythonPath=1 to the Context constructor.  Note that this should only be used when the authors of the templates are completely trusted, the code included in the 'python:' path can do anything.</li>
 <li>TAL markup "on-error" is not yet supported.</li>
-<li>HTML Templates will have duplicate attributes if an attribute is added using "tal:attributes" and the name is in upper case.  The cause of this is the sgmllib implementation which always converts attributes to lower case.</li>
+<li>HTML Templates will have duplicate attributes if an attribute is added using "tal:attributes" and the name is in upper case.  The cause of this is the HTMLParser implementation, which always converts attributes to lower case.</li>
 </ol>
 
 <h2>Known differences</h2>

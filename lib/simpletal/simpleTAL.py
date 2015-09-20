@@ -39,8 +39,8 @@ try:
 except:
 	import DummyLogger as logging
 	
-import sgmllib, xml.sax, cgi, StringIO, codecs, re, sgmlentitynames, types
-import simpletal, copy, sys
+import xml.sax, cgi, StringIO, codecs, re, sgmlentitynames, types
+import simpletal, copy, sys, HTMLParser
 
 __version__ = simpletal.__version__
 
@@ -59,16 +59,6 @@ try:
 	use_dom2sax = 1
 except ImportError:
 	use_dom2sax = 0
-	
-# Determine how to convert non-string objects
-if (sys.version_info[0] <= 2 and sys.version_info[1] < 2):
-	# Old version, must use str()
-	def unicodeStringConv (anObj):
-		return unicode (str (anObj), 'ascii')
-		
-	OBJ_CONV=unicodeStringConv
-else:
-	OBJ_CONV=unicode
 
 import simpleTALES
 
@@ -116,6 +106,21 @@ METAL_DEFINE_MACRO=17
 METAL_NAME_REGEX = re.compile ("[a-zA-Z_][a-zA-Z0-9_]*")
 SINGLETON_XML_REGEX = re.compile ('^<[^\s/>]+(?:\s*[^=>]+="[^">]+")*\s*/>')
 ENTITY_REF_REGEX = re.compile (r'(?:&[a-zA-Z][\-\.a-zA-Z0-9]*[^\-\.a-zA-Z0-9])|(?:&#[xX]?[a-eA-E0-9]*[^0-9a-eA-E])')
+
+# The list of elements in HTML that can not have end tags - done as a dictionary for fast
+# lookup.	
+HTML_FORBIDDEN_ENDTAG = {'AREA': 1, 'BASE': 1, 'BASEFONT': 1, 'BR': 1, 'COL': 1
+						,'FRAME': 1, 'HR': 1, 'IMG': 1, 'INPUT': 1, 'ISINDEX': 1
+						,'LINK': 1, 'META': 1, 'PARAM': 1}
+							
+# List of element:attribute pairs that can use minimized form in HTML
+HTML_BOOLEAN_ATTS = {'AREA:NOHREF': 1, 'IMG:ISMAP': 1, 'OBJECT:DECLARE': 1
+									, 'INPUT:CHECKED': 1, 'INPUT:DISABLED': 1, 'INPUT:READONLY': 1, 'INPUT:ISMAP': 1
+									, 'SELECT:MULTIPLE': 1, 'SELECT:DISABLED': 1
+									, 'OPTGROUP:DISABLED': 1
+									, 'OPTION:SELECTED': 1, 'OPTION:DISABLED': 1
+									, 'TEXTAREA:DISABLED': 1, 'TEXTAREA:READONLY': 1
+									, 'BUTTON:DISABLED': 1, 'SCRIPT:DEFER': 1}
 
 class TemplateInterpreter:
 	def __init__ (self):
@@ -379,7 +384,7 @@ class TemplateInterpreter:
 				else:
 					# THIS IS NOT A BUG!
 					# Use Unicode in the Context object if you are not using Ascii
-					escapedAttVal = OBJ_CONV (resultVal)
+					escapedAttVal = unicode (resultVal)
 				newAtts.append ((attName, escapedAttVal))
 		# Copy over the old attributes 
 		for oldAttName, oldAttValue in self.currentAttributes:
@@ -438,7 +443,7 @@ class TemplateInterpreter:
 					else:
 						# THIS IS NOT A BUG!
 						# Use Unicode in the Context object if you are not using Ascii
-						self.file.write (OBJ_CONV (resultVal))
+						self.file.write (unicode (resultVal))
 			else:
 				if (isinstance (resultVal, types.UnicodeType)):
 					self.file.write (cgi.escape (resultVal))
@@ -449,7 +454,7 @@ class TemplateInterpreter:
 				else:
 					# THIS IS NOT A BUG!
 					# Use Unicode in the Context object if you are not using Ascii
-					self.file.write (cgi.escape (OBJ_CONV (resultVal)))
+					self.file.write (cgi.escape (unicode (resultVal)))
 					
 		if (self.outputTag and not args[1]):
 			# Do NOT output end tag if a singleton with no content
@@ -539,6 +544,38 @@ class TemplateInterpreter:
 		# Slot isn't filled, so just use our own content
 		self.programCounter += 1
 		return
+	
+
+class HTMLTemplateInterpreter (TemplateInterpreter):
+	def __init__ (self, minimizeBooleanAtts = 0):
+		TemplateInterpreter.__init__ (self)
+		self.minimizeBooleanAtts = minimizeBooleanAtts
+		if (minimizeBooleanAtts):
+			# Override the tagAsText method for this instance
+			self.tagAsText = self.tagAsTextMinimizeAtts
+		
+	def tagAsTextMinimizeAtts (self, (tag,atts), singletonFlag=0):
+		""" This returns a tag as text.
+		"""
+		result = ["<"]
+		result.append (tag)
+		upperTag = tag.upper()
+		for attName, attValue in atts:
+			if (HTML_BOOLEAN_ATTS.has_key ('%s:%s' % (upperTag, attName.upper()))):
+				# We should output a minimised boolean value
+				result.append (' ')
+				result.append (attName)
+			else:
+				result.append (' ')
+				result.append (attName)
+				result.append ('="')
+				result.append (cgi.escape (attValue, quote=1))
+				result.append ('"')
+		if (singletonFlag):
+			result.append (" />")
+		else:
+			result.append (">")
+		return "".join (result)
 	
 class Template:
 	def __init__ (self, commands, macros, symbols, doctype = None):
@@ -638,6 +675,9 @@ class SubTemplate (Template):
 class HTMLTemplate (Template):
 	"""A specialised form of a template that knows how to output HTML
 	"""
+	def __init__ (self, commands, macros, symbols, doctype = None, minimizeBooleanAtts = 0):
+		self.minimizeBooleanAtts = minimizeBooleanAtts
+		Template.__init__ (self, commands, macros, symbols, doctype = None)
 	
 	def expand (self, context, outputFile, outputEncoding="ISO-8859-1",interpreter=None):
 		""" This method will write to the outputFile, using the encoding specified,
@@ -649,6 +689,15 @@ class HTMLTemplate (Template):
 		
 		encodingFile = codecs.lookup (outputEncoding)[3](outputFile, 'replace')
 		self.expandInline (context, encodingFile, interpreter)
+		
+	def expandInline (self, context, outputFile, interpreter=None):
+		""" Ensure we use the HTMLTemplateInterpreter"""
+		if (interpreter is None):
+			ourInterpreter = HTMLTemplateInterpreter(minimizeBooleanAtts = self.minimizeBooleanAtts)
+			ourInterpreter.initialise (context, outputFile)
+		else:
+			ourInterpreter = interpreter
+		Template.expandInline (self, context, outputFile, ourInterpreter)
 		
 class XMLTemplate (Template):
 	"""A specialised form of a template that knows how to output XML
@@ -1216,32 +1265,58 @@ class TemplateParseException (Exception):
 	def __str__ (self):
 		return "[" + self.location + "] " + self.errorDescription
 
-# The list of elements in HTML that can not have end tags - done as a dictionary for fast
-# lookup.	
-HTML_FORBIDDEN_ENDTAG = {'AREA': 1, 'BASE': 1, 'BASEFONT': 1, 'BR': 1, 'COL': 1
-						,'FRAME': 1, 'HR': 1, 'IMG': 1, 'INPUT': 1, 'ISINDEX': 1
-						,'LINK': 1, 'META': 1, 'PARAM': 1}
 
-class HTMLTemplateCompiler (TemplateCompiler, sgmllib.SGMLParser):
+class HTMLTemplateCompiler (TemplateCompiler, HTMLParser.HTMLParser):
 	def __init__ (self):
 		TemplateCompiler.__init__ (self)
-		sgmllib.SGMLParser.__init__ (self)
+		HTMLParser.HTMLParser.__init__ (self)
 		self.log = logging.getLogger ("simpleTAL.HTMLTemplateCompiler")
 		
-	def parseTemplate (self, file, encoding="iso-8859-1"):
+	def parseTemplate (self, file, encoding="iso-8859-1", minimizeBooleanAtts = 0):
 		encodedFile = codecs.lookup (encoding)[2](file, 'replace')
 		self.encoding = encoding
+		self.minimizeBooleanAtts = minimizeBooleanAtts
 		self.feed (encodedFile.read())
 		self.close()
 		
-	def unknown_starttag (self, tag, attributes):
+	def tagAsText (self, (tag,atts), singletonFlag=0):
+		""" This returns a tag as text.
+		"""
+		result = ["<"]
+		result.append (tag)
+		upperTag = tag.upper()
+		for attName, attValue in atts:
+			if (self.minimizeBooleanAtts and HTML_BOOLEAN_ATTS.has_key ('%s:%s' % (upperTag, attName.upper()))):
+				# We should output a minimised boolean value
+				result.append (' ')
+				result.append (attName)
+			else:
+				result.append (' ')
+				result.append (attName)
+				result.append ('="')
+				result.append (cgi.escape (attValue, quote=1))
+				result.append ('"')
+		if (singletonFlag):
+			result.append (" />")
+		else:
+			result.append (">")
+		return "".join (result)
+		
+	def handle_startendtag (self, tag, attributes):
+		self.handle_starttag (tag, attributes)
+		if not (HTML_FORBIDDEN_ENDTAG.has_key (tag.upper())):
+			self.handle_endtag(tag)
+		
+	def handle_starttag (self, tag, attributes):
 		self.log.debug ("Recieved Start Tag: " + tag + " Attributes: " + str (attributes))
 		atts = []
 		for att, attValue in attributes:
 			# We need to spot empty tal:omit-tags 
-			if (att == attValue and att == self.tal_namespace_omittag):
-				# Set the attribute value to "" which tal:omit-tag interprets as true
-				atts.append ((att, u""))
+			if (attValue is None):
+				if (att == self.tal_namespace_omittag):
+					atts.append ((att, u""))
+				else:
+					atts.append ((att, att))
 			else:
 				# Expand any SGML entity references or char references
 				goodAttValue = []
@@ -1274,7 +1349,7 @@ class HTMLTemplateCompiler (TemplateCompiler, sgmllib.SGMLParser):
 		else:
 			self.parseStartTag (tag, atts)
 		
-	def unknown_endtag (self, tag):
+	def handle_endtag (self, tag):
 		self.log.debug ("Recieved End Tag: " + tag)
 		if (HTML_FORBIDDEN_ENDTAG.has_key (tag.upper())):
 			self.log.warn ("HTML 4.01 forbids end tags for the %s element" % tag)
@@ -1305,7 +1380,7 @@ class HTMLTemplateCompiler (TemplateCompiler, sgmllib.SGMLParser):
 		self.log.warn ("End tag %s present with no corresponding open tag.")
 			
 	def getTemplate (self):
-		template = HTMLTemplate (self.commandList, self.macroMap, self.symbolLocationTable)
+		template = HTMLTemplate (self.commandList, self.macroMap, self.symbolLocationTable, minimizeBooleanAtts = self.minimizeBooleanAtts)
 		return template
 			
 class XMLTemplateCompiler (TemplateCompiler, xml.sax.handler.ContentHandler, xml.sax.handler.DTDHandler, LexicalHandler):
@@ -1391,7 +1466,7 @@ class XMLTemplateCompiler (TemplateCompiler, xml.sax.handler.ContentHandler, xml
 		template = XMLTemplate (self.commandList, self.macroMap, self.symbolLocationTable, self.doctype)
 		return template
 			
-def compileHTMLTemplate (template, inputEncoding="ISO-8859-1"):
+def compileHTMLTemplate (template, inputEncoding="ISO-8859-1", minimizeBooleanAtts = 0):
 	""" Reads the templateFile and produces a compiled template.
 			To use the resulting template object call:
 				template.expand (context, outputFile)
@@ -1402,7 +1477,7 @@ def compileHTMLTemplate (template, inputEncoding="ISO-8859-1"):
 	else:
 		templateFile = template
 	compiler = HTMLTemplateCompiler()
-	compiler.parseTemplate (templateFile, inputEncoding)
+	compiler.parseTemplate (templateFile, inputEncoding, minimizeBooleanAtts)
 	return compiler.getTemplate()
 
 def compileXMLTemplate (template):

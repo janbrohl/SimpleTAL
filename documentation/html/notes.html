@@ -54,12 +54,11 @@ Context.addGlobal ("dict", myDict)
 instead of: <code>&lt;div tal:condition="python: a &lt; b"&gt;Conditional Text&lt;/div&gt;</code></p>
 <h2>Known limitations</h2>
 <ol>
-<li>In the Zope implementation of TAL any elements in the TAL or METAL namespace have no start or end tags written out.&nbsp; This is supported in SimpleTAL version 3.0 onwards, but only for XML templates.&nbsp; HTML templates can not have elements in anything other than the default namespace.&nbsp; This is a limitation of the Python sgmllib implementation.</li>
 <li>Repeat Variables do not support 'first' and 'last'.</li>
 <li>When using 'not:' on an empty expression the result will be true rather than an error.</li>
 <li>Path type 'python:' is not supported by default.&nbsp; You can enable this by passing allowPythonPath=1 to the Context constructor.&nbsp; Note that this should only be used when the authors of the templates are completely trusted, the code included in the 'python:' path can do anything.</li>
 <li>TAL markup "on-error" is not yet supported.</li>
-<li>HTML Templates will have duplicate attributes if an attribute is added using "tal:attributes" and the name is in upper case.&nbsp; The cause of this is the sgmllib implementation which always converts attributes to lower case.</li>
+<li>HTML Templates will have duplicate attributes if an attribute is added using "tal:attributes" and the name is in upper case.&nbsp; The cause of this is the HTMLParser implementation, which always converts attributes to lower case.</li>
 </ol>
 <h2>Known differences</h2>
 <p>Non-existent path types, e.g. '&lt;b tal:content="total: $totalAmount"&gt;&lt;/b&gt;' are not supported.&nbsp; In Zope, this results in the path being interpreted as a string - in simpleTAL/ES the result will be an error.</p>
@@ -69,7 +68,7 @@ instead of: <code>&lt;div tal:condition="python: a &lt; b"&gt;Conditional Text&l
   <p id="version">PubTal Version </p>
   <div id="footer">
   <p>File: notes.txt</p>
-  <p>Last modified: Tue, 30 Nov 2004 23:52:27 GMT</p>
+  <p>Last modified: Mon, 12 Dec 2005 12:24:50 EST</p>
   <p>Copyright 2005 Colin Stewart</p>
   <p title="PubTal is a template driven web site publisher.">Made with <a href="http://www.owlfish.com/software/PubTal/">PubTal</a> 3.1.3</p>
   </div>

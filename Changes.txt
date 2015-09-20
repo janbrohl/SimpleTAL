@@ -1,5 +1,16 @@
-simpleTAL / simpleTALES (Version 3.13)
+simpleTAL / simpleTALES (Version 4.0)
 -------------------------------------
+Version 4.0
+------------
+This version of SimpleTAL is not 100% backwards compatible with the 3.x series of releases.  Version 4.0 of SimpleTAL requires Python 2.2 or higher.
+
+New features:
+ - Added support for minimizing boolean attributes in HTML (minimizeBooleanAtts = 1).
+ - Switched HTML parser library from SGMLParser to HTMLParser.  HTMLParser is generally less
+   strict than the SGMLParser, however it doesn't handle unbalanced quotes around attributes (thanks to Carlos Neves for the initial patch).
+ - Python 2.2 or higher supported.
+ - All METAL namespace attributes are automatically omitted, not just those in XML templates.
+
 Version 3.13
 ------------
 New features:

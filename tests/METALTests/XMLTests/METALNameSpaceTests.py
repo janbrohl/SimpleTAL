@@ -78,7 +78,7 @@ class METALNameSpaceTests (unittest.TestCase):
 		self._runTest_ ('<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><newmetal:div newmetal:define-macro="one" class="funny">Before <b newmetal:define-slot="blue">blue</b> After</newmetal:div></html>'
 										,'<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><body newmetal:use-macro="site/macros/one">Nowt <newmetal:block newmetal:fill-slot="blue">white</newmetal:block> here</body></html>'
 										,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html>Before white After</html>'
-										,"Single Bind, commands, failed.")
+										,"METAL namespace does not cause implicit omit-tag")
 										
 if __name__ == '__main__':
 	unittest.main()

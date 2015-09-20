@@ -42,8 +42,6 @@ except:
 	
 import simpletal, simpleTAL
 
-OBJ_CONV = simpleTAL.OBJ_CONV
-
 __version__ = simpletal.__version__
 
 DEFAULTVALUE = "This represents a Default value."
@@ -521,7 +519,7 @@ class Context:
 									else:
 										# THIS IS NOT A BUG!
 										# Use Unicode in Context if you aren't using Ascii!
-										result += OBJ_CONV (pathResult)
+										result += unicode (pathResult)
 								skipCount = endPos - position 
 						else:
 							# It's a variable
@@ -541,7 +539,7 @@ class Context:
 								else:
 									# THIS IS NOT A BUG!
 									# Use Unicode in Context if you aren't using Ascii!
-									result += OBJ_CONV (pathResult)
+									result += unicode (pathResult)
 							skipCount = endPos - position - 1
 					except IndexError, e:
 						# Trailing $ sign - just suppress it
