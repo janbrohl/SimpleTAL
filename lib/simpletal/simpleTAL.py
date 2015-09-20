@@ -1,6 +1,6 @@
 """ simpleTAL Interpreter
 
-		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
+		Copyright (c) 2005 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -45,7 +45,7 @@ import simpletal, copy, sys
 __version__ = simpletal.__version__
 
 try:
-    # check to see if pyxml is installed
+    # Is PyXML's LexicalHandler available? 
     from xml.sax.saxlib import LexicalHandler
     use_lexical_handler = 1
 except ImportError:
@@ -53,6 +53,13 @@ except ImportError:
     class LexicalHandler:
         pass
 
+try:
+	# Is PyXML's DOM2SAX available?
+	import xml.dom.ext.Dom2Sax
+	use_dom2sax = 1
+except ImportError:
+	use_dom2sax = 0
+	
 # Determine how to convert non-string objects
 if (sys.version_info[0] <= 2 and sys.version_info[1] < 2):
 	# Old version, must use str()
@@ -164,8 +171,6 @@ class TemplateInterpreter:
 		self.repeatAttributesCopy = []
 		self.currentSlots = {}
 		self.repeatVariable = None
-		self.repeatIndex = 0
-		self.repeatSequence = None
 		self.tagContent = None
 		# tagState flag as to whether there are any local variables to pop
 		self.localVarsDefined = 0
@@ -174,7 +179,7 @@ class TemplateInterpreter:
 		
 	def popProgram (self):
 		vars, self.commandList, self.symbolTable = self.programStack.pop()
-		self.programCounter,self.scopeStack,self.slotParameters,self.currentSlots, self.movePCForward,self.movePCBack,self.outputTag,self.originalAttributes,self.currentAttributes,self.repeatVariable,self.repeatIndex,self.repeatSequence,self.tagContent,self.localVarsDefined = vars
+		self.programCounter,self.scopeStack,self.slotParameters,self.currentSlots, self.movePCForward,self.movePCBack,self.outputTag,self.originalAttributes,self.currentAttributes,self.repeatVariable,self.tagContent,self.localVarsDefined = vars
 		
 	def pushProgram (self):
 		vars = (self.programCounter
@@ -187,8 +192,6 @@ class TemplateInterpreter:
 					 ,self.originalAttributes
 					 ,self.currentAttributes
 					 ,self.repeatVariable
-					 ,self.repeatIndex
-					 ,self.repeatSequence
 					 ,self.tagContent
 					 ,self.localVarsDefined)
 		self.programStack.append ((vars,self.commandList, self.symbolTable))
@@ -257,8 +260,13 @@ class TemplateInterpreter:
 			self.outputTag = 1
 			self.tagContent = None
 			self.movePCForward = None
-			self.repeatIndex += 1
-			if (self.repeatIndex == len (self.repeatSequence)):
+			
+			try:
+				self.repeatVariable.increment()
+				self.context.setLocal (args[0], self.repeatVariable.getCurrentValue())
+				self.programCounter += 1
+				return
+			except IndexError, e:
 				# We have finished the repeat
 				self.repeatVariable = None
 				self.context.removeRepeat (args[0])
@@ -272,10 +280,6 @@ class TemplateInterpreter:
 				# Restore the state of repeatAttributesCopy in case we are nested.
 				self.repeatAttributesCopy = self.scopeStack.pop()
 				return
-			self.context.setLocal (args[0], self.repeatSequence[self.repeatIndex])
-			self.repeatVariable.increment()
-			self.programCounter += 1
-			return
 		
 		# The first time through this command
 		result = self.context.evaluate (args[1], self.originalAttributes)
@@ -284,20 +288,42 @@ class TemplateInterpreter:
 			self.programCounter += 1
 			return
 		try:
+			# We have three options, either the result is a natural sequence, an iterator., or something that can produce an iterator.
 			isSequence = len (result)
+			if (isSequence):
+				# Only setup if we have a sequence with length
+				self.repeatVariable = simpleTALES.RepeatVariable (result)
+			else:
+				# Delete the tags and their contents
+				self.outputTag = 0
+				self.programCounter = self.symbolTable [args[2]]
+				return
 		except:
-			isSequence = 0
-		if (result is None or not isSequence):
-			# Delete the tags and their contents
+			# Not a natural sequence, can it produce an iterator?
+			if (hasattr (result, "__iter__") and callable (result.__iter__)):
+				# We can get an iterator!
+				self.repeatVariable = simpleTALES.IteratorRepeatVariable (result.__iter__())
+			elif (hasattr (result, "next") and callable (result.next)):
+				# Treat as an iterator
+				self.repeatVariable = simpleTALES.IteratorRepeatVariable (result)
+			else:
+				# Just a plain object, let's not loop
+				# Delete the tags and their contents
+				self.outputTag = 0
+				self.programCounter = self.symbolTable [args[2]]
+				return
+				
+		try:
+			curValue = self.repeatVariable.getCurrentValue()
+		except IndexError, e:
+			# The iterator ran out of values before we started - treat as an empty list
 			self.outputTag = 0
+			self.repeatVariable = None
 			self.programCounter = self.symbolTable [args[2]]
 			return
-		
 		# We really do want to repeat - so lets do it
-		self.repeatSequence = result
 		self.movePCBack = self.programCounter
-		self.repeatVariable = simpleTALES.RepeatVariable (self.repeatSequence)
-		self.context.addRepeat (args[0], self.repeatVariable, self.repeatSequence[self.repeatIndex])
+		self.context.addRepeat (args[0], self.repeatVariable, curValue)
 		# We keep the old state of the repeatAttributesCopy for nested loops
 		self.scopeStack.append (self.repeatAttributesCopy)
 		# Keep a copy of the current attributes for this tag
@@ -437,7 +463,7 @@ class TemplateInterpreter:
 		if (self.localVarsDefined):
 			self.context.popLocals()
 			
-		self.movePCForward,self.movePCBack,self.outputTag,self.originalAttributes,self.currentAttributes,self.repeatVariable,self.repeatIndex,self.repeatSequence,self.tagContent,self.localVarsDefined = self.scopeStack.pop()			
+		self.movePCForward,self.movePCBack,self.outputTag,self.originalAttributes,self.currentAttributes,self.repeatVariable,self.tagContent,self.localVarsDefined = self.scopeStack.pop()			
 		self.programCounter += 1
 	
 	def cmdOutput (self, command, args):
@@ -454,8 +480,6 @@ class TemplateInterpreter:
 								,self.originalAttributes
 								,self.currentAttributes
 								,self.repeatVariable
-								,self.repeatIndex
-								,self.repeatSequence
 								,self.tagContent
 								,self.localVarsDefined))
 
@@ -465,8 +489,6 @@ class TemplateInterpreter:
 		self.originalAttributes = args[0]
 		self.currentAttributes = args[1]
 		self.repeatVariable = None
-		self.repeatIndex = 0
-		self.repeatSequence = None
 		self.tagContent = None
 		self.localVarsDefined = 0
 		
@@ -1308,6 +1330,20 @@ class XMLTemplateCompiler (TemplateCompiler, xml.sax.handler.ContentHandler, xml
 		self.ourParser.setDTDHandler (self)
 		
 		self.ourParser.parse (file)
+		
+	def parseDOM (self, dom):
+		if (not use_dom2sax):
+			self.log.critical ("PyXML is not available, DOM can not be parsed.")
+		
+		self.ourParser = xml.dom.ext.Dom2Sax.Dom2SaxParser()
+		self.log.debug ("Setting features of parser")
+		if use_lexical_handler:
+			   self.ourParser.setProperty(xml.sax.handler.property_lexical_handler, self) 
+		
+		self.ourParser.setContentHandler (self)
+		self.ourParser.setDTDHandler (self)
+		
+		self.ourParser.parse (dom)
 
 	def startDTD(self, name, public_id, system_id):
 		self.log.debug ("Recieved DOCTYPE: " + name + " public_id: " + public_id + " system_id: " + system_id)
@@ -1381,5 +1417,14 @@ def compileXMLTemplate (template):
 		templateFile = template
 	compiler = XMLTemplateCompiler()
 	compiler.parseTemplate (templateFile)
+	return compiler.getTemplate()
+
+def compileDOMTemplate (template):
+	""" Traverses the DOM and produces a compiled template.
+			To use the resulting template object call:
+				template.expand (context, outputFile)
+	"""
+	compiler = XMLTemplateCompiler ()
+	compiler.parseDOM (template)
 	return compiler.getTemplate()
 	

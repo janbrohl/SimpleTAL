@@ -1,10 +1,20 @@
-simpleTAL / simpleTALES (Version 3.12)
+simpleTAL / simpleTALES (Version 3.13)
 -------------------------------------
+Version 3.13
+------------
+New features:
+ - Added support for compiling a template from a DOM tree (thanks to Benjamin Niemann for the 
+   patch).
+ - Added support for iterators in the Context (thanks to Kevin Smith for the ideas).
+
+Bug fixes:
+ - ElementTree paths can now be used from 'python: path ()' expressions (thanks to Jochen   
+   Kupperschmidt for the fix).
 
 Version 3.12
 ------------
 New features:
- - Integration with ElementTree
+ - Integration with ElementTree.
  - Use Python 2.2's unicode function if available (honours the __unicode__ method) when 
    converting non-unicode variables in the Context.
  

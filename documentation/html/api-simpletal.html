@@ -13,6 +13,8 @@
 <p>Compiles the passed in HTML template into an instance of the 'Template' class.&nbsp; The template object should be either a string containing the template, or a file-like object.&nbsp; The inputEncoding specifies the encoding that the template was written using and deafults to iso-8859-1.&nbsp; See below for details of how to use the Template class.</p>
 <h3>compileXMLTemplate (template)</h3>
 <p>Compiles the passed in XML template into an instance of the 'Template' class.&nbsp; The template object should be either a string containing the template, or a file-like object.&nbsp; The XML template must be a well formed XML document.&nbsp; The character set will be determined from the prolog of the template or be assumed to be utf-8.&nbsp; See below for details of how to use the Template class.</p>
+<h3>compileDOMTemplate (dom)</h3>
+<p>Compiles an XML template that is stored as a DOM tree.&nbsp; This requires PyXML to be installed to function.&nbsp; </p>
 <h3>Template Instances</h3>
 <p>The compiled templates contain all of the logic required to be able to expand themselves for a given context.&nbsp; They can be kept around and reused as often as required, there is no need or benefit to re-compiling them unless the underlying template changes.&nbsp; They have one method of interest as part of the external API:</p>
 <pre>
@@ -36,8 +38,8 @@ template.expand (context, outputFile, docType='&lt;!DOCTYPE html&nbsp; PUBLIC "-
   <p id="version">PubTal Version </p>
   <div id="footer">
   <p>File: api-simpletal.txt</p>
-  <p>Last modified: Mon, 13 Oct 2003 20:09:20 BST</p>
+  <p>Last modified: Sun, 07 Aug 2005 19:27:55 BST</p>
   <p>Copyright 2005 Colin Stewart</p>
-  <p title="PubTal is a template driven web site publisher.">Made with <a href="http://www.owlfish.com/software/PubTal/">PubTal</a> 3.1.3-dev</p>
+  <p title="PubTal is a template driven web site publisher.">Made with <a href="http://www.owlfish.com/software/PubTal/">PubTal</a> 3.1.3</p>
   </div>
 </body>

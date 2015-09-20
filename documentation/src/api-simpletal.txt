@@ -10,6 +10,9 @@ Compiles the passed in HTML template into an instance of the 'Template' class.  
 <h3>compileXMLTemplate (template)</h3>
 Compiles the passed in XML template into an instance of the 'Template' class.  The template object should be either a string containing the template, or a file-like object.  The XML template must be a well formed XML document.  The character set will be determined from the prolog of the template or be assumed to be utf-8.  See below for details of how to use the Template class.
 
+<h3>compileDOMTemplate (dom)</h3>
+Compiles an XML template that is stored as a DOM tree.  This requires PyXML to be installed to function.  
+
 <h3>Template Instances</h3>
 The compiled templates contain all of the logic required to be able to expand themselves for a given context.  They can be kept around and reused as often as required, there is no need or benefit to re-compiling them unless the underlying template changes.  They have one method of interest as part of the external API:
 

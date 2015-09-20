@@ -1,6 +1,6 @@
 """ simpleTALES Implementation
 
-		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
+		Copyright (c) 2005 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,7 @@
 		Module Dependencies: logging
 """
 
-import types
+import types, sys
 
 try:
 	import logging
@@ -90,8 +90,13 @@ class RepeatVariable (ContextVariable):
 	def rawValue (self):
 		return self.value()
 		
+	def getCurrentValue (self):
+		return self.sequence [self.position]
+		
 	def increment (self):
 		self.position += 1
+		if (self.position == len (self.sequence)):
+			raise IndexError ("Repeat Finished")
 		
 	def createMap (self):
 		self.map = {}
@@ -176,6 +181,51 @@ class RepeatVariable (ContextVariable):
 		
 	def getUpperRoman (self):
 		return self.getLowerRoman().upper()
+		
+class IteratorRepeatVariable (RepeatVariable):
+	def __init__ (self, sequence):
+		RepeatVariable.__init__ (self, sequence)
+		self.curValue = None
+		self.iterStatus = 0
+	
+	def getCurrentValue (self):
+		if (self.iterStatus == 0):
+			self.iterStatus = 1
+			try:
+				self.curValue = self.sequence.next()
+			except StopIteration, e:
+				self.iterStatus = 2
+				raise IndexError ("Repeat Finished")
+		return self.curValue
+		
+	def increment (self):
+		# Need this for the repeat variable functions.
+		self.position += 1
+		try:
+			self.curValue = self.sequence.next()
+		except StopIteration, e:
+			self.iterStatus = 2
+			raise IndexError ("Repeat Finished")
+			
+	def createMap (self):
+		self.map = {}
+		self.map ['index'] = self.getIndex
+		self.map ['number'] = self.getNumber
+		self.map ['even'] = self.getEven
+		self.map ['odd'] = self.getOdd
+		self.map ['start'] = self.getStart
+		self.map ['end'] = self.getEnd
+		# TODO: first and last need to be implemented.
+		self.map ['length'] = sys.maxint
+		self.map ['letter'] = self.getLowerLetter
+		self.map ['Letter'] = self.getUpperLetter
+		self.map ['roman'] = self.getLowerRoman
+		self.map ['Roman'] = self.getUpperRoman
+		
+	def getEnd (self):
+		if (self.iterStatus == 2):
+			return 1
+		return 0
 		
 class PathFunctionVariable (ContextVariable):
 	def __init__ (self, func):

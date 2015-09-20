@@ -1,6 +1,6 @@
 """ simpleTALUtils
 
-		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
+		Copyright (c) 2005 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
 		Redistribution and use in source and binary forms, with or without
@@ -275,7 +275,7 @@ class MacroExpansionInterpreter (simpleTAL.TemplateInterpreter):
 		if (self.localVarsDefined):
 			self.context.popLocals()
 			
-		self.movePCForward,self.movePCBack,self.outputTag,self.originalAttributes,self.currentAttributes,self.repeatVariable,self.repeatIndex,self.repeatSequence,self.tagContent,self.localVarsDefined = self.scopeStack.pop()			
+		self.movePCForward,self.movePCBack,self.outputTag,self.originalAttributes,self.currentAttributes,self.repeatVariable,self.tagContent,self.localVarsDefined = self.scopeStack.pop()			
 		self.programCounter += 1
 			
 def ExpandMacros (context, template, outputEncoding="ISO-8859-1"):

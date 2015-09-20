@@ -36,6 +36,13 @@ import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
 
+try:
+    # Is PyXML's LexicalHandler available? 
+    from xml.sax.saxlib import LexicalHandler
+    use_lexical_handler = 1
+except ImportError:
+    use_lexical_handler = 0
+
 if (os.path.exists ("logging.ini")):
 	logging.config.fileConfig ("logging.ini")
 else:
@@ -72,18 +79,33 @@ class DefineMacroTests (unittest.TestCase):
 		self.fail ("Expected exception '%s' during compile - but got no exception" % result)				
 					
 	def testSingleMacroDefinition (self):
+		if (use_lexical_handler):
+			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<div class="funny">No slots here</div>\n<br />\n</html>'
+		else:
+			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<div class="funny">No slots here</div>\n<br></br>\n</html>'
+			
 		self._runTest_ ('<html><div metal:define-macro="one" class="funny">No slots here</div></html>'
-										,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<div class="funny">No slots here</div>\n<br />\n</html>'
+										,result
 										,"Single macro with no slots failed.")
 		
 	def testTwoMacroDefinition (self):
+		if (use_lexical_handler):
+			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<div class="funny">No slots here</div>\n<br />\n</html>'
+		else:
+			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<div class="funny">No slots here</div>\n<br></br>\n</html>'
+			
 		self._runTest_ ('<html><body metal:define-macro="two">A second macro</body><div metal:define-macro="one" class="funny">No slots here</div></html>'
-										,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<div class="funny">No slots here</div>\n<br />\n</html>'
+										,result
 										,"Two macros with no slots failed.")
 										
 	def testNestedMacroDefinition (self):
+		if (use_lexical_handler):
+			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<body>A second macro</body>\n<br />\n</html>'
+		else:
+			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<body>A second macro</body>\n<br></br>\n</html>'
+			
 		self._runTest_ ('<html><div metal:define-macro="two" class="funny"><body metal:define-macro="one">A second macro</body>No slots here</div></html>'
-										,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<body>A second macro</body>\n<br />\n</html>'
+										,result
 										,"Nested macro with no slots failed.")
 										
 	def testDuplicateMacroDefinition (self):
@@ -92,13 +114,23 @@ class DefineMacroTests (unittest.TestCase):
 								,"Duplicate macro failed to error.")										
 
 	def testMacroTALDefinition (self):
+		if (use_lexical_handler):
+			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<p>testing</p>\n<br />\n</html>'
+		else:
+			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<p>testing</p>\n<br></br>\n</html>'
+			
 		self._runTest_ ('<html><p metal:define-macro="one" tal:content="test">Wibble</p></html>'
-						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<p>testing</p>\n<br />\n</html>'
+						, result
 						,"TAL Command on a macro failed.")
 						
 	def testSingletonMacros (self):
+		if (use_lexical_handler):
+			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<p>Wibble<br /></p>\n<br />\n</html>'
+		else:
+			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<p>Wibble<br></br></p>\n<br></br>\n</html>'
+			
 		self._runTest_ ('<html><p metal:define-macro="one">Wibble<br/></p></html>'
-						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<p>Wibble<br /></p>\n<br />\n</html>'
+						,result
 						,"Singleton inside slot failed.")
 	
 if __name__ == '__main__':

@@ -44,6 +44,10 @@ from elementtree import ElementTree
 import simpleTALES
 
 class SimpleElementTreeVar (ElementTree._ElementInterface, simpleTALES.ContextVariable):
+	def __init__(self, tag, attrib):
+		ElementTree._ElementInterface.__init__(self, tag, attrib)
+		simpleTALES.ContextVariable.__init__(self)
+		
 	def value (self, pathInfo = None):
 		if (pathInfo is not None):
 			pathIndex, paths = pathInfo
