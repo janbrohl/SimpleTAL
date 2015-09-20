@@ -1,5 +1,11 @@
-simpleTAL / simpleTALES (Version 2.2)
+simpleTAL / simpleTALES (Version 2.3)
 -------------------------------------
+
+Version 2.3
+-----------
+Bug fixes:
+  - Using tal:repeat on empty lists would cause an exception to be thrown.
+    Now the repeating elements are removed from the output.
 
 Version 2.2
 -----------

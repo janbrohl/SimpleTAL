@@ -15,7 +15,7 @@
 		Module Dependencies: logging, simpleTALES, simpleTALTemplates
 """
 
-__version__ = "2.2"
+__version__ = "2.3"
 
 try:
 	import logging

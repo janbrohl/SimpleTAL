@@ -52,6 +52,12 @@ class TALRepeatTestCases (unittest.TestCase):
 		self._runTest_ ('<html><p tal:repeat="entry default">Default Only</p></html>'
 									 ,'<?xml version="1.0" encoding="iso8859-1"?>\n<html><p>Default Only</p></html>'
 									 , 'Default did not keep existing structure intact')
+									 
+	def testEmptyList (self):
+		self._runTest_ ('<html><p tal:repeat="short emptyList"><b tal:replace="short">Empty</b></p></html>'
+									,'<?xml version="1.0" encoding="iso8859-1"?>\n<html></html>'
+									,'Empty list repeat failed.'
+									)
 		
 	def testStringRepeat (self):
 		self._runTest_ ('<html><p tal:omit-tag="" tal:repeat="letter test"><b tal:replace="letter"></b></p></html>'

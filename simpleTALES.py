@@ -15,7 +15,7 @@
 		Module Dependencies: logging
 """
 
-__version__ = "2.2"
+__version__ = "2.3"
 
 import copy, string
 
@@ -38,10 +38,12 @@ class ContextVariable:
 		return 0
 		
 	def isSequence (self):
+		# Return the length of the sequence - if it's zero length then it's handled
+		# as though it wasn't a sequence at all.
 		try:
-			temp = len (self.value())
+			seqLength = len (self.value())
 			temp = self.value()[1:1]
-			return 1
+			return seqLength
 		except:
 			return 0
 		

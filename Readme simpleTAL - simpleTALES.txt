@@ -1,4 +1,4 @@
-simpleTAL / simpleTALES (Version 2.2)
+simpleTAL / simpleTALES (Version 2.3)
 -------------------------------------
 This is an implementation of the TAL and TALES specifications
 see (http://www.zope.org/Documentation/Books/ZopeBook/current/AppendixC.stx)
