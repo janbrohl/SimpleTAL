@@ -1,9 +1,28 @@
 #!/usr/bin/python
-""" Copyright 2003 Colin Stewart (http://www.owlfish.com/)
+"""		Copyright (c) 2003 Colin Stewart (http://www.owlfish.com/)
+		All rights reserved.
 		
-		This code is made freely available for commercial and non-commercial use.
-		No warranties, expressed or implied, are made as to the fitness of this
-		code for any purpose.
+		Redistribution and use in source and binary forms, with or without
+		modification, are permitted provided that the following conditions
+		are met:
+		1. Redistributions of source code must retain the above copyright
+		   notice, this list of conditions and the following disclaimer.
+		2. Redistributions in binary form must reproduce the above copyright
+		   notice, this list of conditions and the following disclaimer in the
+		   documentation and/or other materials provided with the distribution.
+		3. The name of the author may not be used to endorse or promote products
+		   derived from this software without specific prior written permission.
+		
+		THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+		IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+		OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+		IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+		INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+		NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+		DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+		THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+		(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+		THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		
 		If you make any bug fixes or feature enhancements please let me know!
 		
@@ -55,7 +74,17 @@ class TALAttributesTestCases (unittest.TestCase):
 		self._runTest_ ('<html old="still here" class="test" tal:attributes="href default;class nothing;new test" href="owlfish.com">Hello</html>'
 										,'<html new="testing" old="still here" href="owlfish.com">Hello</html>'
 										,"Setting multiple attributes at once failed.")
-										
+
+	def testMultipleAttributesSpace (self):
+		self._runTest_ ('<html old="still here" class="test" tal:attributes="href default ; class string:Hello there; new test" href="owlfish.com">Hello</html>'
+										,'<html class="Hello there" new="testing" old="still here" href="owlfish.com">Hello</html>'
+										,"Setting multiple attributes at once, with spaces between semi-colons, failed.")
+
+	def testMultipleAttributesEscaped (self):
+		self._runTest_ ('<html old="still here" class="test" tal:attributes="href default ; class string: Semi-colon;;test;new test " href="owlfish.com">Hello</html>'
+										,'<html class="Semi-colon;test" new="testing" old="still here" href="owlfish.com">Hello</html>'
+										,"Setting multiple attributes at once, with spaces between semi-colons, failed.")
+
 	def testAttributeEscaping (self):
 		self._runTest_ ('<html existingAtt="&quot;Testing&quot;" tal:attributes="href needsQuoting">Hello</html>'
 										,"""<html href="Does &quot;this&quot; work?" existingatt="&quot;Testing&quot;">Hello</html>"""

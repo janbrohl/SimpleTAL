@@ -1,10 +1,29 @@
 """ simpleTAL Interpreter
 
-		Copyright 2003 Colin Stewart (http://www.owlfish.com/)
+		Copyright (c) 2003 Colin Stewart (http://www.owlfish.com/)
+		All rights reserved.
 		
-		This code is made freely available for commercial and non-commercial
-		use.  No warranties, expressed or implied, are made as to the
-		fitness of this code for any purpose.
+		Redistribution and use in source and binary forms, with or without
+		modification, are permitted provided that the following conditions
+		are met:
+		1. Redistributions of source code must retain the above copyright
+		   notice, this list of conditions and the following disclaimer.
+		2. Redistributions in binary form must reproduce the above copyright
+		   notice, this list of conditions and the following disclaimer in the
+		   documentation and/or other materials provided with the distribution.
+		3. The name of the author may not be used to endorse or promote products
+		   derived from this software without specific prior written permission.
+		
+		THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+		IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+		OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+		IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+		INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+		NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+		DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+		THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+		(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+		THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		
 		If you make any bug fixes or feature enhancements please let me know!
 		
@@ -15,7 +34,7 @@
 		Module Dependencies: logging, simpleTALES, simpleTALTemplates
 """
 
-__version__ = "3.2"
+__version__ = "3.3"
 
 try:
 	import logging
@@ -337,15 +356,15 @@ class TemplateInterpreter:
 				Pushes the current state onto the stack, and sets up the new state
 		"""
 		self.scopeStack.append ((self.movePCForward
-														,self.movePCBack
-														,self.outputTag
-														,self.originalAttributes
-														,self.currentAttributes
-														,self.repeatVariable
-														,self.repeatIndex
-														,self.repeatSequence
-														,self.tagContent
-														,self.localVarsDefined))
+								,self.movePCBack
+								,self.outputTag
+								,self.originalAttributes
+								,self.currentAttributes
+								,self.repeatVariable
+								,self.repeatIndex
+								,self.repeatSequence
+								,self.tagContent
+								,self.localVarsDefined))
 
 		self.movePCForward = None
 		self.movePCBack = None
@@ -818,7 +837,11 @@ class TemplateCompiler:
 		# [(isLocalFlag (Y/n), variableName, variablePath),...]
 		# Break up the list of defines first
 		commandArgs = []
-		for defineStmt in argument.split (';'):
+		# We only want to match semi-colons that are not escaped
+		argumentSplitter =  re.compile ('(?<!;);(?!;)')
+		for defineStmt in argumentSplitter.split (argument):
+			#  remove any leading space and un-escape any semi-colons
+			defineStmt = defineStmt.lstrip().replace (';;', ';')
 			# Break each defineStmt into pieces "[local|global] varName expression"
 			stmtBits = defineStmt.split (' ')
 			isLocal = 1
@@ -910,7 +933,11 @@ class TemplateCompiler:
 		
 		# Break up the list of attribute settings first
 		commandArgs = []
-		for attributeStmt in argument.split (';'):
+		# We only want to match semi-colons that are not escaped
+		argumentSplitter =  re.compile ('(?<!;);(?!;)')
+		for attributeStmt in argumentSplitter.split (argument):
+			#  remove any leading space and un-escape any semi-colons
+			attributeStmt = attributeStmt.lstrip().replace (';;', ';')
 			# Break each attributeStmt into name and expression
 			stmtBits = attributeStmt.split (' ')
 			if (len (stmtBits) < 2):

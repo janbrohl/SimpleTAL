@@ -1,3 +1,0 @@
-*.txt
-recursive-include examples *.py *.html
-recursive-include tests *.py

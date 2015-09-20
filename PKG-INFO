@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: SimpleTAL
+Version: 3.3
+Summary: SimpleTAL is a stand alone Python implementation of the TAL, TALES and METAL  specifications  used in Zope to power HTML and XML templates.
+Home-page: http://www.owlfish.com/software/simpleTAL/index.html
+Author: Colin Stewart
+Author-email: colin@owlfish.com
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN

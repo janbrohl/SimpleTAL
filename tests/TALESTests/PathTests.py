@@ -1,9 +1,28 @@
 #!/usr/bin/python
-""" Copyright 2003 Colin Stewart (http://www.owlfish.com/)
+""" 	Copyright (c) 2003 Colin Stewart (http://www.owlfish.com/)
+		All rights reserved.
 		
-		This code is made freely available for commercial and non-commercial use.
-		No warranties, expressed or implied, are made as to the fitness of this
-		code for any purpose.
+		Redistribution and use in source and binary forms, with or without
+		modification, are permitted provided that the following conditions
+		are met:
+		1. Redistributions of source code must retain the above copyright
+		   notice, this list of conditions and the following disclaimer.
+		2. Redistributions in binary form must reproduce the above copyright
+		   notice, this list of conditions and the following disclaimer in the
+		   documentation and/or other materials provided with the distribution.
+		3. The name of the author may not be used to endorse or promote products
+		   derived from this software without specific prior written permission.
+		
+		THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+		IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+		OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+		IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+		INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+		NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+		DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+		THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+		(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+		THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		
 		If you make any bug fixes or feature enhancements please let me know!
 		
@@ -27,6 +46,9 @@ def simpleFunction ():
 	
 def nestedFunction ():
 	return {'nest': simpleFunction}
+		
+def pathFunction (thePath):
+	return thePath
 	
 class PathTests (unittest.TestCase):
 	def setUp (self):
@@ -34,8 +56,9 @@ class PathTests (unittest.TestCase):
 		self.context.addGlobal ('top', 'Hello from the top')
 		self.context.addGlobal ('alt', 'Wobble the way')
 		self.context.addGlobal ('theMap', {'top': 'Hello', 'onelevel': {'top': 'Bye'}})
-		self.context.addGlobal ('funcMap', {'simple': simpleFunction, 'nested': nestedFunction})
+		self.context.addGlobal ('funcMap', {'simple': simpleFunction, 'nested': nestedFunction, 'pathFunc': simpleTALES.PathFunctionVariable (pathFunction)})
 		self.context.addGlobal ('topFunc', simpleFunction)
+		self.context.addGlobal ('pathFunc', simpleTALES.PathFunctionVariable (pathFunction))
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileHTMLTemplate (txt)
@@ -115,6 +138,30 @@ class PathTests (unittest.TestCase):
 					   ,'Wobble the way'
 					   ,'Trailing quote was not handled'
 					   )
+					   
+	def testPathFunctionNoParams (self):
+		self._runTest_ ('<html tal:content="pathFunc">hmm</html>'
+						,'<html></html>'
+						,'Path Function with no parameters failed.'
+						)
+						
+	def testPathFunctionWithOnePath (self):
+		self._runTest_ ('<html tal:content="pathFunc/firstPath">hmm</html>'
+						,'<html>firstPath</html>'
+						,'Path Function with one parameter failed.'
+						)
+						
+	def testPathFunctionWithTwoPath (self):
+		self._runTest_ ('<html tal:content="pathFunc/firstPath/second">hmm</html>'
+						,'<html>firstPath/second</html>'
+						,'Path Function with two parameters failed.'
+						)
+						
+	def testPathFunctionWithOnePathOneDeep (self):
+		self._runTest_ ('<html tal:content="funcMap/pathFunc/firstPath">hmm</html>'
+						,'<html>firstPath</html>'
+						,'Path Function with one parameter, nested one deep, failed.'
+						)
 
 if __name__ == '__main__':
 	unittest.main()

@@ -1,9 +1,28 @@
 #!/usr/bin/python
-""" Copyright 2003 Colin Stewart (http://www.owlfish.com/)
+""" 	Copyright (c) 2003 Colin Stewart (http://www.owlfish.com/)
+		All rights reserved.
 		
-		This code is made freely available for commercial and non-commercial use.
-		No warranties, expressed or implied, are made as to the fitness of this
-		code for any purpose.
+		Redistribution and use in source and binary forms, with or without
+		modification, are permitted provided that the following conditions
+		are met:
+		1. Redistributions of source code must retain the above copyright
+		   notice, this list of conditions and the following disclaimer.
+		2. Redistributions in binary form must reproduce the above copyright
+		   notice, this list of conditions and the following disclaimer in the
+		   documentation and/or other materials provided with the distribution.
+		3. The name of the author may not be used to endorse or promote products
+		   derived from this software without specific prior written permission.
+		
+		THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+		IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+		OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+		IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+		INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+		NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+		DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+		THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+		(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+		THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		
 		If you make any bug fixes or feature enhancements please let me know!
 		
@@ -63,6 +82,14 @@ class TALDefineTestCases (unittest.TestCase):
 	def testDefineNothing (self):
 		self._runTest_ ('<html><p tal:define="global test nothing"></p><p tal:content="test">Can you see me?</p></html>'
 						, '<html><p></p><p></p></html>', 'Nothing variable did not define proplerly.')
+						
+	def testDefineMultipleLocal (self):
+		self._runTest_ ('<html><div tal:define="firstVar test;secondVar string:This is a semi;;colon;thirdVar string:Test"><p tal:content="test">Testing</p><p tal:content="secondVar"></p><p tal:content="thirdVar"></p></div></html>'
+						, '<html><div><p>testing</p><p>This is a semi;colon</p><p>Test</p></div></html>', 'Multiple defines failed.')
+		
+	def testDefineMultipleMixed (self):
+		self._runTest_ ('<html><div tal:define="firstVar test;global secondVar string:This is a semi;;colon;thirdVar string:Test"><p tal:content="test">Testing</p><p tal:content="secondVar"></p><p tal:content="thirdVar"></p></div><b tal:content="secondVar"></b></html>'
+						, '<html><div><p>testing</p><p>This is a semi;colon</p><p>Test</p></div><b>This is a semi;colon</b></html>', 'Multiple defines failed.')
 
 		
 if __name__ == '__main__':

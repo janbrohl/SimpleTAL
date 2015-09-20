@@ -1,11 +1,10 @@
-simpleTAL / simpleTALES (Version 3.2)
+simpleTAL / simpleTALES (Version 3.3)
 -------------------------------------
 This is an implementation of the TAL and TALES specifications
 see (http://www.zope.org/Documentation/Books/ZopeBook/current/AppendixC.stx)
 
-This code is made freely available for commercial and non-commercial use. No
-warranties, expressed or implied, are made as to the fitness of this code
-for any purpose.
+This code is made freely available under a BSD style license, see 
+LICENSE.txt for more details.
 
 If this is of any use to anyone then please let me know, otherwise this may
 become the first and last release of this code.

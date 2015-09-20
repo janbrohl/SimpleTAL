@@ -1,5 +1,21 @@
-simpleTAL / simpleTALES (Version 3.2)
+simpleTAL / simpleTALES (Version 3.3)
 -------------------------------------
+Version 3.3
+-----------
+New features:
+  - TemplateCache now supports inputEncoding, allowing HTML templates using 
+    character sets other than ISO8859-1 to be used.
+  - Functions path, string, exists, and nocall are available to python: paths.
+  - Functions can now receive parameters via paths by wrapping them in 
+    simpleTALES.PathFunctionVariable before placing them into the Context.
+    
+Bug fixes:
+  - In tal:attributes and tal:define double escaped semi-colons are now handled.
+  - Space after a semi-colon in tal:attributes and tal:define is now handled
+    (thanks to Sean Reifschneider)
+  - Handling of stray quotes at the start and end of attributes shouldn't interfere
+    with python: paths anymore.
+
 Version 3.2
 -----------
 This release incorporates patches from Wichert Akkerman implementing the Python TAL path
