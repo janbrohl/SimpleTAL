@@ -1,6 +1,18 @@
-simpleTAL / simpleTALES (Version 3.7)
+simpleTAL / simpleTALES (Version 3.8)
 -------------------------------------
 
+Version 3.8
+-----------
+New features:
+  - Added new method getXMLTemplate to simpleTALUtils.TemplateCache
+  - Comments in XML templates are now included in the output if pyxml is
+    installed.
+  - Lists can now be indexed into.
+	
+Bug fixes:
+  - TAL commands on METAL namespaced elements and vice-versa now work correctly
+    (thanks to Kevin Smith for the bug report).
+  
 Version 3.7
 -----------
 New features:

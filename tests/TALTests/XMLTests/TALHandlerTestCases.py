@@ -86,6 +86,9 @@ class XMLChecksumHandler (xml.sax.handler.ContentHandler, xml.sax.handler.DTDHan
 		self.digest.update (target)
 		self.digest.update (data)
 		
+	def comment (self, data):
+		self.digest.update (data)
+		
 	def skippedEntity (self, name):
 		self.digest.update (name)
 		
@@ -183,6 +186,14 @@ class TALHandlerTestCases (unittest.TestCase):
 							,"""<?xml version="1.0" encoding="iso-8859-1"?>\n<p>Some<?test testInstruction="yes" doNothing="yes"?><i>markup</i></p>"""
 							,"""Processing instructions not preserved.""")
 							
+	def testCommentHandling (self):
+		if (not use_lexical_handler):
+			return
+			
+		self._runTest_ ("""<?xml version="1.0" encoding="iso-8859-1"?>\n<p><!-- This is a <b>test -->Here</p>"""
+						,"""<?xml version="1.0" encoding="iso-8859-1"?>\n<p><!-- This is a <b>test -->Here</p>"""
+						,"Comments not preserved.")
+		
 	def testDocumentTypeDeclaration (self):
 		txt = """<?xml version="1.0" encoding="iso-8859-1"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n<html><p>Test</p></html>"""
 		template = simpleTAL.compileXMLTemplate (txt)

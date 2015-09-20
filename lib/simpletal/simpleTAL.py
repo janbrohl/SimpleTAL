@@ -890,7 +890,8 @@ class TemplateCompiler:
 				foundCommandsArgs [TAL_OMITTAG] = ""
 				
 		for att, value in attributes:
-			if (TALElementNameSpace and att[0:len (prefixToAdd)] != prefixToAdd):
+			if (TALElementNameSpace and not att.find (':') > 0):
+				# This means that the attribute name does not have a namespace, so use the prefix for this tag.
 				commandAttName = prefixToAdd + att
 			else:
 				commandAttName = att
@@ -1373,6 +1374,10 @@ class XMLTemplateCompiler (TemplateCompiler, xml.sax.handler.ContentHandler, xml
 	def processingInstruction (self, target, data):
 		self.log.debug ("Recieved processing instruction.")
 		self.parseData (u'<?%s %s?>' % (target, data))
+		
+	def comment (self, data):
+		# This is only called if your XML parser supports the LexicalHandler interface.
+		self.parseData (u'<!--%s-->' % data)
 		
 	def getTemplate (self):
 		template = XMLTemplate (self.commandList, self.macroMap, self.symbolLocationTable, self.doctype)

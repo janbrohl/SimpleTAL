@@ -43,6 +43,7 @@ XMLTemplate2 = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1 t
 TEMP_DIR="/tmp/"
 HTML_TEMPLATE_NAME='TemplateCacheTestCasesHtmlTemplate.html'
 XML_TEMPLATE_NAME='TemplateCacheTestCasesXmlTemplate.xml'
+EXPXML_TEMPLATE_NAME='TemplateCacheTestCasesXmlTemplate.xhtml'
 
 #print "Macro is: %s" % str (macroTemplate)
 
@@ -189,6 +190,60 @@ class TemplateCacheTestCases (unittest.TestCase):
 		self.failUnless (self.cache.misses == 2, "Cache miss not recorded!")
 		# Get the cached template
 		template = self.cache.getTemplate (name)
+		outputFile = StringIO.StringIO ()
+		template.expand (self.context, outputFile)
+		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
+		self.failUnless (outputFile.getvalue() == expectedResult
+										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
+		self.failUnless (self.cache.hits == 2, "Cache hit not recorded!")
+		
+	def testExplicitXMLTemplateCache (self):
+		# Remove any previously created test files
+		name = os.path.join (TEMP_DIR, EXPXML_TEMPLATE_NAME)
+		try:
+			os.remove (name)
+		except:
+			pass
+		# Ensure that time ellapses so that a ctime change is recorded
+		time.sleep (1)
+		tf = open (name, 'w')
+		tf.write (XMLTemplate1)
+		tf.close()
+		
+		# Get the template
+		template = self.cache.getXMLTemplate (name)
+		outputFile = StringIO.StringIO ()
+		template.expand (self.context, outputFile)
+		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1></body></html>"""
+		self.failUnless (outputFile.getvalue() == expectedResult
+										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
+		self.failUnless (self.cache.misses == 1, "Cache miss not recorded!")
+		# Get the cached template
+		template = self.cache.getXMLTemplate (name)
+		outputFile = StringIO.StringIO ()
+		template.expand (self.context, outputFile)
+		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1></body></html>"""
+		self.failUnless (outputFile.getvalue() == expectedResult
+										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
+		self.failUnless (self.cache.hits == 1, "Cache hit not recorded!")
+		
+		# Update the template, should cause a re-compile of the template
+		# Ensure that time ellapses so that a ctime change is recorded
+		time.sleep (1)
+		tf = open (name, 'w')
+		tf.write (XMLTemplate2)
+		tf.close()
+		
+		# Get the template
+		template = self.cache.getXMLTemplate (name)
+		outputFile = StringIO.StringIO ()
+		template.expand (self.context, outputFile)
+		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
+		self.failUnless (outputFile.getvalue() == expectedResult
+										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
+		self.failUnless (self.cache.misses == 2, "Cache miss not recorded!")
+		# Get the cached template
+		template = self.cache.getXMLTemplate (name)
 		outputFile = StringIO.StringIO ()
 		template.expand (self.context, outputFile)
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""

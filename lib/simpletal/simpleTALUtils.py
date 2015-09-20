@@ -119,16 +119,34 @@ class TemplateCache:
 		# Cache miss, let's cache this template
 		return self._cacheTemplate_ (name, inputEncoding)
 		
-	def _cacheTemplate_ (self, name, inputEncoding):
+	def getXMLTemplate (self, name):
+		""" Name should be the path of an XML template file.  
+		"""
+		if (self.templateCache.has_key (name)):
+			template, oldctime = self.templateCache [name]
+			ctime = os.stat (name)[stat.ST_MTIME]
+			if (oldctime == ctime):
+				# Cache hit!
+				self.hits += 1
+				return template
+		# Cache miss, let's cache this template
+		return self._cacheTemplate_ (name, None, xmlTemplate=1)
+		
+	def _cacheTemplate_ (self, name, inputEncoding, xmlTemplate=0):
 		self.cacheLock.acquire ()
 		try:
 			tempFile = open (name, 'r')
-			firstline = tempFile.readline()
-			tempFile.seek(0)
-			if (name [-3:] == "xml") or (firstline.strip ()[:5] == '<?xml') or (firstline [:9] == '<!DOCTYPE' and firstline.find('XHTML') != -1):
+			if (xmlTemplate):
+				# We know it is XML
 				template = simpleTAL.compileXMLTemplate (tempFile)
 			else:
-				template = simpleTAL.compileHTMLTemplate (tempFile, inputEncoding)
+				# We have to guess...
+				firstline = tempFile.readline()
+				tempFile.seek(0)
+				if (name [-3:] == "xml") or (firstline.strip ()[:5] == '<?xml') or (firstline [:9] == '<!DOCTYPE' and firstline.find('XHTML') != -1):
+					template = simpleTAL.compileXMLTemplate (tempFile)
+				else:
+					template = simpleTAL.compileHTMLTemplate (tempFile, inputEncoding)
 			tempFile.close()
 			self.templateCache [name] = (template, os.stat (name)[stat.ST_MTIME])
 			self.misses += 1

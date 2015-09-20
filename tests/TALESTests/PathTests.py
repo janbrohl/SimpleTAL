@@ -59,6 +59,7 @@ class PathTests (unittest.TestCase):
 		self.context.addGlobal ('funcMap', {'simple': simpleFunction, 'nested': nestedFunction, 'pathFunc': simpleTALES.PathFunctionVariable (pathFunction)})
 		self.context.addGlobal ('topFunc', simpleFunction)
 		self.context.addGlobal ('pathFunc', simpleTALES.PathFunctionVariable (pathFunction))
+		self.context.addGlobal ('alist', [{'a': 'An A', 'b': 'A B'},"Hello!"])
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileHTMLTemplate (txt)
@@ -161,6 +162,24 @@ class PathTests (unittest.TestCase):
 		self._runTest_ ('<html tal:content="funcMap/pathFunc/firstPath">hmm</html>'
 						,'<html>firstPath</html>'
 						,'Path Function with one parameter, nested one deep, failed.'
+						)
+						
+	def testAList (self):
+		self._runTest_ ('<html tal:content="alist/0/a">hmm</html>'
+						,'<html>An A</html>'
+						,'Index into list then dictionary failed.'
+						)
+						
+	def testAList2ndItem (self):
+		self._runTest_ ('<html tal:content="alist/1">hmm</html>'
+						,'<html>Hello!</html>'
+						,'Index into list failed.'
+						)
+						
+	def testAListNoSuchItem (self):
+		self._runTest_ ('<html tal:content="alist/2">hmm</html>'
+						,'<html></html>'
+						,'Index past end of list failed.'
 						)
 
 if __name__ == '__main__':

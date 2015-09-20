@@ -571,7 +571,10 @@ class Context:
 					val = ContextVariable (val)
 			else:
 				try:
-					val = temp[path]
+					try:
+						val = temp[path]
+					except TypeError:
+						val = temp[int(path)]
 					if (not isinstance (val, ContextVariable)):
 						val = ContextVariable (val)
 				except:

@@ -110,7 +110,12 @@ class TALNameSpaceTests (unittest.TestCase):
 	def testTALEmlementWithDefaultNS (self):
 		self._runTest_ ('<html><tal:body content="test">Hello</tal:body></html>'
 										,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html>testing</html>'
-										,'TAL Element written!')								
+										,'TAL Element written!')
+
+	def testMetalBlockWithRepeat (self):
+		self._runTest_ ('<html><metal:block tal:repeat="var two">Some <b tal:content="var">value</b> here</metal:block></html>'
+						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html>Some <b>one</b> hereSome <b>two</b> here</html>'
+						,"Repeat on Metal:Block failed.")
 											
 	# Now test exceptions
 	def testDefaultTALNameSpace (self):

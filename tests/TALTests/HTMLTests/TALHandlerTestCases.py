@@ -73,6 +73,9 @@ class TALHandlerTestCases (unittest.TestCase):
 
 	def testCaseSensitivity (self):
 		self._runTest_ ("<p>Hello.<br><b>World</B></p>", "<p>Hello.<br><b>World</b></p>")
+		
+	def testComments (self):
+		self._runTest_ ("<html><!-- This is a comment <here> --><p>Boo</p></html>", "<html><!-- This is a comment <here> --><p>Boo</p></html>")
 				
 	def testUnbalancedCloseTag (self):
 		try:
