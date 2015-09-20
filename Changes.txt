@@ -1,5 +1,9 @@
-simpleTAL / simpleTALES (Version 4.2)
+simpleTAL / simpleTALES (Version 4.3)
 -------------------------------------
+
+Version 4.3
+-----------
+Back-ported fix from 5.1 - missing XML files from ElementTree example.
 
 Version 4.2
 -----------

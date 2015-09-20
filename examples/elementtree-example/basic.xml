@@ -1,0 +1,10 @@
+<html>
+	<body>
+		<h1 tal:attributes="class input/title/@type" tal:content="input/title">Title here</h1>
+		<ul>
+			<li tal:repeat="note input/findall/.//note">
+			<b tal:condition="note/@type" tal:replace="string: Note (${note/@type}) - $note and then some"></b><b tal:condition="not:note/@type" tal:replace="string: Note: $note"></b>
+			</li>
+		</ul>
+	</body>
+</html>
