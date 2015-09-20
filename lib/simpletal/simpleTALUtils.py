@@ -113,7 +113,7 @@ class TemplateCache:
 		"""
 		if (self.templateCache.has_key (name)):
 			template, oldctime = self.templateCache [name]
-			ctime = os.stat (name)[stat.ST_CTIME]
+			ctime = os.stat (name)[stat.ST_MTIME]
 			if (oldctime == ctime):
 				# Cache hit!
 				self.hits += 1
@@ -125,11 +125,14 @@ class TemplateCache:
 		self.cacheLock.acquire ()
 		try:
 			tempFile = open (name, 'r')
-			if (name [-3:] == "xml"):
+			firstline = tempFile.readline()
+			tempFile.seek(0)
+			if (name [-3:] == "xml") or (firstline.strip ()[:5] == '<?xml'):
 				template = simpleTAL.compileXMLTemplate (tempFile)
 			else:
 				template = simpleTAL.compileHTMLTemplate (tempFile, inputEncoding)
-			self.templateCache [name] = (template, os.stat (name)[stat.ST_CTIME])
+			tempFile.close()
+			self.templateCache [name] = (template, os.stat (name)[stat.ST_MTIME])
 			self.misses += 1
 		except Exception, e:
 			self.cacheLock.release()
@@ -249,7 +252,7 @@ def ExpandMacros (context, template, outputEncoding="ISO8859-1"):
 	out = StringIO.StringIO()
 	interp = MacroExpansionInterpreter()
 	interp.initialise (context, out)
-	template.expand (context, out, outputEncoding, interp)
+	template.expand (context, out, outputEncoding=outputEncoding, interpreter=interp)
 	# StringIO returns unicode, so we need to turn it back into native string
 	result = out.getvalue()
 	reencoder = codecs.lookup (outputEncoding)[0]

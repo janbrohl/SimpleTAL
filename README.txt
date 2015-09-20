@@ -1,19 +1,30 @@
-simpleTAL / simpleTALES (Version 3.3)
+simpleTAL / simpleTALES (Version 3.4)
 -------------------------------------
 This is an implementation of the TAL and TALES specifications
 see (http://www.zope.org/Documentation/Books/ZopeBook/current/AppendixC.stx)
 
+Installation
+------------
+To install SimpleTAL under Unix:
+  
+  (Note that to perform the installation of SimpleTAL you will probably
+   have to have the Python Development package installed.)
+  
+  1 - Become root
+  2 - Run "python setup.py install"
+	
+Under MacOS X:
+  1 - Run "sudo python setup.py install"
+  2 - Close the terminal program and re-open it.
+  
+Notes
+-----
 This code is made freely available under a BSD style license, see 
 LICENSE.txt for more details.
 
-If this is of any use to anyone then please let me know, otherwise this may
-become the first and last release of this code.
-
-The DummyLogger.py module is required if you do not have either Python 2.3
+The DummyLogger.py module is used if you do not have either Python 2.3
 (un-tested on this) or the logging code from
-http://www.red-dove.com/python_logging.html installed.  Just drop it, along
-with simpleTAL.py and simpleTALES.py into your site-packages and all should
-work.
+http://www.red-dove.com/python_logging.html installed.
 
 Note that the unit test cases (under tests) require logging to be installed
 to run.
@@ -83,11 +94,6 @@ Repeat Variables do not support 'first' and 'last'.
 When using 'not:' on an empty expression the result will be true rather than
 an error
 
-Path type 'python:' is not supported.  I'm not keen on this path type
-because it allow TAL Templates to do things other than pure presentment.  It
-should be easy to add if required, although limiting the execution scope may
-be difficult.
-
 on-error is not yet supported.
 
 Known differences
@@ -96,4 +102,3 @@ Known differences
 Non existant path types, e.g. '<b tal:content="total: $totalAmount"></b>'
 are not supported.  In Zope this results in the path being interpreted as a
 string - in simpleTAL/ES the result will be an error.
-

@@ -49,7 +49,7 @@ class TALRepeatTestCases (unittest.TestCase):
 		self.context.addGlobal ('two', ["one", "two"])
 		self.context.addGlobal ('three', [1,"Two",3])
 		self.context.addGlobal ('emptyList', [])
-		self.context.addGlobal ('bigList', xrange (1,100))
+		self.context.addGlobal ('bigList', range (1,100))
 		self.context.addGlobal ('fourList', ["zero", "one", "two", "three"])
 		self.context.addGlobal ('nested', [{'title': 'Image 1', 'catList': [1,2,3]}
 												  ,{'title': 'Image 2', 'catList': [5,2,3]}

@@ -40,6 +40,9 @@ class DummyLogger:
 
 	def warn (self, *args):
 		pass
+		
+	def error (self, *args):
+		pass
 
 	def critical (self, *args):
 		pass

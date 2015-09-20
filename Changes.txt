@@ -1,5 +1,25 @@
-simpleTAL / simpleTALES (Version 3.3)
+simpleTAL / simpleTALES (Version 3.4)
 -------------------------------------
+Version 3.4
+-----------
+New features:
+  - TemplateCache now uses MTIME rather than CTIME to spot
+    changes to templates.
+  - SimpleTAL is now compatible with PyXML 0.8.2 (Thanks to 
+    Myers Carpenter for the testing).
+  - Added support for passing in an XML Doctype when calling 
+	template.expand
+  - Added support to maintain XML singleton tags, including use of 
+    METAL and TAL on singleton tags.
+  - Added support for using variables in paths (e.g. If colour='blue' then
+	the path 'colourMap/?colour' is equivalent to 'colourMap/blue').  This 
+    is not part of the TALES specification, but is supported by Zope.
+	(Thanks to Bastian Kleineidam for the initial implementation).
+	
+Bug fixes:
+  - If the logging module was not installed exceptions would be thrown
+    when SimpleTAL attempted to log errors - fixed.
+
 Version 3.3
 -----------
 New features:

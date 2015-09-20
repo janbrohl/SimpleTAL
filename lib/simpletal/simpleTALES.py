@@ -86,7 +86,6 @@ class ContextVariable:
 		return self.ourValue
 		
 	def __str__ (self):
-		return 
 		try:
 			return str (self.ourValue)
 		except UnicodeError, e:
@@ -510,6 +509,13 @@ class Context:
 		pathList = expr.split ('/')
 		
 		path = pathList[0]
+		if path.startswith ('?'):
+			path = path[1:]
+			if self.locals.has_key(path):
+				path = self.locals[path].value()
+			elif self.globals.has_key(path):
+				path = self.globals[path].value()
+				#self.log.debug ("Dereferenced to %s" % path)
 		if self.locals.has_key(path):
 			val = self.locals[path]
 		elif self.globals.has_key(path):
@@ -520,6 +526,13 @@ class Context:
 		index = 1
 		for path in pathList[1:]:
 			#self.log.debug ("Looking for path element %s" % path)
+			if path.startswith ('?'):
+				path = path[1:]
+				if self.locals.has_key(path):
+					path = self.locals[path].value()
+				elif self.globals.has_key(path):
+					path = self.globals[path].value()
+				#self.log.debug ("Dereferenced to %s" % path)
 			if (canCall):
 				try:
 					temp = val.value((index,pathList))
@@ -532,17 +545,14 @@ class Context:
 				val = getattr (temp, path)
 				if (not isinstance (val, ContextVariable)):
 					val = ContextVariable (val)
-			elif (hasattr (temp, 'has_key')):
-				if (temp.has_key (path)):
+			else:
+				try:
 					val = temp[path]
 					if (not isinstance (val, ContextVariable)):
 						val = ContextVariable (val)
-				else:
+				except:
 					#self.log.debug ("Not found.")
 					return None		
-			else:
-				#self.log.debug ("Not found.")
-				return None
 			index = index + 1
 		#self.log.debug ("Found value %s" % str (val))
 		if (not canCall):
