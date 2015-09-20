@@ -67,13 +67,9 @@ class TALSpecialCharsTestCases (unittest.TestCase):
 						,"Python bit shift failed.")
 						
 	def testAmpInTemplate (self):
-		self._runTest_ ("""<!DOCTYPE html
-PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html test="&amp;" tal:attributes="test2 string: Boo There ${test}">Hello Bye Bye</html>"""
+		self._runTest_ ("""<html tal:attributes="test2 string: Boo There ${test}"><body test="&amp;">Hello Bye Bye</body></html>"""
 							,"""<?xml version="1.0" encoding="iso-8859-1"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html test2="Boo There &lt; testing &gt; experimenting &amp; twice as useful" test="&amp;">Hello Bye Bye</html>"""
+<html test2="Boo There &lt; testing &gt; experimenting &amp; twice as useful"><body test="&amp;">Hello Bye Bye</body></html>"""
 							,"&amp; in template failed.")
 						
 if __name__ == '__main__':

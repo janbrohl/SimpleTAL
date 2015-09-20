@@ -220,7 +220,10 @@ class TALHandlerTestCases (unittest.TestCase):
 		txt = """<?xml version="1.0" encoding="iso-8859-1"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n<html><p>Test&nbsp;Space</p></html>"""
 		template = simpleTAL.compileXMLTemplate (txt)
 		fh = StringIO.StringIO ()
-		template.expand (self.context, fh)
+		if use_lexical_handler:
+                    template.expand (self.context, fh)
+                else:
+                    template.expand (self.context, fh, docType="""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">""")
 		realResult = fh.getvalue()
 		expectedResult = u"""<?xml version="1.0"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n<html><p>Test\xa0Space</p></html>""".encode ("utf-8")
 		self.failUnless (realResult == expectedResult, "NBSP expansion failed - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (txt, realResult, expectedResult, template))

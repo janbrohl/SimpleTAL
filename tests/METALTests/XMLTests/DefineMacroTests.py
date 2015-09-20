@@ -82,7 +82,7 @@ class DefineMacroTests (unittest.TestCase):
 		if (use_lexical_handler):
 			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<div class="funny">No slots here</div>\n<br />\n</html>'
 		else:
-			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<div class="funny">No slots here</div>\n<br></br>\n</html>'
+			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<div class="funny">No slots here</div>\n<br />\n</html>'
 			
 		self._runTest_ ('<html><div metal:define-macro="one" class="funny">No slots here</div></html>'
 										,result
@@ -92,7 +92,7 @@ class DefineMacroTests (unittest.TestCase):
 		if (use_lexical_handler):
 			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<div class="funny">No slots here</div>\n<br />\n</html>'
 		else:
-			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<div class="funny">No slots here</div>\n<br></br>\n</html>'
+			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<div class="funny">No slots here</div>\n<br />\n</html>'
 			
 		self._runTest_ ('<html><body metal:define-macro="two">A second macro</body><div metal:define-macro="one" class="funny">No slots here</div></html>'
 										,result
@@ -102,7 +102,7 @@ class DefineMacroTests (unittest.TestCase):
 		if (use_lexical_handler):
 			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<body>A second macro</body>\n<br />\n</html>'
 		else:
-			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<body>A second macro</body>\n<br></br>\n</html>'
+			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<body>A second macro</body>\n<br />\n</html>'
 			
 		self._runTest_ ('<html><div metal:define-macro="two" class="funny"><body metal:define-macro="one">A second macro</body>No slots here</div></html>'
 										,result
@@ -117,7 +117,7 @@ class DefineMacroTests (unittest.TestCase):
 		if (use_lexical_handler):
 			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<p>testing</p>\n<br />\n</html>'
 		else:
-			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<p>testing</p>\n<br></br>\n</html>'
+			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<p>testing</p>\n<br />\n</html>'
 			
 		self._runTest_ ('<html><p metal:define-macro="one" tal:content="test">Wibble</p></html>'
 						, result
@@ -127,7 +127,7 @@ class DefineMacroTests (unittest.TestCase):
 		if (use_lexical_handler):
 			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<p>Wibble<br /></p>\n<br />\n</html>'
 		else:
-			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<p>Wibble<br></br></p>\n<br></br>\n</html>'
+			result = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>\n<p>Wibble<br /></p>\n<br />\n</html>'
 			
 		self._runTest_ ('<html><p metal:define-macro="one">Wibble<br/></p></html>'
 						,result
