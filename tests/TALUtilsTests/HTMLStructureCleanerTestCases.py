@@ -73,6 +73,21 @@ class HTMLStructureCleanerTestCases (unittest.TestCase):
 		uniStream = StringIO.StringIO (uniText)
 		result = cleaner.clean (uniStream)
 		self.failUnless (result == cleanResult, "Clean-up failed, expected:\n%s\n Got back:\n%s\n" % (cleanResult, result))
+				
+	def testCleanURL (self):
+		goodLink = u"""<html><a href="http://news.ft.com/servlet/ContentServer?pagename=FT.com/StoryFT/FullStory&amp;c=StoryFT&amp;cid=1042491488445&amp;p=1012571727088">link</a></html>"""
+		cleaner = simpleTALUtils.HTMLStructureCleaner ()
+		uniStream = StringIO.StringIO (goodLink)
+		result = cleaner.clean (uniStream)
+		self.failUnless (result == goodLink, "Clean-up failed, expected:\n%s\n Got back:\n%s\n" % (goodLink.encode ('ascii', 'ignore'), result.encode ('ascii', 'ignore')))		
 
+	def testUnCleanURL (self):
+		badLink = u"""<html><a href="http://news.ft.com/servlet/ContentServer?pagename=FT.com/StoryFT/FullStory&c=StoryFT&cid=1042491488445&p=1012571727088">link</a></html>"""
+		goodLink = u"""<html><a href="http://news.ft.com/servlet/ContentServer?pagename=FT.com/StoryFT/FullStory&amp;c=StoryFT&amp;cid=1042491488445&amp;p=1012571727088">link</a></html>"""
+		cleaner = simpleTALUtils.HTMLStructureCleaner ()
+		uniStream = StringIO.StringIO (badLink)
+		result = cleaner.clean (uniStream)
+		self.failUnless (result == goodLink, "Clean-up failed, expected:\n%s\n Got back:\n%s\n" % (goodLink.encode ('ascii', 'ignore'), result.encode ('ascii', 'ignore')))		
+		
 if __name__ == '__main__':
 	unittest.main()

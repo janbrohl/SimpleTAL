@@ -47,6 +47,17 @@ class TALHandlerTestCases (unittest.TestCase):
 		self._runTest_ ("<single><![CDATA[Here's some <escaped> CDATA section stuff & things.]]></single>"
 									 ,"""<?xml version="1.0" encoding="iso8859-1"?>\n<single>Here's some &lt;escaped&gt; CDATA section stuff &amp; things.</single>"""
 									 ,"CDATA section was not re-encoded correctly.")
+									 
+	def testNameSpaces (self):
+		self._runTest_ ("""<?xml version="1.0" encoding="iso8859-1"?>\n<test1:html xmlns:test1="http://test1" xmlns:test2="http://test2"><test2:p>Testing</test2:p></test1:html>"""
+										,"""<?xml version="1.0" encoding="iso8859-1"?>\n<test1:html xmlns:test1="http://test1" xmlns:test2="http://test2"><test2:p>Testing</test2:p></test1:html>"""
+										,"""Namespaces not preserved.""")
+										
+	def testProcessingInstructions (self):
+		self._runTest_ ("""<?xml version="1.0" encoding="iso8859-1"?>\n<p>Some<?test testInstruction="yes" doNothing="yes"?><i>markup</i></p>"""
+										,"""<?xml version="1.0" encoding="iso8859-1"?>\n<p>Some<?test testInstruction="yes" doNothing="yes"?><i>markup</i></p>"""
+										,"""Processing instructions not preserved.""")
+		
 
 if __name__ == '__main__':
 	unittest.main()

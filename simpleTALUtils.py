@@ -15,10 +15,13 @@
 		Module Dependencies: None
 """
 
-__version__ = "2.1"
+__version__ = "2.2"
 
 
-import StringIO, os, sys, codecs, sgmllib, cgi
+import StringIO, os, sys, codecs, sgmllib, cgi, re
+
+# This is used to check for already escaped attributes.
+ESCAPED_TEXT_REGEX=re.compile (r"\&\S+?;")
 
 class HTMLStructureCleaner (sgmllib.SGMLParser):
 	""" A helper class that takes HTML content and parses it, so converting
@@ -71,8 +74,12 @@ class HTMLStructureCleaner (sgmllib.SGMLParser):
 
 def tagAsText (tag,atts):
 	result = "<" + tag 
-	for att in atts:
-		result += ' ' + att[0] + '="' + att[1] + '"'
+	for name,value in atts:
+		if (ESCAPED_TEXT_REGEX.search (value) is not None):
+			# We already have some escaped characters in here, so assume it's all valid
+			result += ' %s="%s"' % (name, value)
+		else:
+			result += ' %s="%s"' % (name, cgi.escape (value))
 	result += ">"
 	return result
 

@@ -51,11 +51,37 @@ class TALHandlerTestCases (unittest.TestCase):
 		
 	def testNoCloseElement (self):
 		self._runTest_ ("<p>Hello.<br>World</p>", "<p>Hello.<br>World</p>")
+
+	def testCaseSensitivity (self):
+		self._runTest_ ("<p>Hello.<br><b>World</B></p>", "<p>Hello.<br><b>World</b></p>")
+				
+	def testUnbalancedCloseTag (self):
+		try:
+			template = simpleTAL.compileHTMLTemplate ("<p>Hello</b> World</p>")
+			file = StringIO.StringIO ()
+			template.expand (self.context, file)
+			realResult = file.getvalue()
+			self.fail ("No exception raised during parsing of unbalanced tag.")
+		except simpleTAL.TemplateParseException, e:
+			pass
     
-	def testCDATASection (self):
+	def testEncodedCharsSection (self):
 		self._runTest_ ("""<p>&lt;section&gt; stuff &amp; things.</p>"""
 									 ,"""<p>&lt;section&gt; stuff &amp; things.</p>"""
 									 ,"Quoted chars were not re-encoded correctly.")
+									 
+	def testDocumentTypeDeclaration (self):
+		self._runTest_("""<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><html><p tal:content="test"></p></html>"""
+									,"""<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><html><p>testing</p></html>"""
+									,"""Document type was not output correctly."""
+									)
+									
+	def testHTMLComments (self):
+		self._runTest_("""<html><!-- Tal content coming up.--><p tal:content="test"></p></html>"""
+									,"""<html><!-- Tal content coming up.--><p>testing</p></html>"""
+									,"""Comment not output correctly."""
+									)
+		
 
 if __name__ == '__main__':
 	unittest.main()

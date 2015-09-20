@@ -15,7 +15,7 @@
 		Module Dependencies: logging, simpleTALES, simpleTALTemplates
 """
 
-__version__ = "2.1"
+__version__ = "2.2"
 
 try:
 	import logging
@@ -403,7 +403,7 @@ class TemplateCompiler:
 		return Template (self.commandList, self.symbolLocationTable)
 		
 	def addCommand (self, command):
-		if (command[0] == TAL_OUTPUT and (len (self.commandList) > 1) and self.commandList[-1][0] == TAL_OUTPUT):
+		if (command[0] == TAL_OUTPUT and (len (self.commandList) > 0) and self.commandList[-1][0] == TAL_OUTPUT):
 			# We can combine output commands
 			self.commandList[-1] = (TAL_OUTPUT, self.commandList[-1][1] + command[1])
 		else:
@@ -464,6 +464,9 @@ class TemplateCompiler:
 					msg = "TAL Elements must be ballanced - found close tag %s expecting %s" % (oldTag[0], tag[0])
 					self.log.error (msg)
 					raise TemplateParseException (tagAsText(oldTag), msg)
+		self.log.error ("Close tag %s found with no corresponding open tag." % tag[0])
+		raise TemplateParseException ("</%s>" % tag[0], "Close tag encountered with no corresponding open tag.")
+		
 					
 	def parseStartTag (self, tag, attributes):
 		# Note down the tag we are handling, it will be used for error handling during
@@ -695,6 +698,17 @@ class HTMLTemplateCompiler (TemplateCompiler, sgmllib.SGMLParser):
 		
 	def handle_entityref (self, ref):
 		self.parseData (u'&%s;' % ref)
+		
+	# Handle document type declarations
+	def handle_decl (self, data):
+		self.parseData (u'<!%s>' % data)
+		
+	# Pass comments through un-affected.
+	def handle_comment (self, data):
+		self.parseData (u'<!--%s-->' % data)
+		
+	def report_unbalanced (self, tag):
+		self.log.warn ("End tag %s present with no corresponding open tag.")
 			
 	def getTemplate (self):
 		return HTMLTemplate (self.commandList, self.symbolLocationTable)
@@ -721,9 +735,13 @@ class XMLTemplateCompiler (TemplateCompiler, xml.sax.handler.ContentHandler):
 		self.parseEndTag (tag)
 		
 	def characters (self, data):
-		self.log.debug ("Recieved Real Data: " + data)
+		#self.log.debug ("Recieved Real Data: " + data)
 		# Escape any data we recieve - we don't want any: <&> in there.
 		self.parseData (cgi.escape (data))
+		
+	def processingInstruction (self, target, data):
+		self.log.debug ("Recieved processing instruction.")
+		self.parseData (u'<?%s %s?>' % (target, data))
 		
 	def getTemplate (self):
 		return XMLTemplate (self.commandList, self.symbolLocationTable)

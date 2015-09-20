@@ -1,9 +1,17 @@
-simpleTAL / simpleTALES (Version 1.1)
+simpleTAL / simpleTALES (Version 2.2)
 -------------------------------------
+
+Version 2.2
+-----------
+Bug fixes:
+	- HTML Document type declarations were not being passed through from the template
+	- HTML Comments are now passed through to the output
+	- End tags with no start tag now raise an error rather than failing silently
+	- The first text element in a template is now combined with other text elements
+	- XML Processing Instructions are now passed through the template correctly.
 
 Version 2.1
 -----------
-
 Bug fixes:
 	- HTML Templates will now suppress the output of close tags for elements
 		that are forbidden to have them in HTML 4.01.  Additionally tags that 
