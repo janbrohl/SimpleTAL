@@ -59,7 +59,7 @@ class NotTests (unittest.TestCase):
 		file = io.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
-		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.assertTrue (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 
 	def testNotNothing (self):
 		self._runTest_ ('<html tal:condition="not:nothing">Exists</html>'

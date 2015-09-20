@@ -76,15 +76,15 @@ class PathTests (unittest.TestCase):
 		file = io.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
-		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.assertTrue (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 		
 	def _runCacheTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileHTMLTemplate (txt)
 		file = io.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
-		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
-		self.failUnless (self.recorder.called == 1, 'Recorder shows function was called %s times!' % str (self.recorder.called))
+		self.assertTrue (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.assertTrue (self.recorder.called == 1, 'Recorder shows function was called %s times!' % str (self.recorder.called))
 			
 	def testSimpleTopPath (self):
 		self._runTest_ ('<html tal:replace="top">Top</html>'

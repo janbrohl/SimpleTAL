@@ -56,7 +56,7 @@ class TALAttributesTestCases (unittest.TestCase):
 		file = io.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
-		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.assertTrue (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 						
 	def testAddingAnAttribute (self):
 		self._runTest_ ('<html tal:attributes="link link" href="owlfish.com">Hello</html>'
@@ -122,6 +122,11 @@ class TALAttributesTestCases (unittest.TestCase):
 		self._runTest_ ('<html existingAtt="&amp;Testing&amp;" tal:attributes="newAtt attrs/existingatt" tal:content="attrs/existingatt">Hello</html>'
 						,"""<html newAtt="&amp;Testing&amp;" existingatt="&amp;Testing&amp;">&amp;Testing&amp;</html>"""
 						,"Accessing existing attributes failed.")
+
+	def testPreviouslyEscapedAmpersandInAttributes (self):
+		self._runTest_ ('<html tal:attributes="newAtt string:x.py?p1=p1val&amp;p2=p2val">Hello</html>'
+						,"""<html newAtt="x.py?p1=p1val&amp;p2=p2val">Hello</html>"""
+						,"Setting attribute to previously escaped value failed.")
 						
 
 	#~ def testAttributeCase (self):

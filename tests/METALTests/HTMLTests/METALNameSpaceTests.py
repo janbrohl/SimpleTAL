@@ -58,7 +58,7 @@ class METALNameSpaceTests (unittest.TestCase):
 		file = io.StringIO ()
 		pageTemplate.expand (self.context, file)
 		realResult = file.getvalue()
-		self.failUnless (realResult == result, "%s - \npassed in macro: %s \npage: %s\ngot back %s \nexpected %s\n" % (errMsg, macros, page, realResult, result))
+		self.assertTrue (realResult == result, "%s - \npassed in macro: %s \npage: %s\ngot back %s \nexpected %s\n" % (errMsg, macros, page, realResult, result))
 	
 	# Test that rebinding the namespaces works		
 	def testSingleBindNoCommands (self):

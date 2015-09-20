@@ -1,6 +1,6 @@
-simpleTAL / simpleTALES (Version 5.1)
+simpleTAL / simpleTALES (Version 5.2)
 -------------------------------------
-This is an implementation of the TAL and TALES specifications for Python 3.1
+This is an implementation of the TAL and TALES specifications for Python 3.2
 and higher.  
 
 Installation

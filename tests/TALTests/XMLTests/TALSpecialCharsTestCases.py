@@ -63,7 +63,7 @@ class TALSpecialCharsTestCases (unittest.TestCase):
 		file = io.StringIO ()
 		template.expand (self.context, file, outputEncoding="iso-8859-1")
 		realResult = file.getvalue()
-		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.assertTrue (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 		
 	def testLessThanGreaterThanAmpersand (self):
 		self._runTest_ ('<html tal:content="test">Hello</html>'

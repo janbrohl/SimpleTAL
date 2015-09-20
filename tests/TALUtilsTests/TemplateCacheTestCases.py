@@ -59,7 +59,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		
 	def _runTest_ (self, template, txt, result, errMsg="Error"):
 		realResult = simpleTALUtils.ExpandMacros (self.context, template)
-		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.assertTrue (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 			
 	def testHTMLTemplateCacheNoFile (self):
 		# Remove any previously created test files
@@ -94,17 +94,17 @@ class TemplateCacheTestCases (unittest.TestCase):
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile)
 		expectedResult = """<html><body><h1>Cache Test</h1></body></html>"""
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertTrue (outputFile.getvalue() == expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
-		self.failUnless (self.cache.misses == 1, "Cache miss not recorded!")
+		self.assertTrue (self.cache.misses == 1, "Cache miss not recorded!")
 		# Get the cached template
 		template = self.cache.getTemplate (name)
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile)
 		expectedResult = """<html><body><h1>Cache Test</h1></body></html>"""
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertTrue (outputFile.getvalue() == expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
-		self.failUnless (self.cache.hits == 1, "Cache hit not recorded!")
+		self.assertTrue (self.cache.hits == 1, "Cache hit not recorded!")
 		
 		# Update the template, should cause a re-compile of the template
 		# Ensure that time ellapses so that a ctime change is recorded
@@ -118,17 +118,17 @@ class TemplateCacheTestCases (unittest.TestCase):
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile)
 		expectedResult = """<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertTrue (outputFile.getvalue() == expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
-		self.failUnless (self.cache.misses == 2, "Cache miss not recorded!")
+		self.assertTrue (self.cache.misses == 2, "Cache miss not recorded!")
 		# Get the cached template
 		template = self.cache.getTemplate (name)
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile)
 		expectedResult = """<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertTrue (outputFile.getvalue() == expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
-		self.failUnless (self.cache.hits == 2, "Cache hit not recorded!")
+		self.assertTrue (self.cache.hits == 2, "Cache hit not recorded!")
 		
 	def testXMLTemplateCacheNoFile (self):
 		# Remove any previously created test files
@@ -163,18 +163,18 @@ class TemplateCacheTestCases (unittest.TestCase):
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1></body></html>"""
-		self.failUnless (type (template) == simpleTAL.XMLTemplate, "Error: Template was not auto-detected as XML")
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertTrue (type (template) == simpleTAL.XMLTemplate, "Error: Template was not auto-detected as XML")
+		self.assertTrue (outputFile.getvalue() == expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
-		self.failUnless (self.cache.misses == 1, "Cache miss not recorded!")
+		self.assertTrue (self.cache.misses == 1, "Cache miss not recorded!")
 		# Get the cached template
 		template = self.cache.getTemplate (name)
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1></body></html>"""
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertTrue (outputFile.getvalue() == expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
-		self.failUnless (self.cache.hits == 1, "Cache hit not recorded!")
+		self.assertTrue (self.cache.hits == 1, "Cache hit not recorded!")
 		
 		# Update the template, should cause a re-compile of the template
 		# Ensure that time ellapses so that a ctime change is recorded
@@ -188,17 +188,17 @@ class TemplateCacheTestCases (unittest.TestCase):
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertTrue (outputFile.getvalue() == expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
-		self.failUnless (self.cache.misses == 2, "Cache miss not recorded!")
+		self.assertTrue (self.cache.misses == 2, "Cache miss not recorded!")
 		# Get the cached template
 		template = self.cache.getTemplate (name)
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertTrue (outputFile.getvalue() == expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
-		self.failUnless (self.cache.hits == 2, "Cache hit not recorded!")
+		self.assertTrue (self.cache.hits == 2, "Cache hit not recorded!")
 		
 	def testExplicitXMLTemplateCache (self):
 		# Remove any previously created test files
@@ -218,17 +218,17 @@ class TemplateCacheTestCases (unittest.TestCase):
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1></body></html>"""
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertTrue (outputFile.getvalue() == expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
-		self.failUnless (self.cache.misses == 1, "Cache miss not recorded!")
+		self.assertTrue (self.cache.misses == 1, "Cache miss not recorded!")
 		# Get the cached template
 		template = self.cache.getXMLTemplate (name)
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1></body></html>"""
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertTrue (outputFile.getvalue() == expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
-		self.failUnless (self.cache.hits == 1, "Cache hit not recorded!")
+		self.assertTrue (self.cache.hits == 1, "Cache hit not recorded!")
 		
 		# Update the template, should cause a re-compile of the template
 		# Ensure that time ellapses so that a ctime change is recorded
@@ -242,17 +242,17 @@ class TemplateCacheTestCases (unittest.TestCase):
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertTrue (outputFile.getvalue() == expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
-		self.failUnless (self.cache.misses == 2, "Cache miss not recorded!")
+		self.assertTrue (self.cache.misses == 2, "Cache miss not recorded!")
 		# Get the cached template
 		template = self.cache.getXMLTemplate (name)
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertTrue (outputFile.getvalue() == expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
-		self.failUnless (self.cache.hits == 2, "Cache hit not recorded!")
+		self.assertTrue (self.cache.hits == 2, "Cache hit not recorded!")
 		
 if __name__ == '__main__':
 	unittest.main()

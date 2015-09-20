@@ -57,7 +57,7 @@ class TALEncodingTestCases (unittest.TestCase):
 		file = io.StringIO ()
 		template.expand (self.context, file, outputEncoding="iso-8859-1")
 		realResult = file.getvalue()
-		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.assertTrue (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 						
 	def testISOToUTF8 (self):
 		utf8Pound = b"\xc2\xa3"
@@ -66,7 +66,7 @@ class TALEncodingTestCases (unittest.TestCase):
 		template.expand (self.context, file, 'utf-8')
 		result = file.getvalue().encode ('utf-8')
 		expectedResult = b'<?xml version="1.0"?>\n<html>' + utf8Pound + b"3.12?  This cost nothing, yep " + utf8Pound + b"0!</html>"
-		self.failUnless (result == expectedResult, "UTF8 Encoding failed.  \nResult was: " + str(result) + "\nExpected result: " + str(expectedResult))
+		self.assertTrue (result == expectedResult, "UTF8 Encoding failed.  \nResult was: " + str(result) + "\nExpected result: " + str(expectedResult))
 		
 	def testISOToISO (self):
 		template = simpleTAL.compileXMLTemplate ('<?xml version="1.0" encoding="iso-8859-1"?>\n<html>£3.12?  <b tal:replace="HighBC"></b></html>'.encode ('iso-8859-1'))
@@ -74,7 +74,7 @@ class TALEncodingTestCases (unittest.TestCase):
 		template.expand (self.context, file, 'iso-8859-1')
 		result = file.getvalue().encode ('iso-8859-1')
 		expectedResult = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>£3.12?  This cost nothing, yep £0!</html>'.encode ('iso-8859-1')
-		self.failUnless (result == expectedResult, "ISO Encoding failed.  \nResult was: " + str(result) + "\nExpected result: " + str(expectedResult))
+		self.assertTrue (result == expectedResult, "ISO Encoding failed.  \nResult was: " + str(result) + "\nExpected result: " + str(expectedResult))
 	
 	def testUTF8ToISO (self):
 		template = simpleTAL.compileXMLTemplate (b'<?xml version="1.0"?>\n<html>\xc2\xa33.12?  <b tal:replace="HighBC"></b></html>')
@@ -82,7 +82,7 @@ class TALEncodingTestCases (unittest.TestCase):
 		template.expand (self.context, file, 'iso-8859-1')
 		result = file.getvalue().encode ('iso-8859-1')
 		expectedResult = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>£3.12?  This cost nothing, yep £0!</html>'.encode ('iso-8859-1')
-		self.failUnless (result == expectedResult, "UTF8 -> ISO Encoding failed.  \nResult was: " + str (result) + "\nExpected result: " + str (expectedResult))
+		self.assertTrue (result == expectedResult, "UTF8 -> ISO Encoding failed.  \nResult was: " + str (result) + "\nExpected result: " + str (expectedResult))
 		
 if __name__ == '__main__':
 	unittest.main()

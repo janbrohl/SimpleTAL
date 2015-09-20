@@ -52,7 +52,7 @@ class TALOmitTagTestCases (unittest.TestCase):
 		file = io.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
-		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.assertTrue (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 						
 	def testOmitTagTrue (self):
 		self._runTest_ ('<html tal:omit-tag="link" href="owlfish.com">Hello</html>'

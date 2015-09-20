@@ -1,5 +1,16 @@
-simpleTAL / simpleTALES (Version 5.1)
+simpleTAL / simpleTALES (Version 5.2)
 -------------------------------------
+
+Version 5.2
+-----------
+This version requires a minimum of Python 3.2 and has been tested on Python 3.3 & 3.4
+
+Bug fixes:
+
+ - Removed ElementTree support due to incompatible API in Python 3.4
+ - Switched to non-deprecated methods
+ - Fixed issue with Ampersand escaping in attributed in Python 3.4
+ - Repeat variables can now be accessed from Python Paths
 
 Version 5.1
 -----------

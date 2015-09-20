@@ -87,11 +87,15 @@
 <h3>string</h3>
 <p>Syntax: string:<span style="font-style:italic">text</span></p>
 <p>Description:&nbsp; Evaluates to a literal string with value <span style="font-style:italic">text while substituting variables with the form ${pathName} and $pathName</span></p>
-<p>Example: &lt;b tal:content="string:Welcome ${user/name}!"&gt;&lt;/b&gt;</p>
+<p>Example: <code>&lt;b tal:content="string:Welcome ${user/name}!"&gt;&lt;/b&gt;</code></p>
 <h3>python</h3>
 <p>Syntax: python:<span style="font-style:italic">python-code</span></p>
 <p>Description:&nbsp; Evaluates the python-code and returns the result.&nbsp; The python code must be properly escaped, e.g. "python: 1 &lt; 2" must be written as "python: 1 &amp;lt; 2".&nbsp; The python code has access to all Python functions, including four extra functions that correspond to their TALES commands: path (string), string (string), exists (string), and nocall (string)</p>
-<p>Example: &lt;div tal:condition="python: path (basket/items) &amp;gt; 1"&gt;Checkout!&lt;/div&gt;</p>
+<p>Example: <code>&lt;div tal:condition="python: path (basket/items) &amp;gt; 1"&gt;Checkout!&lt;/div&gt;</code></p>
+<h3>?</h3>
+<p>Syntax: [path:]object/?attribute</p>
+<p>Description:&nbsp; The "attribute" is evaluated as a local or global variable, and it's value is used as the attribute to lookup on the object.&nbsp; Useful for accessing the contents of a dictionary within a loop:</p>
+<p>Example: <code>&lt;div tal:content="myDictionary/loopValue"/&gt;</code></p>
 <h2>METAL Macro Language</h2>
 <p>METAL is a macro language commonly used with TAL &amp; TALES.&nbsp; METAL allows part of a template to be used as a macro in later parts of a template, or a separate template altogether.</p>
 <h3>metal:define-macro</h3>
@@ -123,8 +127,8 @@
   <p id="version">PubTal Version </p>
   <div id="footer">
   <p>File: tal-guide.sxw</p>
-  <p>Last modified: Thu, 06 Aug 2009 19:19:10 BST</p>
-  <p>Copyright 2009 Colin Stewart</p>
-  <p title="PubTal is a template driven web site publisher.">Made with <a href="http://www.owlfish.com/software/PubTal/">PubTal</a> 3.3</p>
+  <p>Last modified: Thu, 07 Jul 2011 20:24:28 BST</p>
+  <p>Copyright 2011 Colin Stewart</p>
+  <p title="PubTal is a template driven web site publisher.">Made with <a href="http://www.owlfish.com/software/PubTal/">PubTal</a> 3.5</p>
   </div>
 </body>

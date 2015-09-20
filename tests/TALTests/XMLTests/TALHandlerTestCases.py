@@ -168,7 +168,7 @@ class TALHandlerTestCases (unittest.TestCase):
 		except Exception as e:
 			self.fail ("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s" % (str (e), realResult, str (template)))
 		
-		self.failUnless (expectedChecksum == realChecksum, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.assertTrue (expectedChecksum == realChecksum, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 												
 	def testSingleEmptyElement (self):
 		self._runTest_ ("<single/>", '<?xml version="1.0" encoding="iso-8859-1"?>\n<single/>')
@@ -222,7 +222,7 @@ class TALHandlerTestCases (unittest.TestCase):
 		template.expand (self.context, fh, docType="""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3c.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">""", outputEncoding="iso-8859-1")
 		realResult = fh.getvalue()
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3c.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n<html><p>Test</p></html>"""
-		self.failUnless (realResult == expectedResult, "Doctype failed - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (txt, realResult, expectedResult, str(template)))
+		self.assertTrue (realResult == expectedResult, "Doctype failed - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (txt, realResult, expectedResult, str(template)))
 		
 	def testXMLDeclarationSuppressionWithDocType (self):
 		txt = """<?xml version="1.0" encoding="iso-8859-1"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n<html><p>Test</p></html>"""
@@ -231,7 +231,7 @@ class TALHandlerTestCases (unittest.TestCase):
 		template.expand (self.context, fh, docType="""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3c.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">""", suppressXMLDeclaration=1)
 		realResult = fh.getvalue()
 		expectedResult = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3c.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n<html><p>Test</p></html>"""
-		self.failUnless (realResult == expectedResult, "Doctype failed - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (txt, realResult, expectedResult, str(template)))
+		self.assertTrue (realResult == expectedResult, "Doctype failed - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (txt, realResult, expectedResult, str(template)))
 
 	def testNBSPparsing (self):
 		txt = """<?xml version="1.0" encoding="iso-8859-1"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n<html><p>Test&nbsp;Space</p></html>""".encode ("iso-8859-1")
@@ -243,7 +243,7 @@ class TALHandlerTestCases (unittest.TestCase):
 			expectedResult = """<?xml version="1.0"?>\n<html><p>Test\xa0Space</p></html>""".encode ("utf-8")
 		else:
 			expectedResult = """<?xml version="1.0"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n<html><p>Test\xa0Space</p></html>""".encode ("utf-8")
-		self.failUnless (realResult == expectedResult, "NBSP expansion failed - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (txt, realResult, expectedResult, template))
+		self.assertTrue (realResult == expectedResult, "NBSP expansion failed - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (txt, realResult, expectedResult, template))
 
 	def testXMLDeclarationSuppressionWithNoDocType (self):
 		txt = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p>Test</p></html>"""
@@ -252,7 +252,7 @@ class TALHandlerTestCases (unittest.TestCase):
 		template.expand (self.context, fh, suppressXMLDeclaration=1)
 		realResult = fh.getvalue()
 		expectedResult = """<html><p>Test</p></html>"""
-		self.failUnless (realResult == expectedResult, "Doctype failed - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (txt, realResult, expectedResult, str(template)))
+		self.assertTrue (realResult == expectedResult, "Doctype failed - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (txt, realResult, expectedResult, str(template)))
 
 	def testDTDPassthru (self):
 		if not use_lexical_handler:

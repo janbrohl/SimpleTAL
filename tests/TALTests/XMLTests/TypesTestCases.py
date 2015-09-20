@@ -59,7 +59,7 @@ class TALContentTestCases (unittest.TestCase):
 		file = io.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
-		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.assertTrue (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 			
 	def testCompileTemplateBinary (self):
 		""" Test creating an XML template directly from a file that was binary opened.
@@ -96,7 +96,7 @@ class TALContentTestCases (unittest.TestCase):
 			# Delete the temporary file we created
 			os.remove (fileName)
 
-		self.failUnless (outputValue == expectedOutput, "passed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (txt, outputValue, expectedOutput, template))
+		self.assertTrue (outputValue == expectedOutput, "passed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (txt, outputValue, expectedOutput, template))
 		
 	def testCompileTemplateText (self):
 		""" Test creating an XML template directly from a file that was text opened.
@@ -130,7 +130,7 @@ class TALContentTestCases (unittest.TestCase):
 			# Delete the temporary file we created
 			os.remove (fileName)
 			
-		self.failUnless (outputValue == expectedOutput, "passed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (txt, outputValue, expectedOutput, template))
+		self.assertTrue (outputValue == expectedOutput, "passed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (txt, outputValue, expectedOutput, template))
 
 
 if __name__ == '__main__':

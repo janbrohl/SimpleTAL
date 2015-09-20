@@ -77,6 +77,12 @@ class RepeatVariable (ContextVariable):
 		self.sequence = sequence	
 		self.position = 0	
 		self.map = None
+
+	def __getattr__(self, name): # to be used from python eval
+ 		if (self.map is None):
+ 			self.createMap()
+
+ 		return self.map[name]
 		
 	def value (self, currentPath=None):
 		if (self.map is None):
@@ -367,7 +373,7 @@ class Context:
 		
 	def evaluatePython (self, expr):
 		if (not self.allowPythonPath):
-			self.log.warn ("Parameter allowPythonPath is false.  NOT Evaluating python expression %s" % expr)
+			self.log.warning ("Parameter allowPythonPath is false.  NOT Evaluating python expression %s" % expr)
 			return self.false
 		#self.log.debug ("Evaluating python expression %s" % expr)
 		
@@ -393,7 +399,7 @@ class Context:
 			return result
 		except Exception as e:
 			# An exception occured evaluating the template, return the exception as text
-			self.log.warn ("Exception occurred evaluating python path, exception: " + str (e))
+			self.log.warning ("Exception occurred evaluating python path, exception: " + str (e))
 			return "Exception: %s" % str (e)
 
 	def evaluatePath (self, expr):
@@ -541,7 +547,7 @@ class Context:
 							skipCount = endPos - position - 1
 					except IndexError as e:
 						# Trailing $ sign - just suppress it
-						self.log.warn ("Trailing $ detected")
+						self.log.warning ("Trailing $ detected")
 						pass
 				else:
 					result += expr[position]

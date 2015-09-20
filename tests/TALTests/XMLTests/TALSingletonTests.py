@@ -145,7 +145,7 @@ class TALSingletonTests (unittest.TestCase):
 		template.expand (self.context, file, outputEncoding="iso-8859-1")
 		realResult = file.getvalue().encode ('iso-8859-1')
 		
-		self.failUnless (result == realResult, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, text, realResult, result, template))
+		self.assertTrue (result == realResult, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, text, realResult, result, template))
 		
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
@@ -163,7 +163,7 @@ class TALSingletonTests (unittest.TestCase):
 		except Exception as e:
 			self.fail ("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s" % (str (e), realResult, str (template)))
 		
-		self.failUnless (expectedChecksum == realChecksum, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.assertTrue (expectedChecksum == realChecksum, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 		
 	def _runMacroTest_ (self, macros, page, result, errMsg="Error"):
 		macroTemplate = simpleTAL.compileXMLTemplate (macros)
@@ -183,7 +183,7 @@ class TALSingletonTests (unittest.TestCase):
 		except Exception as e:
 			self.fail ("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s\nMacro Template: %s" % (str (e), realResult, str (pageTemplate), str (macroTemplate)))
 		
-		self.failUnless (expectedChecksum == realChecksum, "%s - \npassed in macro: %s \n and page: %s\ngot back %s \nexpected %s\n\nPage Template: %s" % (errMsg, macros,page, realResult, result, pageTemplate))
+		self.assertTrue (expectedChecksum == realChecksum, "%s - \npassed in macro: %s \n and page: %s\ngot back %s \nexpected %s\n\nPage Template: %s" % (errMsg, macros,page, realResult, result, pageTemplate))
 		
 	def testBasicPassThrough (self):
 		self._runBasicTest_ ("""<?xml version="1.0" encoding="iso-8859-1"?><html><br /><p>Hello</p><hr /></html>""".encode ("iso-8859-1")

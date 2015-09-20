@@ -64,7 +64,7 @@ class PathTests (unittest.TestCase):
 		file = io.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
-		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.assertTrue (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 			
 	def testRepeatVariablePath (self):
 		self._runTest_ ('<html><ul><li tal:repeat="colour aList" tal:content="colours/?colour">List</li></ul></html>'

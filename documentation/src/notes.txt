@@ -81,4 +81,6 @@ instead of: <code>&lt;div tal:condition="python: a &lt; b"&gt;Conditional Text&l
 <h2>Known differences</h2>
 Non-existent path types, e.g. '&lt;b tal:content="total: $totalAmount"&gt;&lt;/b&gt;' are not supported.  In Zope, this results in the path being interpreted as a string - in simpleTAL/ES the result will be an error.
 
+SimpleTAL 5.2 onwards supports accessing repeat variables through Python paths.  Unlike Zope, all variables on the repeat variable are methods, with the exception of length.  To access the value from a python path you need to call the method, e.g.: '&lt;b tal:content="python:repeat['item'].index()"&gt;&lt;/b&gt; 
+
 <a href="index.html">Back to SimpleTAL</a>

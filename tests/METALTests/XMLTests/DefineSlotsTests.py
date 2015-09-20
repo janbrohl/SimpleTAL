@@ -57,7 +57,7 @@ class DefineSlotsTests (unittest.TestCase):
 		file = io.StringIO ()
 		pageTemplate.expand (self.context, file, outputEncoding="iso-8859-1")
 		realResult = file.getvalue()
-		self.failUnless (realResult == result, "%s - \npassed in macro: %s \npage: %s\ngot back %s \nexpected %s\n" % (errMsg, macros, page, realResult, result))
+		self.assertEqual (realResult,result, "%s - \npassed in macro: %s \npage: %s\ngot back %s \nexpected %s\n" % (errMsg, macros, page, realResult, result))
 	
 	def _runCompileTest_ (self, txt, result, errMsg="Error"):
 		try:

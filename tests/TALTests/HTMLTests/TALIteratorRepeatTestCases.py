@@ -88,7 +88,7 @@ class TALIteratorRepeatTestCases (unittest.TestCase):
 			print("Error, template compiled to: " + str (template))
 			raise e
 		realResult = file.getvalue()
-		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.assertTrue (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 					
 	def testZeroCont (self):
 		self._runTest_ ('<html><p tal:repeat="entry zeroCont">Hello</p></html>', "<html></html>", "Repeat of zero length container failed.")

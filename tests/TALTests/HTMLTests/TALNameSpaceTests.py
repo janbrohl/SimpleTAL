@@ -54,14 +54,14 @@ class TALNameSpaceTests (unittest.TestCase):
 		file = io.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
-		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.assertTrue (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 	
 	def _runErrTest_ (self, txt, result, errMsg="Error"):
 		try:
 			template = simpleTAL.compileHTMLTemplate (txt)
 		except simpleTAL.TemplateParseException as e:
 			realResult = str (e)
-			self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back exception %s \nexpected exception %s\n" % (errMsg, txt, realResult, result))
+			self.assertTrue (realResult == result, "%s - \npassed in: %s \ngot back exception %s \nexpected exception %s\n" % (errMsg, txt, realResult, result))
 			return
 		self.fail ("No exception thrown!")					
 
