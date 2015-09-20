@@ -15,7 +15,7 @@
 		Module Dependencies: logging, simpleTALES, simpleTALTemplates
 """
 
-__version__ = "3.0"
+__version__ = "3.1"
 
 try:
 	import logging
@@ -167,6 +167,7 @@ class TemplateInterpreter:
 		if (result is None or not result.isTrue()):
 			# Nothing to output - evaluated to false.
 			self.outputTag = 0
+			self.tagContent = None
 			self.programCounter = self.symbolTable[args[1]]
 			return
 		self.programCounter += 1
@@ -184,7 +185,8 @@ class TemplateInterpreter:
 				self.context.removeRepeat (args[0])
 				self.context.popLocals()
 				self.movePCBack = None
-				# Suppress the final close tag
+				# Suppress the final close tag and content
+				self.tagContent = None
 				self.outputTag = 0
 				self.programCounter = self.symbolTable [args[2]]
 				return

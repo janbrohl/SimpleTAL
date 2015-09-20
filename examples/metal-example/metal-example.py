@@ -14,7 +14,7 @@
 		Module Dependencies: simpleTAL, simpleTALES
 """
 
-import simpleTAL, simpleTALES
+from simpletal import simpleTAL, simpleTALES
 import sys
 
 # Creat the context that is used by the template

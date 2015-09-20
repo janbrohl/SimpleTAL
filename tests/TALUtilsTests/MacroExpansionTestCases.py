@@ -15,7 +15,7 @@ import unittest, os, codecs
 import StringIO
 import logging, logging.config
 
-import simpleTALUtils, simpleTALES, simpleTAL
+from simpletal import simpleTALUtils, simpleTALES, simpleTAL
 
 macroTemplate = simpleTAL.compileHTMLTemplate ("""<html>
 <body metal:define-macro="one">World is <i metal:define-slot="blue">White</i></body>

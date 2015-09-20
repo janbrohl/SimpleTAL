@@ -19,7 +19,7 @@
 		Module Dependencies: simpleTAL, simpleTALES
 """
 
-import simpleTAL, simpleTALES
+from simpletal import simpleTAL, simpleTALES
 import cgi, sys
 		
 class ExampleCGI:

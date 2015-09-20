@@ -9,7 +9,7 @@
 		Performance test cases.
 		
 """
-import simpleTAL, simpleTALES
+from simpletal import simpleTAL, simpleTALES
 
 import time, StringIO, cStringIO, sys
 

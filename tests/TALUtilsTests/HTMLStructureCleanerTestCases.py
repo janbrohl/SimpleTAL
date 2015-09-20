@@ -15,7 +15,7 @@ import unittest, os, codecs
 import StringIO
 import logging, logging.config
 
-import simpleTALUtils
+from simpletal import simpleTALUtils
 
 isoText = """<html>
 <h1>Some bad html follows</h1>

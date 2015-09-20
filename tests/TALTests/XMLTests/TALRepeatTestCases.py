@@ -15,7 +15,7 @@ import unittest, os
 import StringIO
 import logging, logging.config
 
-import simpleTAL, simpleTALES
+from simpletal import simpleTAL, simpleTALES
 
 if (os.path.exists ("logging.ini")):
 	logging.config.fileConfig ("logging.ini")
@@ -68,6 +68,11 @@ class TALRepeatTestCases (unittest.TestCase):
 		self._runTest_ ('<html><p tal:repeat="word two"><b tal:replace="word"></b></p></html>'
 									 ,'<?xml version="1.0" encoding="iso8859-1"?>\n<html><p>one</p><p>two</p></html>'
 									 ,'Itteration over list failed.')
+									 
+	def testTwoCmndsOneTagListRepeat (self):
+		self._runTest_ ('<html><p tal:repeat="word two" tal:content="word"></p></html>'
+									 ,'<?xml version="1.0" encoding="iso8859-1"?>\n<html><p>one</p><p>two</p></html>'
+									 ,'Itteration over list with both content and repeat on same element failed.')
 		
 	def testNestedRepeat (self):
 		self._runTest_ ('<html><p tal:repeat="image nested"><h2 tal:content="image/title"></h2><b tal:omit-tag="" tal:repeat="category image/catList"><i tal:content="category"></i></b></p></html>'

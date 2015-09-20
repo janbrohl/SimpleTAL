@@ -1,6 +1,21 @@
 simpleTAL / simpleTALES (Version 3.0)
 -------------------------------------
 
+Version 3.1
+-----------
+With this release import statements need to be changed.  Please now use:
+from simpletal import simpleTAL, simpleTALES.  The API has not changed.
+
+New features:
+  - SimpleTAL can now be installed using distutils, thanks to Michael Twomey.
+    
+Bug fixes:
+  - If tal:repeat and tal:content were used on the same element, the last piece of
+    content would be present twice - fixed.
+  - If a path element inside a string: path evaluated to something other than a string or
+    unicode string, it would not be evaluated.  Now an attempt to coerce the value to a 
+    string is done using the str function.
+
 Version 3.0
 -----------
 New features:
@@ -18,23 +33,23 @@ Bug fixes:
 Version 2.2
 -----------
 Bug fixes:
-	- HTML Document type declarations were not being passed through from the template
-	- HTML Comments are now passed through to the output
-	- End tags with no start tag now raise an error rather than failing silently
-	- The first text element in a template is now combined with other text elements
-	- XML Processing Instructions are now passed through the template correctly.
+  - HTML Document type declarations were not being passed through from the template
+  - HTML Comments are now passed through to the output
+  - End tags with no start tag now raise an error rather than failing silently
+  - The first text element in a template is now combined with other text elements
+  - XML Processing Instructions are now passed through the template correctly.
 
 Version 2.1
 -----------
 Bug fixes:
-	- HTML Templates will now suppress the output of close tags for elements
-		that are forbidden to have them in HTML 4.01.  Additionally tags that 
-		can have no close tag in HTML can still have TAL attributes.  This means
-		that HTML templates can still be valid HTML, and produce valid HTML.
-		For example:
-		'<html><img tal:attributes="src imgSrc"></html>' is now valid, and will only
-		output the <img> tag.
-	
+  - HTML Templates will now suppress the output of close tags for elements
+    that are forbidden to have them in HTML 4.01.  Additionally tags that 
+    can have no close tag in HTML can still have TAL attributes.  This means
+    that HTML templates can still be valid HTML, and produce valid HTML.
+    For example:
+    '<html><img tal:attributes="src imgSrc"></html>' is now valid, and will only
+    output the <img> tag.
+    
 New features:
   - A simplification of how local variables are handled brings a 5-10%
     performance gain
@@ -58,11 +73,11 @@ New features:
 Version 1.1
 -----------
 Bug fixes:
-	- The "structure" keyword when used in XML templates would fail with an exception.
-	
+  - The "structure" keyword when used in XML templates would fail with an exception.
+    
 New features:
-	- Added test cases for TALES and TAL (both HTML and XML)
-	- Added allowTALInStructure flag to control expansion of TAL attributes
+  - Added test cases for TALES and TAL (both HTML and XML)
+  - Added allowTALInStructure flag to control expansion of TAL attributes
 
 Version 1.0
 -----------

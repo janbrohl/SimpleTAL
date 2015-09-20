@@ -1,4 +1,4 @@
-simpleTAL / simpleTALES (Version 3.0)
+simpleTAL / simpleTALES (Version 3.1)
 -------------------------------------
 This is an implementation of the TAL and TALES specifications
 see (http://www.zope.org/Documentation/Books/ZopeBook/current/AppendixC.stx)
@@ -79,11 +79,6 @@ context.addGlobal ("structuredContent", genTALStruct)
 
 Known limitations
 -----------------
-Only a local namespace of 'tal' is supported.  You should be able to re-bind
-a different name using XML namespaces, but this is not supported yet.  (i.e.
-you must always use the form 'tal:content' you can never use
-'newName:content' with newName bound to the same namespace as tal)
-
 Repeat Variables do not support 'first' and 'last'.
 
 When using 'not:' on an empty expression the result will be true rather than

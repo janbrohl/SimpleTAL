@@ -14,7 +14,7 @@
 		Module Dependencies: logging
 """
 
-__version__ = "3.0"
+__version__ = "3.1"
 
 import copy, string
 
@@ -365,7 +365,13 @@ class Context:
 								# Evaluate the path
 								pathResult = self.evaluate (path)
 								if (pathResult is not None and not pathResult.isNothing()):
-									result += pathResult.value()
+									resultVal = pathResult.value()
+									if (type (resultVal) == type (u"")):
+										result += resultVal
+									elif (type (resultVal) == type ("")):
+										result += unicode (resultVal, 'ascii')
+									else:
+										result += unicode (str (resultVal), 'ascii')
 								skipCount = endPos - position 
 						else:
 							# It's a variable
@@ -376,9 +382,15 @@ class Context:
 							# Evaluate the variable
 							pathResult = self.traversePath (path)
 							if (pathResult is not None and not pathResult.isNothing()):
-								result += pathResult.value()
+								resultVal = pathResult.value()
+								if (type (resultVal) == type (u"")):
+										result += resultVal
+								elif (type (resultVal) == type ("")):
+									result += unicode (resultVal, 'ascii')
+								else:
+									result += unicode (str (resultVal), 'ascii')
 							skipCount = endPos - position - 1
-					except:
+					except Exception, e:
 						# Trailing $ sign - just suppress it
 						self.log.warn ("Trailing $ detected")
 						pass

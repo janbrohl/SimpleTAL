@@ -15,7 +15,7 @@ import unittest, os
 import StringIO
 import logging, logging.config
 
-import simpleTAL, simpleTALES
+from simpletal import simpleTAL, simpleTALES
 
 if (os.path.exists ("logging.ini")):
 	logging.config.fileConfig ("logging.ini")
@@ -34,7 +34,9 @@ class StringTests (unittest.TestCase):
 		self.context.addGlobal ('top', 'Hello from the top')
 		self.context.addGlobal ('alt', 'Wobble the way')
 		self.context.addGlobal ('holder', {'helloFunc': simpleFunction
-										  ,'falseFunc': simpleFalseFunc})		
+										  								,'falseFunc': simpleFalseFunc})		
+		self.context.addGlobal ('version', 3.1)
+		self.context.addGlobal ('uniString', u"Hello")
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileHTMLTemplate (txt)
 		file = StringIO.StringIO ()
@@ -77,6 +79,18 @@ class StringTests (unittest.TestCase):
 					   ,'<html>Thought - Hello from the top</html>'
 					   ,'End variable failed.'
 					   )
+					   
+	def testNumericVariable (self):
+		self._runTest_ ('<html tal:content="string:Thought - $version">Exists</html>'
+								   ,'<html>Thought - 3.1</html>'
+								   ,'Numeric test variable failed.'
+								   )
+								   
+	def testUnicodeVariable (self):
+		self._runTest_ ('<html tal:content="string:Thought - ${uniString}">Exists</html>'
+								   ,'<html>Thought - Hello</html>'
+								   ,'Unicode test variable failed.'
+								   )								   
 					   
 	def testSinglePath (self):
 		self._runTest_ ('<html tal:content="string:${top}">Exists</html>'

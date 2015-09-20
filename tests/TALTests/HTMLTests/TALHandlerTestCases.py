@@ -15,7 +15,7 @@ import unittest, os
 import StringIO
 import logging, logging.config
 
-import simpleTAL, simpleTALES
+from simpletal import simpleTAL, simpleTALES
 
 if (os.path.exists ("logging.ini")):
 	logging.config.fileConfig ("logging.ini")
