@@ -22,32 +22,40 @@ if (os.path.exists ("logging.ini")):
 else:
 	logging.basicConfig()
 	
-class TALHandlerTestCases (unittest.TestCase):
+class TALOmitTagTestCases (unittest.TestCase):
 	def setUp (self):
 		self.context = simpleTALES.Context()
 		self.context.addGlobal ('test', 'testing')
-		self.context.addGlobal ('one', [1])
-		self.context.addGlobal ('two', ["one", "two"])
-		self.context.addGlobal ('three', [1,"Two",3])
+		self.context.addGlobal ('link', 'www.owlfish.com')
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
-		template = simpleTAL.compileXMLTemplate (txt)
+		template = simpleTAL.compileHTMLTemplate (txt)
 		file = StringIO.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
-												
-	def testSingleEmptyElement (self):
-		self._runTest_ ("<single/>", '<?xml version="1.0" encoding="iso8859-1"?>\n<single></single>')
 						
-	def testSingleElement (self):
-		self._runTest_ ("<single>start</single>", '<?xml version="1.0" encoding="iso8859-1"?>\n<single>start</single>')
+	def testOmitTagTrue (self):
+		self._runTest_ ('<html tal:omit-tag="link" href="owlfish.com">Hello</html>'
+										,'Hello'
+										,"Omit tag, true, failed.")
+										
+	def testOmitTagNoArg (self):
+		self._runTest_ ('<html tal:omit-tag href="owlfish.com">Hello</html>'
+										,'Hello'
+										,"Omit tag, no arg, failed.")
 		
-	def testCDATASection (self):
-		self._runTest_ ("<single><![CDATA[Here's some <escaped> CDATA section stuff & things.]]></single>"
-									 ,"""<?xml version="1.0" encoding="iso8859-1"?>\n<single>Here's some &lt;escaped&gt; CDATA section stuff &amp; things.</single>"""
-									 ,"CDATA section was not re-encoded correctly.")
+	def testOmitTagEmptyArg (self):
+		self._runTest_ ('<html tal:omit-tag="" href="owlfish.com">Hello</html>'
+										,'Hello'
+										,"Omit tag, empty arg, failed.")
+						
+	def testOmitTagFalse (self):
+		self._runTest_ ('<html tal:omit-tag="wibble" href="owlfish.com">Hello</html>'
+										,'<html href="owlfish.com">Hello</html>'
+										,"Omit tag, false, failed.")
+						
 
 if __name__ == '__main__':
 	unittest.main()
-	
+

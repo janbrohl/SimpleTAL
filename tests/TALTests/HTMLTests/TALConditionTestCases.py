@@ -31,9 +31,11 @@ class TALConditionTestCases (unittest.TestCase):
 		self.context.addGlobal ('three', [1,"Two",3])
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
-		file = StringIO.StringIO (txt)
-		realResult = simpleTAL.expandTemplate (file, self.context)
-		self.failUnless (realResult == result, "%s - passed in: %s got back %s expected %s" % (errMsg, txt, realResult, result))
+		template = simpleTAL.compileHTMLTemplate (txt)
+		file = StringIO.StringIO ()
+		template.expand (self.context, file)
+		realResult = file.getvalue()
+		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 						
 	def testConditionDefault (self):
 		self._runTest_ ('<html tal:condition="default">Hello</html>', "<html>Hello</html>", "Condition 'default' did not evaluate to true")

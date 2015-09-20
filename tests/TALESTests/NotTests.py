@@ -36,9 +36,11 @@ class NotTests (unittest.TestCase):
 		self.context.addGlobal ('holder', {'helloFunc': simpleFunction
 										  ,'falseFunc': simpleFalseFunc})		
 	def _runTest_ (self, txt, result, errMsg="Error"):
-		file = StringIO.StringIO (txt)
-		realResult = simpleTAL.expandTemplate (file, self.context)
-		self.failUnless (realResult == result, "%s - passed in: %s got back %s expected %s" % (errMsg, txt, realResult, result))
+		template = simpleTAL.compileHTMLTemplate (txt)
+		file = StringIO.StringIO ()
+		template.expand (self.context, file)
+		realResult = file.getvalue()
+		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 
 	def testNotNothing (self):
 		self._runTest_ ('<html tal:condition="not:nothing">Exists</html>'

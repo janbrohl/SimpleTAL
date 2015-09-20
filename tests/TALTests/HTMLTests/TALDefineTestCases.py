@@ -31,10 +31,12 @@ class TALDefineTestCases (unittest.TestCase):
 		self.context.addGlobal ('three', [1,"Two",3])
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
-		file = StringIO.StringIO (txt)
-		realResult = simpleTAL.expandTemplate (file, self.context)
-		self.failUnless (realResult == result, "%s - passed in: %s got back %s expected %s" % (errMsg, txt, realResult, result))
-						
+		template = simpleTAL.compileHTMLTemplate (txt)
+		file = StringIO.StringIO ()
+		template.expand (self.context, file)
+		realResult = file.getvalue()
+		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+							
 	def testDefineString (self):
 		self._runTest_ ('<html tal:define="def1 test"><p tal:content="def1"></p></html>', "<html><p>testing</p></html>", "Simple string define failed.")
 		
@@ -53,6 +55,14 @@ class TALDefineTestCases (unittest.TestCase):
 	def testDefineImplicitLocal (self):
 		self._runTest_ ('<html><p tal:define="def1 test"></p><p tal:content="def1"></p></html>'
 						, '<html><p></p><p></p></html>', 'Implicit local available globaly')
+						
+	def testDefineDefault (self):
+		self._runTest_ ('<html><p tal:define="global test default"></p><p tal:content="test">Can you see me?</p></html>'
+						, '<html><p></p><p>Can you see me?</p></html>', 'Default variable did not define proplerly.')
+
+	def testDefineNothing (self):
+		self._runTest_ ('<html><p tal:define="global test nothing"></p><p tal:content="test">Can you see me?</p></html>'
+						, '<html><p></p><p></p></html>', 'Nothing variable did not define proplerly.')
 
 		
 if __name__ == '__main__':

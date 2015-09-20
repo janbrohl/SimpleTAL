@@ -35,11 +35,13 @@ class TALContentTestCases (unittest.TestCase):
 		self.context.addGlobal ('three', [1,"Two",3])
 		self.context.addGlobal ('weblog', weblog)
 		
-	def _runTest_ (self, txt, result, errMsg="Error", allowTALInStructure=1):
-		file = StringIO.StringIO (txt)
-		realResult = simpleTAL.expandTemplate (file, self.context, allowTALInStructure=allowTALInStructure)
-		self.failUnless (realResult == result, "%s - passed in: %s got back %s expected %s" % (errMsg, txt, realResult, result))
-						
+	def _runTest_ (self, txt, result, errMsg="Error"):
+		template = simpleTAL.compileHTMLTemplate (txt)
+		file = StringIO.StringIO ()
+		template.expand (self.context, file)
+		realResult = file.getvalue()
+		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+			
 	def testContentNothing (self):
 		self._runTest_ ('<html><p tal:content="nothing"></p></html>'
 						,'<html><p></p></html>'
@@ -56,6 +58,11 @@ class TALContentTestCases (unittest.TestCase):
 						,'Content of string did not evaluate to contain string')
 						
 	def testContentStructure (self):
+		# This test has specific needs - i.e. wrap the weblog/entry in a template...		
+		entry = """Some structure: <b tal:content="weblog/subject"></b>"""
+		weblog = {'subject': 'Test subject', 'entry': simpleTAL.compileHTMLTemplate(entry)}
+		self.context.addGlobal ('weblog', weblog)
+		
 		self._runTest_ ('<html><p tal:content="structure weblog/entry">Original</p></html>'
 						,'<html><p>Some structure: <b>Test subject</b></p></html>'
 						,'Content of Structure did not evaluate to expected result')   
@@ -63,8 +70,7 @@ class TALContentTestCases (unittest.TestCase):
 	def testTALDisabledContentStructure (self):
 		self._runTest_ ('<html><p tal:content="structure weblog/entry">Original</p></html>'
 						,'<html><p>Some structure: <b tal:content="weblog/subject"></b></p></html>'
-						,'Content of Structure did not evaluate to expected result'
-						,allowTALInStructure=0)  
+						,'Content of Structure did not evaluate to expected result')  
 						
 if __name__ == '__main__':
 	unittest.main()

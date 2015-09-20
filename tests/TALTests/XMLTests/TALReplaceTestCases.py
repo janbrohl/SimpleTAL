@@ -36,9 +36,11 @@ class TALReplaceTestCases (unittest.TestCase):
 		self.context.addGlobal ('weblog', weblog)
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
-		file = StringIO.StringIO (txt)
-		realResult = simpleTAL.expandXMLTemplate (file, self.context)
-		self.failUnless (realResult == result, "%s - passed in: %s got back %s expected %s" % (errMsg, txt, realResult, result))
+		template = simpleTAL.compileXMLTemplate (txt)
+		file = StringIO.StringIO ()
+		template.expand (self.context, file)
+		realResult = file.getvalue()
+		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 						
 	def testContentNothing (self):
 		self._runTest_ ('<html><p tal:replace="nothing"></p></html>'
@@ -56,6 +58,11 @@ class TALReplaceTestCases (unittest.TestCase):
 						,'Content of string did not evaluate to contain string')
 						
 	def testContentStructure (self):
+		# This test has specific needs - i.e. wrap the weblog/entry in a template...		
+		entry = """<anEntry>Some structure: <b tal:content="weblog/subject"></b></anEntry>"""
+		weblog = {'subject': 'Test subject', 'entry': simpleTAL.compileXMLTemplate(entry)}
+		self.context.addGlobal ('weblog', weblog)
+
 		self._runTest_ ('<html><p tal:replace="structure weblog/entry">Original</p></html>'
 						,'<?xml version="1.0" encoding="iso8859-1"?>\n<html><anEntry>Some structure: <b>Test subject</b></anEntry></html>'
 						,'Content of Structure did not evaluate to expected result')    

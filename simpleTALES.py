@@ -2,19 +2,20 @@
 
 		Copyright 2003 Colin Stewart (http://www.owlfish.com/)
 		
-		This code is made freely available for commerical and non-commerical use.
-		No warranties, expressed or implied, are made as to the fitness of this
-		code for any purpose.
+		This code is made freely available for commerical and non-commerical
+		use.  No warranties, expressed or implied, are made as to the
+		fitness of this code for any purpose.
 		
-		If you make any bug fixes or feature enhancements please let me know!
+		If you make any bug fixes or feature enhancements please let me
+		know!
 		
-		The classes in this module implement the TALES specification, used by the
-		simpleTAL module.
+		The classes in this module implement the TALES specification, used
+		by the simpleTAL module.
 		
 		Module Dependencies: logging
 """
 
-__version__ = "1.1"
+__version__ = "2.0"
 
 import copy, string
 
@@ -73,13 +74,23 @@ class DefaultVariable (ContextVariable):
 	def __init__ (self):
 		ContextVariable.__init__ (self, 1)
 		
+	def isNothing (self):
+		return 0
+		
 	def isDefault (self):
 		return 1
+		
+	def value (self):
+		# We return our self so that define works properly.
+		return self
+		
+	def __str__ (self):
+		return "Default"
 		
 class NothingVariable (ContextVariable):
 	def __init__ (self):
 		ContextVariable.__init__ (self, None)
-		
+				
 	def isNothing (self):
 		return 1
 		

@@ -61,14 +61,20 @@ class ExampleCGI:
 			self.expandTemplate ("fields.html")
 
 	def expandTemplate (self, templateName):
+		# Print out the headers
+		sys.stdout.write ("Content-Type: text/html\n")     # HTML is following
+		sys.stdout.write ("\n")                            # blank line, end of headers
+		
 		# Expand the template and print it out
 		templateFile = open (templateName, 'r')
-		result = simpleTAL.expandTemplate (templateFile, self.context)
+		template = simpleTAL.compileHTMLTemplate (templateFile)
+
+		# Close the template file
 		templateFile.close()
-	
-		print "Content-Type: text/html"     # HTML is following
-		print                               # blank line, end of headers
-		print result
+		
+		# Expand the template as HTML using this context
+		template.expand (self.context, sys.stdout)
+
 		sys.exit (0)				
 			
 # Entry point for the cgi

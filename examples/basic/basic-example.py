@@ -11,14 +11,14 @@
 		
 		As simple as it gets:
 				1 - Create a context
-				2 - Open a template
+				2 - Compile a template
 				3 - Expand the template
-				4 - Print out the result
 		
 		Module Dependencies: simpleTAL, simpleTALES
 """
 
 import simpleTAL, simpleTALES
+import sys
 
 # Creat the context that is used by the template
 context = simpleTALES.Context()
@@ -34,11 +34,12 @@ context.addGlobal ("rainbow", colours)
 # Open the template file
 templateFile = open ("basic.html", 'r')
 
-# Expand the template as HTML using this context
-result = simpleTAL.expandTemplate (templateFile, context)
+# Compile a template
+template = simpleTAL.compileHTMLTemplate (templateFile)
 
 # Close the template file
 templateFile.close()
 
-# Print out the result
-print result
+# Expand the template as HTML using this context
+template.expand (context, sys.stdout)
+

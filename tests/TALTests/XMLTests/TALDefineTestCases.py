@@ -31,9 +31,11 @@ class TALDefineTestCases (unittest.TestCase):
 		self.context.addGlobal ('three', [1,"Two",3])
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
-		file = StringIO.StringIO (txt)
-		realResult = simpleTAL.expandXMLTemplate (file, self.context)
-		self.failUnless (realResult == result, "%s - passed in: %s got back %s expected %s" % (errMsg, txt, realResult, result))
+		template = simpleTAL.compileXMLTemplate (txt)
+		file = StringIO.StringIO ()
+		template.expand (self.context, file)
+		realResult = file.getvalue()
+		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 						
 	def testDefineString (self):
 		self._runTest_ ('<html tal:define="def1 test"><p tal:content="def1"></p></html>', '<?xml version="1.0" encoding="iso8859-1"?>\n<html><p>testing</p></html>', "Simple string define failed.")

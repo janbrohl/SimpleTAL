@@ -37,10 +37,16 @@ class TALRepeatTestCases (unittest.TestCase):
 										  ])
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
-		file = StringIO.StringIO (txt)
-		realResult = simpleTAL.expandTemplate (file, self.context)
-		self.failUnless (realResult == result, "%s - passed in: %s got back %s expected %s" % (errMsg, txt, realResult, result))
-						
+		template = simpleTAL.compileHTMLTemplate (txt)
+		file = StringIO.StringIO ()
+		try:
+			template.expand (self.context, file)
+		except Exception, e:
+			print "Error, template compiled to: " + str (template)
+			raise e
+		realResult = file.getvalue()
+		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+					
 	def testInvalidPath (self):
 		self._runTest_ ('<html><p tal:repeat="entry wibble">Hello</p></html>', "<html></html>", "Repeat of non-existant element failed")
 		

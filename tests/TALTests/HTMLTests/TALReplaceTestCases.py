@@ -36,9 +36,11 @@ class TALReplaceTestCases (unittest.TestCase):
 		self.context.addGlobal ('weblog', weblog)
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
-		file = StringIO.StringIO (txt)
-		realResult = simpleTAL.expandTemplate (file, self.context)
-		self.failUnless (realResult == result, "%s - passed in: %s got back %s expected %s" % (errMsg, txt, realResult, result))
+		template = simpleTAL.compileHTMLTemplate (txt)
+		file = StringIO.StringIO ()
+		template.expand (self.context, file)
+		realResult = file.getvalue()
+		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 						
 	def testContentNothing (self):
 		self._runTest_ ('<html><p tal:replace="nothing"></p></html>'
@@ -56,6 +58,10 @@ class TALReplaceTestCases (unittest.TestCase):
 						,'Content of string did not evaluate to contain string')
 						
 	def testContentStructure (self):
+		# This test uses a specific context
+		entry = """Some structure: <b tal:content="weblog/subject"></b>"""
+		weblog = {'subject': 'Test subject', 'entry': simpleTAL.compileHTMLTemplate(entry)}
+		self.context.addGlobal ('weblog', weblog)
 		self._runTest_ ('<html><p tal:replace="structure weblog/entry">Original</p></html>'
 						,'<html>Some structure: <b>Test subject</b></html>'
 						,'Content of Structure did not evaluate to expected result')    

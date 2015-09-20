@@ -22,32 +22,26 @@ if (os.path.exists ("logging.ini")):
 else:
 	logging.basicConfig()
 	
-class TALHandlerTestCases (unittest.TestCase):
+class TALSpecialCharsTestCases (unittest.TestCase):
 	def setUp (self):
 		self.context = simpleTALES.Context()
-		self.context.addGlobal ('test', 'testing')
+		self.context.addGlobal ('test', '< testing > experimenting & twice as useful')
 		self.context.addGlobal ('one', [1])
 		self.context.addGlobal ('two', ["one", "two"])
 		self.context.addGlobal ('three', [1,"Two",3])
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
-		template = simpleTAL.compileXMLTemplate (txt)
+		template = simpleTAL.compileHTMLTemplate (txt)
 		file = StringIO.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
-												
-	def testSingleEmptyElement (self):
-		self._runTest_ ("<single/>", '<?xml version="1.0" encoding="iso8859-1"?>\n<single></single>')
 						
-	def testSingleElement (self):
-		self._runTest_ ("<single>start</single>", '<?xml version="1.0" encoding="iso8859-1"?>\n<single>start</single>')
-		
-	def testCDATASection (self):
-		self._runTest_ ("<single><![CDATA[Here's some <escaped> CDATA section stuff & things.]]></single>"
-									 ,"""<?xml version="1.0" encoding="iso8859-1"?>\n<single>Here's some &lt;escaped&gt; CDATA section stuff &amp; things.</single>"""
-									 ,"CDATA section was not re-encoded correctly.")
-
+	def testLessThanGreaterThanAmpersand (self):
+		self._runTest_ ('<html tal:content="test">Hello</html>'
+										,"<html>&lt; testing &gt; experimenting &amp; twice as useful</html>"
+										,"Less than, greater than or amperand were not encoded correctly")
+										
 if __name__ == '__main__':
 	unittest.main()
-	
+

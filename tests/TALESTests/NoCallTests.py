@@ -39,10 +39,12 @@ class NoCallTests (unittest.TestCase):
 		self.context.addGlobal ('holder', {'recorder': self.recorder.simpleFunction})
 		
 	def _runTest_ (self, txt, result, errMsg="Error", expectedRecorderVal=0):
-		file = StringIO.StringIO (txt)
-		realResult = simpleTAL.expandTemplate (file, self.context)
-		self.failUnless (realResult == result, "%s - passed in: %s got back %s expected %s" % (errMsg, txt, realResult, result))
-		self.failUnless (self.recorder.called == expectedRecorderVal, 'Call recorder detected that the call recorder object was had state %s' % str (self.recorder.called))
+		template = simpleTAL.compileHTMLTemplate (txt)
+		file = StringIO.StringIO ()
+		template.expand (self.context, file)
+		realResult = file.getvalue()
+		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.failUnless (self.recorder.called == expectedRecorderVal, 'Call recorder detected that the call recorder object has state %s' % str (self.recorder.called))
 			
 	def testNoCallString (self):
 		self._runTest_ ('<html tal:define="test nocall:top"><b tal:condition="exists:test">Exists</b></html>'
@@ -68,7 +70,7 @@ class NoCallTests (unittest.TestCase):
 					   ,'Binding function using nocall as second part of path failed'
 					   )
 					   					   
-	def testNoCallRecorder (self):
+	def testNoCallRecorderInfra (self):
 		self._runTest_ ('<html tal:define="test holder/recorder"><b tal:condition="exists:test">Exists</b></html>'
 					   ,'<html><b>Exists</b></html>'
 					   ,'Recorder failed to note call'

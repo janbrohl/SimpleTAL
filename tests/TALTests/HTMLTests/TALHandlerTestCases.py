@@ -31,9 +31,11 @@ class TALHandlerTestCases (unittest.TestCase):
 		self.context.addGlobal ('three', [1,"Two",3])
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
-		file = StringIO.StringIO (txt)
-		realResult = simpleTAL.expandTemplate (file, self.context)
-		self.failUnless (realResult == result, "%s - passed in: %s got back %s expected %s" % (errMsg, txt, realResult, result))
+		template = simpleTAL.compileHTMLTemplate (txt)
+		file = StringIO.StringIO ()
+		template.expand (self.context, file)
+		realResult = file.getvalue()
+		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 						
 	def testEmptyFile (self):
 		self._runTest_ ("", "", "Empty template contains more text than given.")
@@ -50,6 +52,10 @@ class TALHandlerTestCases (unittest.TestCase):
 	def testNoCloseElement (self):
 		self._runTest_ ("<p>Hello.<br>World</p>", "<p>Hello.<br>World</p>")
     
+	def testCDATASection (self):
+		self._runTest_ ("""<p>&lt;section&gt; stuff &amp; things.</p>"""
+									 ,"""<p>&lt;section&gt; stuff &amp; things.</p>"""
+									 ,"Quoted chars were not re-encoded correctly.")
 
 if __name__ == '__main__':
 	unittest.main()

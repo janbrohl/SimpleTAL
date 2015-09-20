@@ -1,6 +1,22 @@
 simpleTAL / simpleTALES (Version 1.1)
 -------------------------------------
 
+Version 2.0
+-----------
+Complete refactoring of simpleTAL leading to very significant performance
+improvements.  
+
+Bug fixes:
+  - Any unknown entity references present in a HTML template were not passed
+    through to the rendered template, now they are.
+  - Attributes created using tal:attributes did not have their values escaped
+    properly
+
+New features:
+  - Large performance improvements by splitting the process into two
+  - Templates once compiled can now be re-used, leading to large performance
+    gains
+
 Version 1.1
 -----------
 Bug fixes:

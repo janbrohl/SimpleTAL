@@ -15,7 +15,7 @@ import unittest, os
 import StringIO
 import logging
 
-import TALConditionTestCases,TALDefineTestCases,TALHandlerTestCases,TALContentTestCases,TALReplaceTestCases,TALRepeatTestCases
+import TALConditionTestCases,TALDefineTestCases,TALHandlerTestCases,TALContentTestCases,TALReplaceTestCases,TALRepeatTestCases,TALEncodingTestCases
 
 print "Running all XML tests."
 runner = unittest.TextTestRunner(verbosity='-v')
@@ -24,6 +24,7 @@ for mod in [TALConditionTestCases
 			,TALHandlerTestCases
 			,TALContentTestCases
 			,TALReplaceTestCases
-			,TALRepeatTestCases]:
+			,TALRepeatTestCases
+			,TALEncodingTestCases]:
 	htmlSuite = unittest.defaultTestLoader.loadTestsFromModule (mod)
 	runner.run(htmlSuite)
