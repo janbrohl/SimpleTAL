@@ -34,7 +34,7 @@
 		Module Dependencies: None
 """
 
-import StringIO, os, stat, threading, sys, codecs, sgmllib, cgi, re
+import StringIO, os, stat, threading, sys, codecs, sgmllib, cgi, re, types
 import simpletal, simpleTAL
 
 __version__ = simpletal.__version__
@@ -56,11 +56,11 @@ class HTMLStructureCleaner (sgmllib.SGMLParser):
 				The method returns a unicode string which is suitable for addition to a
 				simpleTALES.Context object.
 		"""
-		if (type (content) == type ("")):
+		if (isinstance (content, types.StringType)):
 			# Not unicode, convert
 			converter = codecs.lookup (encoding)[1]
 			file = StringIO.StringIO (converter (content)[0])
-		elif (type (content) == type (u"")):
+		elif (isinstance (content, types.UnicodeType)):
 			file = StringIO.StringIO (content)
 		else:
 			# Treat it as a file type object - and convert it if we have an encoding
@@ -251,16 +251,16 @@ class MacroExpansionInterpreter (simpleTAL.TemplateInterpreter):
 					# End of the macro
 					self.inMacro = 0
 				else:
-					if (type (resultVal) == type (u"")):
+					if (isinstance (resultVal, types.UnicodeType)):
 						self.file.write (resultVal)
-					elif (type (resultVal) == type ("")):
+					elif (isinstance (resultVal, types.StringType)):
 						self.file.write (unicode (resultVal, 'ascii'))
 					else:
 						self.file.write (unicode (str (resultVal), 'ascii'))
 			else:
-				if (type (resultVal) == type (u"")):
+				if (isinstance (resultVal, types.UnicodeType)):
 					self.file.write (cgi.escape (resultVal))
-				elif (type (resultVal) == type ("")):
+				elif (isinstance (resultVal, types.StringType)):
 					self.file.write (cgi.escape (unicode (resultVal, 'ascii')))
 				else:
 					self.file.write (cgi.escape (unicode (str (resultVal), 'ascii')))

@@ -33,12 +33,16 @@
 		Module Dependencies: logging
 """
 
+import types
+
 try:
 	import logging
 except:
 	import DummyLogger as logging
 	
-import simpletal
+import simpletal, simpleTAL
+
+OBJ_CONV = simpleTAL.OBJ_CONV
 
 __version__ = simpletal.__version__
 
@@ -462,16 +466,12 @@ class Context:
 									# This part of the path didn't evaluate to anything - leave blank
 									pathResult = u''
 								if (pathResult is not None):
-									if (type (pathResult) == type (u"")):
+									if (isinstance (pathResult, types.UnicodeType)):
 										result += pathResult
-									elif (type (pathResult) == type ("")):
-										# THIS IS NOT A BUG!
-										# Use Unicode in Context if you aren't using Ascii!
-										result += unicode (pathResult, 'ascii')
 									else:
 										# THIS IS NOT A BUG!
 										# Use Unicode in Context if you aren't using Ascii!
-										result += unicode (str (pathResult), 'ascii')
+										result += OBJ_CONV (pathResult)
 								skipCount = endPos - position 
 						else:
 							# It's a variable
@@ -486,16 +486,12 @@ class Context:
 								# This part of the path didn't evaluate to anything - leave blank
 								pathResult = u''
 							if (pathResult is not None):
-								if (type (pathResult) == type (u"")):
+								if (isinstance (pathResult, types.UnicodeType)):
 										result += pathResult
-								elif (type (pathResult) == type ("")):
-									# THIS IS NOT A BUG!
-									# Use Unicode in Context if you aren't using Ascii!
-									result += unicode (pathResult, 'ascii')
 								else:
 									# THIS IS NOT A BUG!
 									# Use Unicode in Context if you aren't using Ascii!
-									result += unicode (str (pathResult), 'ascii')
+									result += OBJ_CONV (pathResult)
 							skipCount = endPos - position - 1
 					except IndexError, e:
 						# Trailing $ sign - just suppress it

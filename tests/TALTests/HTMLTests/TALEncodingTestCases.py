@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: iso-8859-1 -*-
 """		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
 		All rights reserved.
 		
@@ -42,6 +43,15 @@ else:
 	logging.basicConfig()
 	
 isoDecoder = codecs.lookup ("iso-8859-1")[1]
+
+import types
+try:
+	class UnicodeSubclass(types.UnicodeType):
+		pass
+	oldPython = 0
+except:
+	# Python 2.1
+	oldPython = 1
 	
 class TALEncodingTestCases (unittest.TestCase):
 	def setUp (self):
@@ -52,6 +62,8 @@ class TALEncodingTestCases (unittest.TestCase):
 		self.context.addGlobal ('two', ["one", "two"])
 		self.context.addGlobal ('three', [1,"Two",3])
 		self.context.addGlobal ('badascii', 'This costs nothing, yep £0')
+		if (not oldPython):
+			self.context.addGlobal ('inheritance', UnicodeSubclass(u'\u2018subclass\u2019'))
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileHTMLTemplate (txt)
@@ -84,6 +96,16 @@ class TALEncodingTestCases (unittest.TestCase):
 		result = file.getvalue()
 		expectedResult = "<html>£3.12?  This cost nothing, yep £0!</html>"
 		self.failUnless (result == expectedResult, "UTF8 -> ISO Encoding failed.  \nResult was: " + result + "\nExpected result: " + expectedResult)
+	
+	def testUnicodeSubclass (self):
+		if (oldPython):
+			return
+		template = simpleTAL.compileHTMLTemplate ('<html tal:content="inheritance"></html>', 'utf-8')
+		file = StringIO.StringIO()
+		template.expand (self.context, file, 'utf-8')
+		result = file.getvalue()
+		expectedResult = u"<html>\u2018subclass\u2019</html>".encode('utf-8')
+		self.failUnless (result == expectedResult, "Unicode subclass failed.  \nResult was: " + result + "\nExpected result: " + expectedResult)
 	
 #	def testBadAscii (self):
 #		template = simpleTAL.compileHTMLTemplate ('<html><p tal:replace="badascii"></p></html>')

@@ -1,14 +1,25 @@
-simpleTAL / simpleTALES (Version 3.11)
+simpleTAL / simpleTALES (Version 3.12)
 -------------------------------------
+
+Version 3.12
+------------
+New features:
+ - Integration with ElementTree
+ - Use Python 2.2's unicode function if available (honours the __unicode__ method) when 
+   converting non-unicode variables in the Context.
+ 
+Bug fixes:
+ - Allow sub-classes of string and Unicode strings to be placed in the Context.
+ 
 Version 3.11
 ------------
 This release changes how HTML templates containing entity references and character references are 
 handled.  In previous releases any references contained in the HTML would be passed through to 
-the output entact.  In order to solve the double escaping bug described below all character references
+the output intact.  In order to solve the double escaping bug described below all character references
 are now expanded in the output with the exception of &lt;, &gt; and &amp;
 
 Bug fixes:
- - If multiple variable substitutions are used in a signle 'string:' path and one failed
+ - If multiple variable substitutions are used in a single 'string:' path and one failed
    the whole path would evaluate to an empty string.
  - When <input name="name"> was used <input name=""> was output.
  - The global variable 'attrs' should be a dictionary, not a list

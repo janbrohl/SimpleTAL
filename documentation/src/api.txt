@@ -6,6 +6,7 @@ SimpleTAL consists of three different modules: simpleTAL, simpleTALES, and simpl
 	<li><a href="api-simpletal.html">simpleTAL</a> - contains functions to compile HTML and XML templates into objects ready for use.</li>
 	<li><a href="api-simpletales.html">simpleTALES</a> - contains the Context class which provides the environment in which templates are expanded.</li>
 	<li><a href="api-simpletalutils.html">simpleTALUtils</a> - optional utility functions for dealing with SimpleTAL templates.</li>
+	<li><a href="api-simpleelementtree.html">simpleElementTree</a> - optional integration with <a href="http://effbot.org/zone/element-index.htm" title="ElementTree XML parsing library">ElementTree</a> allowing XML documents to be parsed and placed directly into the Context instance.</li>
 </ul>
 
 <h2>International character support</h2>

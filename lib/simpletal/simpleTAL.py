@@ -39,8 +39,8 @@ try:
 except:
 	import DummyLogger as logging
 	
-import sgmllib, xml.sax, cgi, StringIO, codecs, re, sgmlentitynames
-import simpletal, copy
+import sgmllib, xml.sax, cgi, StringIO, codecs, re, sgmlentitynames, types
+import simpletal, copy, sys
 
 __version__ = simpletal.__version__
 
@@ -52,6 +52,16 @@ except ImportError:
     use_lexical_handler = 0
     class LexicalHandler:
         pass
+
+# Determine how to convert non-string objects
+if (sys.version_info[0] <= 2 and sys.version_info[1] < 2):
+	# Old version, must use str()
+	def unicodeStringConv (anObj):
+		return unicode (str (anObj), 'ascii')
+		
+	OBJ_CONV=unicodeStringConv
+else:
+	OBJ_CONV=unicode
 
 import simpleTALES
 
@@ -334,16 +344,16 @@ class TemplateInterpreter:
 			elif (not resultVal == simpleTALES.DEFAULTVALUE):
 				# We have a value - let's use it!
 				attsToRemove [attName]=1
-				if (type (resultVal) == type (u"")):
+				if (isinstance (resultVal, types.UnicodeType)):
 					escapedAttVal = resultVal
-				elif (type (resultVal) == type ("")):
+				elif (isinstance (resultVal, types.StringType)):
 					# THIS IS NOT A BUG!
 					# Use Unicode in the Context object if you are not using Ascii
 					escapedAttVal = unicode (resultVal, 'ascii')
 				else:
 					# THIS IS NOT A BUG!
 					# Use Unicode in the Context object if you are not using Ascii
-					escapedAttVal = unicode (str (resultVal), 'ascii')
+					escapedAttVal = OBJ_CONV (resultVal)
 				newAtts.append ((attName, escapedAttVal))
 		# Copy over the old attributes 
 		for oldAttName, oldAttValue in self.currentAttributes:
@@ -393,27 +403,27 @@ class TemplateInterpreter:
 					# End of the macro expansion (if any) so clear the parameters
 					self.slotParameters = {}
 				else:
-					if (type (resultVal) == type (u"")):
+					if (isinstance (resultVal, types.UnicodeType)):
 						self.file.write (resultVal)
-					elif (type (resultVal) == type ("")):
+					elif (isinstance (resultVal, types.StringType)):
 						# THIS IS NOT A BUG!
 						# Use Unicode in the Context object if you are not using Ascii
 						self.file.write (unicode (resultVal, 'ascii'))
 					else:
 						# THIS IS NOT A BUG!
 						# Use Unicode in the Context object if you are not using Ascii
-						self.file.write (unicode (str (resultVal), 'ascii'))
+						self.file.write (OBJ_CONV (resultVal))
 			else:
-				if (type (resultVal) == type (u"")):
+				if (isinstance (resultVal, types.UnicodeType)):
 					self.file.write (cgi.escape (resultVal))
-				elif (type (resultVal) == type ("")):
+				elif (isinstance (resultVal, types.StringType)):
 					# THIS IS NOT A BUG!
 					# Use Unicode in the Context object if you are not using Ascii
 					self.file.write (cgi.escape (unicode (resultVal, 'ascii')))
 				else:
 					# THIS IS NOT A BUG!
 					# Use Unicode in the Context object if you are not using Ascii
-					self.file.write (cgi.escape (unicode (str (resultVal), 'ascii')))
+					self.file.write (cgi.escape (OBJ_CONV (resultVal)))
 					
 		if (self.outputTag and not args[1]):
 			# Do NOT output end tag if a singleton with no content
@@ -1350,7 +1360,7 @@ def compileHTMLTemplate (template, inputEncoding="ISO-8859-1"):
 			To use the resulting template object call:
 				template.expand (context, outputFile)
 	"""
-	if (isinstance (template, type ("")) or isinstance (template, type (u""))):
+	if (isinstance (template, types.StringType) or isinstance (template, types.UnicodeType)):
 		# It's a string!
 		templateFile = StringIO.StringIO (template)
 	else:
@@ -1364,7 +1374,7 @@ def compileXMLTemplate (template):
 			To use the resulting template object call:
 				template.expand (context, outputFile)
 	"""
-	if (isinstance (template, type (""))):
+	if (isinstance (template, types.StringType)):
 		# It's a string!
 		templateFile = StringIO.StringIO (template)
 	else:

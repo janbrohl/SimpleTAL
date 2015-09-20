@@ -1,0 +1,40 @@
+title: SimpleTAL API: simpleElementTree Module.
+subject: Documentation on how to use the simpleElementTree Module.
+
+<h2>simpleElementTree</h2>
+This module provides optional integration with <a href="http://effbot.org/zone/element-index.htm" title="ElementTree XML parsing library">ElementTree</a>, allowing XML documents to be parsed and placed directly into the Context.  The contents of the XML document can then be accessed using an sub-set of XPATH from within TAL templates.
+
+<h3>parseFile (file)</h3>
+This function takes one parameter, which should be either a file-like object or a string holding the name of a file on the filesystem.  The file is read, the XML it contains is parsed, and an instance of simpleTALES.ContextVariable is returned.
+
+The returned ContextVariable can then be added to the Context using addGlobal in the normal way, e.g.
+
+<pre>
+<code>xmlTree = simpleElementTree.parseFile (file="input.xml")
+context = simpleTALES.Context(allowPythonPath=1)
+context.addGlobal ("input", xmlTree)</code>
+</pre>
+
+<h2>ElementTree Paths</h2>
+The Context variable provided by parseFile provides the following syntax for path access in TAL:
+<ul>
+	<li>Accessing the variable directly returns the Text value for this node.</li>
+	<li>Accessing variable/find/path returns the first node to match the path, as supported by ElementTree (see <a href="http://effbot.org/zone/element-xpath.htm">XPath Support in ElementTree</a>).</li>
+	<li>Accessing variable/findall/path returns a list of nodes that match the path, as supported by ElementTree (see <a href="http://effbot.org/zone/element-xpath.htm">XPath Support in ElementTree</a>).</li>
+	<li>Accessing variable@name returns the XML attribute "name".</li>
+	<li>Accessing variable/anotherElement is a short-cut for variable/find/anotherElement.</li>
+</ul>
+
+Here are some examples:
+<pre>
+<code>&lt;html&gt;
+  &lt;body&gt;
+    &lt;h1 tal:attributes="class input/title/@type" tal:content="input/title"&gt;Title here&lt;/h1&gt;
+    &lt;ul&gt;
+      &lt;li tal:repeat="note input/findall/.//note"&gt;
+      &lt;b tal:condition="note/@type" tal:replace="string: Note (${note/@type}) - $note and then some"&gt;&lt;/b&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code>
+</pre>

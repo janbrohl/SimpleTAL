@@ -51,7 +51,7 @@ Context.addGlobal ("dict", myDict)
 You would expect the output from this to be:
 
 <pre>
-<code>&lt;p&gt;123&lt;/p&gt;</code>
+<code>&lt;p&gt;1&lt;/p&gt;&lt;p&gt;2&lt;/p&gt;&lt;p&gt;3&lt;/p&gt;</code>
 </pre>
 
 However this is not what happens.  Instead the variable "item" will be set to the output of "myDict.items()" - i.e. it will call the Python dictionary method 'items()'.
