@@ -185,7 +185,7 @@ class TemplateInterpreter:
 		
 	def popProgram (self):
 		vars, self.commandList, self.symbolTable = self.programStack.pop()
-		self.programCounter,self.scopeStack,self.slotParameters,self.currentSlots, self.movePCForward,self.movePCBack,self.outputTag,self.originalAttributes,self.currentAttributes,self.repeatVariable,self.tagContent,self.localVarsDefined = vars
+		self.programCounter,self.scopeStack,self.slotParameters,self.currentSlots, self.movePCForward,self.movePCBack,self.outputTag,self.originalAttributes,self.currentAttributes,self.repeatVariable,self.repeatAttributesCopy,self.tagContent,self.localVarsDefined = vars
 		
 	def pushProgram (self):
 		vars = (self.programCounter
@@ -198,6 +198,7 @@ class TemplateInterpreter:
 					 ,self.originalAttributes
 					 ,self.currentAttributes
 					 ,self.repeatVariable
+					 ,self.repeatAttributesCopy
 					 ,self.tagContent
 					 ,self.localVarsDefined)
 		self.programStack.append ((vars,self.commandList, self.symbolTable))
@@ -708,7 +709,7 @@ class XMLTemplate (Template):
 		Template.__init__ (self, commands, macros, symbols)
 		self.doctype = doctype
 	
-	def expand (self, context, outputFile, outputEncoding="iso-8859-1", docType=None, suppressXMLDeclaration=0,interpreter=None):
+	def expand (self, context, outputFile, outputEncoding="utf-8", docType=None, suppressXMLDeclaration=0,interpreter=None):
 		""" This method will write to the outputFile, using the encoding specified,
 			the expanded version of this template.  The context passed in is used to resolve
 			all expressions with the template.
@@ -1456,6 +1457,10 @@ class XMLTemplateCompiler (TemplateCompiler, xml.sax.handler.ContentHandler, xml
 		self.parseEndTag (tag)
 		self.singletonElement = 0
 		
+	def skippedEntity (self, name):
+		self.log.info ("Recieved skipped entity: %s" % name)
+		self.characters( unichr (sgmlentitynames.htmlNameToUnicodeNumber.get (name, 65533)))
+		
 	def characters (self, data):
 		#self.log.debug ("Recieved Real Data: " + data)
 		# Escape any data we recieve - we don't want any: <&> in there.
@@ -1509,4 +1514,3 @@ def compileDOMTemplate (template):
 	compiler = XMLTemplateCompiler ()
 	compiler.parseDOM (template)
 	return compiler.getTemplate()
-	

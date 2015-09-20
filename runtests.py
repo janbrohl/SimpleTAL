@@ -13,7 +13,7 @@ found test suites into one big test suite and run them all at once.
 * Modified to use os.path.walk to find all the test scripts
 * Modified to find all python scripts, not just ones of the form *test.py
 """
-import sys, os, re, unittest
+import sys, os, re, unittest, imp
 
 # If logging is available, suppress it to avoid confusion.
 try:
@@ -42,12 +42,19 @@ def regressionTest():
 	test = re.compile(".*\.py$", re.IGNORECASE)
 	files = filter(test.search, files)
 	
-	#load each test into the testsuite
-	filenameToModuleName = lambda f: os.path.splitext(f)[0]
-	moduleNames = map(filenameToModuleName, files)		 
-	modules = map(__import__, moduleNames)				 
+	#load each test into the testsuite	 
+	modules = []
+	modCount = 1
+	for filename in files:
+		modules.append (imp.load_source ("TestModule%s" % str (modCount), filename))
+		modCount += 1
+	#modules = map(__import__, moduleNames)
 	load = unittest.defaultTestLoader.loadTestsFromModule
-	return unittest.TestSuite(map(load, modules))
+	suite = []
+	for module in modules:
+		suite.append (load (module))
+	return unittest.TestSuite (suite)
+	#return unittest.TestSuite(map(load, modules))
 
 if __name__ == "__main__":
 	unittest.main(defaultTest="regressionTest")

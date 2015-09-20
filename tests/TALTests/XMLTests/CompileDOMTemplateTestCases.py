@@ -67,7 +67,7 @@ class CompileDOMTemplateTestCases (unittest.TestCase):
 			return
 		template = simpleTAL.compileDOMTemplate (dom)
 		file = StringIO.StringIO ()
-		template.expand (self.context, file)
+		template.expand (self.context, file, outputEncoding="iso-8859-1")
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, dom.toxml(), realResult, result, template))
 						
@@ -81,4 +81,3 @@ class CompileDOMTemplateTestCases (unittest.TestCase):
 		self._runTest_ (doc
 						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html><h1>testing</h1></html>'
 						,"DOM Template failed to compile.")
-						

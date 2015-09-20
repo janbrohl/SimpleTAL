@@ -56,7 +56,7 @@ class TALEncodingTestCases (unittest.TestCase):
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileHTMLTemplate (txt)
 		file = StringIO.StringIO ()
-		template.expand (self.context, file)
+		template.expand (self.context, file, outputEncoding="iso-8859-1")
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 						
@@ -87,4 +87,3 @@ class TALEncodingTestCases (unittest.TestCase):
 		
 if __name__ == '__main__':
 	unittest.main()
-

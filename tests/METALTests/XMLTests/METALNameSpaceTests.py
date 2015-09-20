@@ -56,7 +56,7 @@ class METALNameSpaceTests (unittest.TestCase):
 		self.context.addGlobal ("site", macroTemplate)
 		self.context.addGlobal ("here", pageTemplate)
 		file = StringIO.StringIO ()
-		pageTemplate.expand (self.context, file)
+		pageTemplate.expand (self.context, file, outputEncoding="iso-8859-1")
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in macro: %s \npage: %s\ngot back %s \nexpected %s\n" % (errMsg, macros, page, realResult, result))
 	
@@ -82,4 +82,3 @@ class METALNameSpaceTests (unittest.TestCase):
 										
 if __name__ == '__main__':
 	unittest.main()
-

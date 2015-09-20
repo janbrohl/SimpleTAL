@@ -1,5 +1,16 @@
-simpleTAL / simpleTALES (Version 4.1)
+simpleTAL / simpleTALES (Version 4.2)
 -------------------------------------
+
+Version 4.2
+-----------
+WARNING: This version is not fully backwards compatible!  The default character encoding for XML templates is not utf-8 rather than iso8859-1.
+
+Bug fixes:
+ - XML Templates now default to utf-8 for output encoding.
+ - Fixed corruption of attributes on a repeat tag if use-macro was used inside it (thanks to Benjamin Niemann for the bug report).
+ - Updates to runtests.py for compatibility with Python 2.6.
+ - Use md5 from hashlib to fix DeprecationWarning within tests.
+
 Version 4.1
 -----------
 

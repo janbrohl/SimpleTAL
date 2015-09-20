@@ -36,7 +36,8 @@ import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
 
-import xml.sax, xml.sax.handler, md5
+import xml.sax, xml.sax.handler
+from hashlib import md5
 
 if (os.path.exists ("logging.ini")):
 	logging.config.fileConfig ("logging.ini")
@@ -49,7 +50,7 @@ class XMLChecksumHandler (xml.sax.handler.ContentHandler, xml.sax.handler.DTDHan
 		self.ourParser = parser
 		
 	def startDocument (self):
-		self.digest = md5.new()
+		self.digest = md5()
 		
 	def startPrefixMapping (self, prefix, uri):
 		self.digest.update (prefix)
@@ -122,7 +123,7 @@ class TALAttributesTestCases (unittest.TestCase):
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileXMLTemplate (txt)
 		file = StringIO.StringIO ()
-		template.expand (self.context, file)
+		template.expand (self.context, file, outputEncoding="iso-8859-1")
 		realResult = file.getvalue()
 		try:
 			expectedChecksum = getXMLChecksum (result)
@@ -188,4 +189,3 @@ class TALAttributesTestCases (unittest.TestCase):
 
 if __name__ == '__main__':
 	unittest.main()
-

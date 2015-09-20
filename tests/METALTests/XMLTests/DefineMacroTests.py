@@ -66,7 +66,7 @@ class DefineMacroTests (unittest.TestCase):
 		macroTemplate = simpleTAL.compileXMLTemplate (txt)
 		self.context.addGlobal ("site", macroTemplate)
 		file = StringIO.StringIO ()
-		pageTemplate.expand (self.context, file)
+		pageTemplate.expand (self.context, file, outputEncoding="iso-8859-1")
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, pageTemplate))
 	

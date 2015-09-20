@@ -9,6 +9,8 @@ Creates a new Context object, used by SimpleTAL when expanding a template.  The 
 
 By default Python TAL paths (e.g. 'python: 1 + 2') are not allowed.  If you require them, and you completely trust the authors of the templates, they can be enabled by passing in allowPythonPath=1.
 
+Any python modules that you wish to use need to be added to the Context object using addGlobal.
+
 <h4>Context.addGlobal (name, value)</h4>
 Adds the value to the context under name.  Value can either be a fundamental python data type or a callable object.  For example, take the code:
 

@@ -47,6 +47,12 @@ pageTemplate = simpleTAL.compileHTMLTemplate ("""<html>
 </body>
 </html>""")
 
+pageTemplate2 = simpleTAL.compileHTMLTemplate ("""<html>
+<body><div foo="a" tal:repeat="i string:abc">
+<div metal:use-macro="site/macros/one"></div>
+</div>
+</body></html>""")
+
 class DefineMacroTests (unittest.TestCase):
 	def setUp (self):
 		self.context = simpleTALES.Context()
@@ -59,6 +65,14 @@ class DefineMacroTests (unittest.TestCase):
 		self.context.addGlobal ("site", macroTemplate)
 		file = StringIO.StringIO ()
 		pageTemplate.expand (self.context, file)
+		realResult = file.getvalue()
+		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, pageTemplate))
+
+	def _runTest2_ (self, txt, result, errMsg="Error"):
+		macroTemplate = simpleTAL.compileHTMLTemplate (txt)
+		self.context.addGlobal ("site", macroTemplate)
+		file = StringIO.StringIO ()
+		pageTemplate2.expand (self.context, file)
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, pageTemplate))
 	
@@ -74,6 +88,11 @@ class DefineMacroTests (unittest.TestCase):
 		self._runTest_ ('<html><div metal:define-macro="one" class="funny">No slots here</div></html>'
 										,'<html>\n<div class="funny">No slots here</div>\n</html>'
 										,"Single macro with no slots failed.")
+										
+	def testSingleMacroDefinitionInRepeat (self):
+		self._runTest2_ ('<html><div metal:define-macro="one" class="funny">No slots here</div></html>'
+						,'<html>\n<body><div foo="a">\n<div class="funny">No slots here</div>\n</div><div foo="a">\n<div class="funny">No slots here</div>\n</div><div foo="a">\n<div class="funny">No slots here</div>\n</div>\n</body></html>'
+						,"Single macro with no slots failed.")
 		
 	def testTwoMacroDefinition (self):
 		self._runTest_ ('<html><body metal:define-macro="two">A second macro</body><div metal:define-macro="one" class="funny">No slots here</div></html>'

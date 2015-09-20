@@ -52,7 +52,7 @@ class TALSpecialCharsTestCases (unittest.TestCase):
 	def _runTest_ (self, txt, result, errMsg="Error", allowTALInStructure=1):
 		template = simpleTAL.compileXMLTemplate (txt)
 		file = StringIO.StringIO ()
-		template.expand (self.context, file)
+		template.expand (self.context, file, outputEncoding="iso-8859-1")
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 		
@@ -78,4 +78,3 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 						
 if __name__ == '__main__':
 	unittest.main()
-
