@@ -1,5 +1,11 @@
-simpleTAL / simpleTALES (Version 5.0)
+simpleTAL / simpleTALES (Version 5.1)
 -------------------------------------
+
+Version 5.1
+-----------
+Bug fixes:
+
+ - Added missing XML files from the ElementTree example.
 
 Version 5.0
 -----------

@@ -1,4 +1,4 @@
-simpleTAL / simpleTALES (Version 5.0)
+simpleTAL / simpleTALES (Version 5.1)
 -------------------------------------
 This is an implementation of the TAL and TALES specifications for Python 3.1
 and higher.  
