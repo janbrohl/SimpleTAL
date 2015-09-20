@@ -15,14 +15,14 @@
 		Module Dependencies: logging, simpleTALES, simpleTALTemplates
 """
 
-__version__ = "3.1"
+__version__ = "3.2"
 
 try:
 	import logging
 except:
 	import DummyLogger as logging
 	
-import sgmllib, xml.sax, cgi, string, StringIO, codecs, re
+import sgmllib, xml.sax, cgi, StringIO, codecs, re
 
 import simpleTALES
 
@@ -832,18 +832,18 @@ class TemplateCompiler:
 				if (stmtBits[0] == 'global'):
 					isLocal = 0
 					varName = stmtBits[1]
-					expression = string.join (stmtBits[2:], ' ')
+					expression = ' '.join (stmtBits[2:])
 				elif (stmtBits[0] == 'local'):
 					varName = stmtBits[1]
-					expression = string.join (stmtBits[2:], ' ')
+					expression = ' '.join (stmtBits[2:])
 				else:
 					# Must be a space in the expression that caused the >3 thing
 					varName = stmtBits[0]
-					expression = string.join (stmtBits[1:], ' ')
+					expression = ' '.join (stmtBits[1:])
 			else:
 				# Only two bits
 				varName = stmtBits[0]
-				expression = string.join (stmtBits[1:], ' ')
+				expression = ' '.join (stmtBits[1:])
 			
 			commandArgs.append ((isLocal, varName, expression))
 		return (TAL_DEFINE, commandArgs)
@@ -871,7 +871,7 @@ class TemplateCompiler:
 			raise TemplateParseException (tagAsText (self.currentStartTag), msg)
 			
 		varName = attProps [0]
-		expression = string.join (attProps[1:])
+		expression = " ".join (attProps[1:])
 		return (TAL_REPEAT, (varName, expression, self.endTagSymbol))
 	
 	def compileCmdContent (self, argument, replaceFlag=0):
@@ -890,10 +890,10 @@ class TemplateCompiler:
 		if (len(attProps) > 1):
 			if (attProps[0] == "structure"):
 				structureFlag = 1
-				express = string.join (attProps[1:])
+				express = " ".join (attProps[1:])
 			elif (attProps[1] == "text"):
 				structureFlag = 0
-				express = string.join (attProps[1:])
+				express = " ".join (attProps[1:])
 			else:
 				# It's not a type selection after all - assume it's part of the path
 				express = argument
@@ -919,7 +919,7 @@ class TemplateCompiler:
 				self.log.error (msg)
 				raise TemplateParseException (tagAsText (self.currentStartTag), msg)
 			attName = stmtBits[0]
-			attExpr = string.join (stmtBits[1:],' ')
+			attExpr = " ".join (stmtBits[1:])
 			commandArgs.append ((attName, attExpr))
 		return (TAL_ATTRIBUTES, commandArgs)
 		

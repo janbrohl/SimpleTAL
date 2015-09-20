@@ -14,9 +14,9 @@
 		Module Dependencies: logging
 """
 
-__version__ = "3.1"
+__version__ = "3.2"
 
-import copy, string
+import copy
 
 try:
 	import logging
@@ -61,6 +61,9 @@ class ContextVariable:
 	def value (self):
 		if (callable (self.ourValue)):
 			return apply (self.ourValue, ())
+		return self.ourValue
+		
+	def rawValue (self):
 		return self.ourValue
 		
 	def __str__ (self):
@@ -115,6 +118,9 @@ class RepeatVariable (ContextVariable):
 		if (self.map is None):
 			self.createMap()
 		return self.map
+		
+	def rawValue (self):
+		return self.value()
 		
 	def increment (self):
 		self.position += 1
@@ -172,7 +178,7 @@ class RepeatVariable (ContextVariable):
 		return result
 	
 	def getUpperLetter (self):
-		return string.upper (self.getLowerLetter())
+		return self.getLowerLetter().upper()
 		
 	def getLowerRoman (self):
 		romanNumeralList = (('m', 1000)
@@ -201,24 +207,34 @@ class RepeatVariable (ContextVariable):
 		return result
 		
 	def getUpperRoman (self):
-		return string.upper (self.getLowerRoman())
+		return self.getLowerRoman().upper()
 		
 				
 class Context:
-	def __init__ (self, options=None):
+	def __init__ (self, options=None, allowPythonPath=0):
+		self.allowPythonPath = allowPythonPath
 		self.globals = {}
 		self.locals = {}
 		self.localStack = []
+		self.repeatStack = []
 		self.populateDefaultVariables (options)
 		self.log = logging.getLogger ("simpleTALES.Context")
 		self.true = ContextVariable (1)
 		self.false = ContextVariable (0)
 		
 	def addRepeat (self, name, var):
+		# Pop the current repeat map onto the stack
+		self.repeatStack.append (self.repeatMap)
+		self.repeatMap = copy.copy (self.repeatMap)
 		self.repeatMap [name] = var
+		# Map this repeatMap into the global space
+		self.addGlobal ('repeat', self.repeatMap)
 		
 	def removeRepeat (self, name):
-		del self.repeatMap [name]
+		# Bring the old repeat map back
+		self.repeatMap = self.repeatStack.pop()
+		# Map this repeatMap into the global space
+		self.addGlobal ('repeat', self.repeatMap)
 		
 	def addGlobal (self, name, value):
 		if (isinstance (value, ContextVariable)):
@@ -230,8 +246,7 @@ class Context:
 		# Pop the current locals onto the stack
 		self.localStack.append (self.locals)
 		self.locals = copy.copy (self.locals)
-		for var in localVarList:
-			name, value = var
+		for name,value in localVarList:
 			if (isinstance (value, ContextVariable)):
 				self.locals [name] = value
 			else:
@@ -260,28 +275,53 @@ class Context:
 				expr = expr [0:-1]
 			
 		# Supports path, exists, nocall, not, and string
-		expr = string.strip(expr)
-		if (expr[0:5] == 'path:'):
-			return self.evaluatePath (string.strip (expr[5:]))
-		elif (expr[0:7] == 'exists:'):
-			return self.evaluateExists (string.strip (expr[7:]))
-		elif (expr[0:7] == 'nocall:'):
-			return self.evaluateNoCall (string.strip (expr[7:]))
-		elif (expr[0:4] == 'not:'):
-			return self.evaluateNot (string.strip (expr[4:]))
-		elif (expr[0:7] == 'string:'):
-			return self.evaluateString (string.strip (expr[7:]))
+		expr = expr.strip ()
+		if expr.startswith ('path:'):
+			return self.evaluatePath (expr[5:].lstrip ())
+		elif expr.startswith ('exists:'):
+			return self.evaluateExists (expr[7:].lstrip())
+		elif expr.startswith ('nocall:'):
+			return self.evaluateNoCall (expr[7:].lstrip())
+		elif expr.startswith ('not:'):
+			return self.evaluateNot (expr[4:].lstrip())
+		elif expr.startswith ('string:'):
+			return self.evaluateString (expr[7:].lstrip())
+		elif expr.startswith ('python:'):
+			return self.evaluatePython (expr[7:].lstrip())
 		else:
 			# Not specified - so it's a path
 			return self.evaluatePath (expr)
 		
+	def evaluatePython (self, expr):
+		if (not self.allowPythonPath):
+			self.log.warn ("Parameter allowPythonPath is false.  NOT Evaluating python expression %s" % expr)
+			return self.false
+		
+		self.log.debug ("Evaluating python expression %s" % expr)
+		
+		globals={}
+		for name, value in self.globals.items():
+			globals [name] = value.rawValue()
+			
+		locals={}
+		for name, value in self.locals.items():
+			locals [name] = value.rawValue()
+			
+		try:
+			result = eval(expr, globals, locals)
+		except Exception, e:
+			# An exception occured evaluating the template, return the exception as text
+			self.log.warn ("Exception occured evaluting python path, exception: " + str (e))
+			return ContextVariable ("Exception: %s" % str (e))
+		return ContextVariable(result)
+
 	def evaluatePath (self, expr):
 		self.log.debug ("Evaluating path expression %s" % expr)
 		allPaths = expr.split ('|')
 		if (len (allPaths) > 1):
 			for path in allPaths:
 				# Evaluate this path
-				pathResult = self.evaluate (string.strip (path))
+				pathResult = self.evaluate (path.strip ())
 				if (pathResult is not None):
 					return pathResult
 			return None
@@ -301,7 +341,7 @@ class Context:
 			
 			for path in allPaths[1:]:
 				# Evaluate this path
-				pathResult = self.evaluate (string.strip (path))
+				pathResult = self.evaluate (path.strip ())
 				if (pathResult is not None):
 					return self.true
 			return None
@@ -323,7 +363,7 @@ class Context:
 				
 			for path in allPaths[1:]:
 				# Evaluate this path
-				pathResult = self.evaluate (string.strip (path))
+				pathResult = self.evaluate (path.strip ())
 				if (pathResult is not None):
 					return pathResult
 			return None

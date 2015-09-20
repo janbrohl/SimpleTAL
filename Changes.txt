@@ -1,5 +1,21 @@
-simpleTAL / simpleTALES (Version 3.0)
+simpleTAL / simpleTALES (Version 3.2)
 -------------------------------------
+Version 3.2
+-----------
+This release incorporates patches from Wichert Akkerman implementing the Python TAL path
+and moving to string methods instead of using the string module.
+
+New features:
+  - The 'python:' path can now be used, pass the parameter 'allowPythonPath=1' to the
+	constructor of SimpleTALES.Context to enable this to be used.
+  - simpleTALUtils now contains a template caching class (TemplateCache) that
+    can be used to cache compiled templates, automatically invalidating the cache if
+	the template file has changed.
+  - The string module is no longer used, replaced by string methods
+  
+Bug fixes:
+  - Nested repeat variables with the same name are now scoped correctly.
+  - If logging is available all error messages are now suppressed during testing.
 
 Version 3.1
 -----------

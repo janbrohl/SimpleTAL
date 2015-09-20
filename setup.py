@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name="SimpleTAL",
-	version="3.1",
+	version="3.2",
 	description="SimpleTAL is a stand alone Python implementation of the TAL, TALES and METAL  specifications  used in Zope to power HTML and XML templates.",
 	author="Colin Stewart",
 	author_email="colin@owlfish.com",

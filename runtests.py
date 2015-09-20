@@ -15,6 +15,14 @@ found test suites into one big test suite and run them all at once.
 """
 import sys, os, re, unittest
 
+# If logging is available, suppress it to avoid confusion.
+try:
+	import logging
+	rootLogger = logging.getLogger ()
+	rootLogger.setLevel (logging.CRITICAL)
+except:
+	pass                
+
 #ensure that the module in this directory is used instead of the system one
 #or else we would be testing the system one and not the one with the changes :)
 import sys

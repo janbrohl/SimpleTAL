@@ -76,6 +76,12 @@ class TALRepeatTestCases (unittest.TestCase):
 					   ,'<html><p><h2>Image 1</h2><i>1</i><i>2</i><i>3</i></p><p><h2>Image 2</h2><i>5</i><i>2</i><i>3</i></p><p><h2>Image 3</h2><i>8</i><i>9</i><i>1</i></p></html>'
 					   ,'Nested repeat did not create expected outcome.'
 					   )
+					   
+	def testNestedRepeatScope (self):
+		self._runTest_ ('<html><p tal:repeat="image nested"><h2 tal:content="image/title"></h2><b tal:omit-tag tal:repeat="image image/catList"><i tal:content="image"></i></b></p></html>'
+					   ,'<html><p><h2>Image 1</h2><i>1</i><i>2</i><i>3</i></p><p><h2>Image 2</h2><i>5</i><i>2</i><i>3</i></p><p><h2>Image 3</h2><i>8</i><i>9</i><i>1</i></p></html>'
+					   ,'Nested repeat did not create expected outcome.'
+					   )
 				
 	def testRepeatVarIndex (self):
 		expectedResult = "<html>"

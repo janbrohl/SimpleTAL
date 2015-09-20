@@ -15,10 +15,10 @@
 		Module Dependencies: None
 """
 
-__version__ = "3.1"
+__version__ = "3.2"
 
 
-import StringIO, os, sys, codecs, sgmllib, cgi, re
+import StringIO, os, stat, threading, sys, codecs, sgmllib, cgi, re
 
 import simpleTAL
 
@@ -72,7 +72,49 @@ class HTMLStructureCleaner (sgmllib.SGMLParser):
 		
 	def handle_entityref (self, ref):
 		self.outputFile.write (u'&%s;' % ref)
+		
+class TemplateCache:
+	""" A TemplateCache is a multi-thread safe object that caches compiled templates.
+			This cache only works with file based templates, the ctime of the file is 
+			checked on each hit, if the file has changed the template is re-compiled.
+	"""
+	def __init__ (self):
+		self.templateCache = {}
+		self.cacheLock = threading.Lock()
+		self.hits = 0
+		self.misses = 0
+		
+	def getTemplate (self, name):
+		""" Name should be the path of a template file.  If the path ends in 'xml' it is treated
+				as an XML Template, otherwise it's treated as an HTML Template.  If the template file
+				has changed since the last cache it will be re-compiled.
+		"""
+		if (self.templateCache.has_key (name)):
+			template, oldctime = self.templateCache [name]
+			ctime = os.stat (name)[stat.ST_CTIME]
+			if (oldctime == ctime):
+				# Cache hit!
+				self.hits += 1
+				return template
+		# Cache miss, let's cache this template
+		return self._cacheTemplate_ (name)
+		
+	def _cacheTemplate_ (self, name):
+		self.cacheLock.acquire ()
+		try:
+			tempFile = open (name, 'r')
+			if (name [-3:] == "xml"):
+				template = simpleTAL.compileXMLTemplate (tempFile)
+			else:
+				template = simpleTAL.compileHTMLTemplate (tempFile)
+			self.templateCache [name] = (template, os.stat (name)[stat.ST_CTIME])
+			self.misses += 1
+		except Exception, e:
+			self.cacheLock.release()
+			raise e
 			
+		self.cacheLock.release()
+		return template
 
 def tagAsText (tag,atts):
 	result = "<" + tag 
