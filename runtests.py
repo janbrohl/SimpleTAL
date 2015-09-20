@@ -21,7 +21,7 @@ try:
 	rootLogger = logging.getLogger ()
 	rootLogger.setLevel (logging.CRITICAL)
 except:
-	pass                
+	pass
 
 #ensure that the module in this directory is used instead of the system one
 #or else we would be testing the system one and not the one with the changes :)

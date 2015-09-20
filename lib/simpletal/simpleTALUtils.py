@@ -216,13 +216,13 @@ class MacroExpansionInterpreter (simpleTAL.TemplateInterpreter):
 		
 	def cmdOutputStartTag (self, command, args):
 		newAtts = []
-		for att in self.originalAttributes:
-			if (self.macroArg is not None and att[0] == "metal:define-macro"):
+		for att, value in self.originalAttributes.items():
+			if (self.macroArg is not None and att == "metal:define-macro"):
 				newAtts.append (("metal:use-macro",self.macroArg))
-			elif (self.inMacro and att[0]=="metal:define-slot"):
-				newAtts.append (("metal:fill-slot", att[1]))
+			elif (self.inMacro and att=="metal:define-slot"):
+				newAtts.append (("metal:fill-slot", value))
 			else:
-				newAtts.append (att)
+				newAtts.append ((att, value))
 		self.macroArg = None
 		self.currentAttributes = newAtts
 		simpleTAL.TemplateInterpreter.cmdOutputStartTag (self, command, args)

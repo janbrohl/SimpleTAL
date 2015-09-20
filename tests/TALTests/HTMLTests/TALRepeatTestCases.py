@@ -93,7 +93,7 @@ class TALRepeatTestCases (unittest.TestCase):
 
 	def testAttributesInRepeat (self):
 		self._runTest_ ('<html><p tal:repeat="words nested" tal:content="words/title" tal:attributes="selected words/selected" selected></p></html>'
-						 ,'<html><p>Image 1</p><p selected="">Image 2</p><p>Image 3</p></html>'
+						 ,'<html><p>Image 1</p><p selected="selected">Image 2</p><p>Image 3</p></html>'
 						 ,'Accessing attributes in repeat loop failed.')
 						 
 	def testDefaultInContentInRepeat (self):

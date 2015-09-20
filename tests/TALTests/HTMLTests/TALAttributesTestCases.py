@@ -108,6 +108,16 @@ class TALAttributesTestCases (unittest.TestCase):
 						,"""<html href="Does &quot;this&quot; work?" existingatt="&quot;Testing&quot;">Hello</html>"""
 						,"Escaping of new attributes failed.")
 						
+	def testOriginalAttributes (self):
+		self._runTest_ ('<html existingAtt="&quot;Testing&quot;" tal:attributes="newAtt attrs/existingatt" tal:content="attrs/existingatt">Hello</html>'
+						,"""<html newAtt="&quot;Testing&quot;" existingatt="&quot;Testing&quot;">"Testing"</html>"""
+						,"Accessing existing attributes failed.")
+						
+	def testMultipleOriginalAttributes (self):
+		self._runTest_ ('<html one="Value One" two="Value two" three="Value three" tal:attributes="four attrs/three" tal:content="attrs/one">Hello</html>'
+						,"""<html four="Value three" one="Value One" two="Value two" three="Value three">Value One</html>"""
+						,"Accessing multiple existing attributes failed.")
+						
 	# HTML Attributes are case insensitive.
 #=======================================
 #	def testAttributeCase (self):

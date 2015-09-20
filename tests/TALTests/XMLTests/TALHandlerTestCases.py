@@ -120,7 +120,10 @@ CHECKSUMHANDLER = XMLChecksumHandler(CHECKSUMPARSER)
 CHECKSUMPARSER.setContentHandler (CHECKSUMHANDLER)
 CHECKSUMPARSER.setDTDHandler (CHECKSUMHANDLER)
 CHECKSUMPARSER.setErrorHandler (CHECKSUMHANDLER)
-CHECKSUMPARSER.setFeature (xml.sax.handler.feature_external_ges, 0)
+try:
+	CHECKSUMPARSER.setFeature (xml.sax.handler.feature_external_ges, 0)
+except:
+	pass
 if use_lexical_handler:
     CHECKSUMPARSER.setProperty(xml.sax.handler.property_lexical_handler, CHECKSUMHANDLER) 
 

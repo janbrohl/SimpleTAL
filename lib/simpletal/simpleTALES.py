@@ -456,7 +456,11 @@ class Context:
 							if (endPos > 0):
 								path = expr[position + 2:endPos]
 								# Evaluate the path - missing paths raise exceptions as normal.
-								pathResult = self.evaluate (path)
+								try:
+									pathResult = self.evaluate (path)
+								except PathNotFoundException, e:
+									# This part of the path didn't evaluate to anything - leave blank
+									pathResult = u''
 								if (pathResult is not None):
 									if (type (pathResult) == type (u"")):
 										result += pathResult
@@ -476,7 +480,11 @@ class Context:
 								endPos = len (expr)
 							path = expr [position + 1:endPos]
 							# Evaluate the variable - missing paths raise exceptions as normal.
-							pathResult = self.traversePath (path)
+							try:
+								pathResult = self.traversePath (path)
+							except PathNotFoundException, e:
+								# This part of the path didn't evaluate to anything - leave blank
+								pathResult = u''
 							if (pathResult is not None):
 								if (type (pathResult) == type (u"")):
 										result += pathResult
