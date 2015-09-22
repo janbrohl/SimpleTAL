@@ -144,9 +144,10 @@ class TemplateInterpreter:
 		self.commandHandler [METAL_DEFINE_SLOT] = self.cmdDefineSlot
 		self.commandHandler [TAL_NOOP] = self.cmdNoOp
 		
-	def tagAsText (self, (tag,atts), singletonFlag=0):
+	def tagAsText (self, tag_atts, singletonFlag=0):
 		""" This returns a tag as text.
 		"""
+		(tag,atts)=tag_atts
 		result = ["<"]
 		result.append (tag)
 		for attName, attValue in atts:
@@ -390,7 +391,7 @@ class TemplateInterpreter:
 				newAtts.append ((attName, escapedAttVal))
 		# Copy over the old attributes 
 		for oldAttName, oldAttValue in self.currentAttributes:
-			if (not attsToRemove.has_key (oldAttName)):
+			if (oldAttName not in attsToRemove):
 				newAtts.append ((oldAttName, oldAttValue))
 		self.currentAttributes = newAtts
 		# Evaluate all other commands
@@ -535,7 +536,7 @@ class TemplateInterpreter:
 				If the slotName is filled then that is used, otherwise the original conent
 				is used.
 		"""
-		if (self.currentSlots.has_key (args[0])):
+		if (args[0] in self.currentSlots):
 			# This slot is filled, so replace us with that content
 			self.outputTag = 0
 			self.tagContent = (1, self.currentSlots [args[0]])
@@ -556,14 +557,15 @@ class HTMLTemplateInterpreter (TemplateInterpreter):
 			# Override the tagAsText method for this instance
 			self.tagAsText = self.tagAsTextMinimizeAtts
 		
-	def tagAsTextMinimizeAtts (self, (tag,atts), singletonFlag=0):
+	def tagAsTextMinimizeAtts (self, tag_atts, singletonFlag=0):
 		""" This returns a tag as text.
 		"""
+		(tag,atts)=tag_atts
 		result = ["<"]
 		result.append (tag)
 		upperTag = tag.upper()
 		for attName, attValue in atts:
-			if (HTML_BOOLEAN_ATTS.has_key ('%s:%s' % (upperTag, attName.upper()))):
+			if ('%s:%s' % (upperTag, attName.upper()) in HTML_BOOLEAN_ATTS ):
 				# We should output a minimised boolean value
 				result.append (' ')
 				result.append (attName)
@@ -794,9 +796,10 @@ class TemplateCompiler:
 		newPrefix = self.metal_namespace_prefix_stack.pop()
 		self.setMETALPrefix (newPrefix)
 		
-	def tagAsText (self, (tag,atts), singletonFlag=0):
+	def tagAsText (self, tag_atts, singletonFlag=0):
 		""" This returns a tag as text.
 		"""
+		(tag,atts)=tag_atts
 		result = ["<"]
 		result.append (tag)
 		for attName, attValue in atts:
@@ -865,7 +868,7 @@ class TemplateCompiler:
 			popCommandList = tagProperties.get ('popFunctionList', [])
 			singletonTag = tagProperties.get ('singletonTag', 0)
 			for func in popCommandList:
-				apply (func, ())
+				func()
 			self.log.debug ("Popped tag %s off stack" % oldTag[0])
 			if (oldTag[0] == tag[0]):
 				# We've found the right tag, now check to see if we have any TAL commands on it
@@ -967,7 +970,7 @@ class TemplateCompiler:
 				else:
 					# It's nothing special, just an ordinary namespace declaration
 					cleanAttributes.append ((att, value))
-			elif (self.tal_attribute_map.has_key (commandAttName)):
+			elif (commandAttName in self.tal_attribute_map):
 				# It's a TAL attribute
 				cmnd = self.tal_attribute_map [commandAttName]
 				if (cmnd == TAL_OMITTAG and TALElementNameSpace):
@@ -975,7 +978,7 @@ class TemplateCompiler:
 				else:
 					foundCommandsArgs [cmnd] = value
 					foundTALAtts.append (cmnd)
-			elif (self.metal_attribute_map.has_key (commandAttName)):
+			elif (commandAttName in self.metal_attribute_map):
 				# It's a METAL attribute
 				cmnd = self.metal_attribute_map [commandAttName]
 				foundCommandsArgs [cmnd] = value
@@ -1184,7 +1187,7 @@ class TemplateCompiler:
 			msg = "Macro name %s is invalid." % argument
 			self.log.error (msg)
 			raise TemplateParseException (self.tagAsText (self.currentStartTag), msg)
-		if (self.macroMap.has_key (argument)):
+		if (argument in self.macroMap):
 			msg = "Macro name %s is already defined!" % argument
 			self.log.error (msg)
 			raise TemplateParseException (self.tagAsText (self.currentStartTag), msg)
@@ -1232,7 +1235,7 @@ class TemplateCompiler:
 			self.log.error (msg)
 			raise TemplateParseException (self.tagAsText (self.currentStartTag), msg)
 		
-		if (slotMap.has_key (argument)):
+		if (argument in slotMap):
 			msg = "Slot %s has already been filled!" % argument
 			self.log.error (msg)
 			raise TemplateParseException (self.tagAsText (self.currentStartTag), msg)
@@ -1281,14 +1284,15 @@ class HTMLTemplateCompiler (TemplateCompiler, FixedHTMLParser.HTMLParser):
 		self.feed (encodedFile.read())
 		self.close()
 		
-	def tagAsText (self, (tag,atts), singletonFlag=0):
+	def tagAsText (self, tag_atts, singletonFlag=0):
 		""" This returns a tag as text.
 		"""
+		(tag,atts)=tag_atts
 		result = ["<"]
 		result.append (tag)
 		upperTag = tag.upper()
 		for attName, attValue in atts:
-			if (self.minimizeBooleanAtts and HTML_BOOLEAN_ATTS.has_key ('%s:%s' % (upperTag, attName.upper()))):
+			if (self.minimizeBooleanAtts and  ('%s:%s' % (upperTag, attName.upper())) in HTML_BOOLEAN_ATTS ):
 				# We should output a minimised boolean value
 				result.append (' ')
 				result.append (attName)
@@ -1306,7 +1310,7 @@ class HTMLTemplateCompiler (TemplateCompiler, FixedHTMLParser.HTMLParser):
 		
 	def handle_startendtag (self, tag, attributes):
 		self.handle_starttag (tag, attributes)
-		if not (HTML_FORBIDDEN_ENDTAG.has_key (tag.upper())):
+		if (tag.upper() not in HTML_FORBIDDEN_ENDTAG):
 			self.handle_endtag(tag)
 		
 	def handle_starttag (self, tag, attributes):
@@ -1343,7 +1347,7 @@ class HTMLTemplateCompiler (TemplateCompiler, FixedHTMLParser.HTMLParser):
 				goodAttValue.append (attValue [last:])
 				atts.append ((att, u"".join (goodAttValue)))
 				
-		if (HTML_FORBIDDEN_ENDTAG.has_key (tag.upper())):
+		if (tag.upper() in HTML_FORBIDDEN_ENDTAG):
 			# This should have no end tag, so we just do the start and suppress the end
 			self.parseStartTag (tag, atts)
 			self.log.debug ("End tag forbidden, generating close tag with no output.")
@@ -1353,7 +1357,7 @@ class HTMLTemplateCompiler (TemplateCompiler, FixedHTMLParser.HTMLParser):
 		
 	def handle_endtag (self, tag):
 		self.log.debug ("Recieved End Tag: " + tag)
-		if (HTML_FORBIDDEN_ENDTAG.has_key (tag.upper())):
+		if (tag.upper() in HTML_FORBIDDEN_ENDTAG):
 			self.log.warn ("HTML 4.01 forbids end tags for the %s element" % tag)
 		else:
 			# Normal end tag

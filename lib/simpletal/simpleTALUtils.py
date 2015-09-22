@@ -34,62 +34,13 @@
 		Module Dependencies: None
 """
 
-import StringIO, os, stat, threading, sys, codecs, sgmllib, cgi, re, types
+import StringIO, os, stat, threading, sys, codecs, cgi, re, types
 import simpletal, simpleTAL
 
 __version__ = simpletal.__version__
 
 # This is used to check for already escaped attributes.
 ESCAPED_TEXT_REGEX=re.compile (r"\&\S+?;")
-
-class HTMLStructureCleaner (sgmllib.SGMLParser):
-	""" A helper class that takes HTML content and parses it, so converting
-			any stray '&', '<', or '>' symbols into their respective entity references.
-	"""
-	def clean (self, content, encoding=None):
-		""" Takes the HTML content given, parses it, and converts stray markup.
-				The content can be either:
-					 - A unicode string, in which case the encoding parameter is not required
-					 - An ordinary string, in which case the encoding will be used
-					 - A file-like object, in which case the encoding will be used if present
-				
-				The method returns a unicode string which is suitable for addition to a
-				simpleTALES.Context object.
-		"""
-		if (isinstance (content, types.StringType)):
-			# Not unicode, convert
-			converter = codecs.lookup (encoding)[1]
-			file = StringIO.StringIO (converter (content)[0])
-		elif (isinstance (content, types.UnicodeType)):
-			file = StringIO.StringIO (content)
-		else:
-			# Treat it as a file type object - and convert it if we have an encoding
-			if (encoding is not None):
-				converterStream = codecs.lookup (encoding)[2]
-				file = converterStream (content)
-			else:
-				file = content
-		
-		self.outputFile = StringIO.StringIO (u"")
-		self.feed (file.read())
-		self.close()
-		return self.outputFile.getvalue()
-		
-	def unknown_starttag (self, tag, attributes):
-		self.outputFile.write (tagAsText (tag, attributes))
-		
-	def unknown_endtag (self, tag):
-		self.outputFile.write ('</' + tag + '>')
-			
-	def handle_data (self, data):
-		self.outputFile.write (cgi.escape (data))
-		
-	def handle_charref (self, ref):
-		self.outputFile.write (u'&#%s;' % ref)
-		
-	def handle_entityref (self, ref):
-		self.outputFile.write (u'&%s;' % ref)
-		
 
 class FastStringOutput:
 	""" A very simple StringIO replacement that only provides write() and getvalue()
@@ -123,8 +74,8 @@ class TemplateCache:
 			inputEncoding is only used for HTML templates, and should be the encoding that the template
 			is stored in.
 		"""
-		if (self.templateCache.has_key (name)):
-			template, oldctime = self.templateCache [name]
+		template, oldctime = self.templateCache.get (name, (None, None))
+		if template is not None:			
 			ctime = os.stat (name)[stat.ST_MTIME]
 			if (oldctime == ctime):
 				# Cache hit!
@@ -136,8 +87,8 @@ class TemplateCache:
 	def getXMLTemplate (self, name):
 		""" Name should be the path of an XML template file.  
 		"""
-		if (self.templateCache.has_key (name)):
-			template, oldctime = self.templateCache [name]
+		template, oldctime = self.templateCache.get (name, (None, None))
+		if template is not None:
 			ctime = os.stat (name)[stat.ST_MTIME]
 			if (oldctime == ctime):
 				# Cache hit!

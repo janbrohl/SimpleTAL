@@ -57,13 +57,13 @@ class ContextContentException (Exception):
 	
 PATHNOTFOUNDEXCEPTION = PathNotFoundException()
 
-class ContextVariable:
+class ContextVariable(Exception):
 	def __init__ (self, value = None):
 		self.ourValue = value
 		
 	def value (self, currentPath=None):
 		if (callable (self.ourValue)):
-			return apply (self.ourValue, ())
+			return self.ourValue()
 		return self.ourValue
 		
 	def rawValue (self):
@@ -233,7 +233,7 @@ class PathFunctionVariable (ContextVariable):
 	def value (self, currentPath=None):
 		if (currentPath is not None):
 			index, paths = currentPath
-			result = ContextVariable (apply (self.func, ('/'.join (paths[index:]),)))
+			result = ContextVariable (self.func('/'.join (paths[index:])))
 			# Fast track the result
 			raise result
 			
@@ -492,7 +492,7 @@ class Context:
 		#self.log.debug ("Evaluating String %s" % expr)
 		result = ""
 		skipCount = 0
-		for position in xrange (0,len (expr)):
+		for position in range (0,len (expr)):
 			if (skipCount > 0):
 				skipCount -= 1
 			else:
@@ -564,19 +564,19 @@ class Context:
 		path = pathList[0]
 		if path.startswith ('?'):
 			path = path[1:]
-			if self.locals.has_key(path):
+			if path in self.locals:
 				path = self.locals[path]
 				if (isinstance (path, ContextVariable)): path = path.value()
-				elif (callable (path)):path = apply (path, ())
+				elif (callable (path)):path = path()
 			
-			elif self.globals.has_key(path):
+			elif path in self.globals:
 				path = self.globals[path]
 				if (isinstance (path, ContextVariable)): path = path.value()
-				elif (callable (path)):path = apply (path, ())
+				elif (callable (path)):path = path()
 				#self.log.debug ("Dereferenced to %s" % path)
-		if self.locals.has_key(path):
+		if path in self.locals:
 			val = self.locals[path]
-		elif self.globals.has_key(path):
+		elif path in self.globals:
 			val = self.globals[path]  
 		else:
 			# If we can't find it then raise an exception
@@ -586,18 +586,18 @@ class Context:
 			#self.log.debug ("Looking for path element %s" % path)
 			if path.startswith ('?'):
 				path = path[1:]
-				if self.locals.has_key(path):
+				if path in self.locals:
 					path = self.locals[path]
 					if (isinstance (path, ContextVariable)): path = path.value()
-					elif (callable (path)):path = apply (path, ())
-				elif self.globals.has_key(path):
+					elif (callable (path)):path = path()
+				elif path in self.globals:
 					path = self.globals[path]
 					if (isinstance (path, ContextVariable)): path = path.value()
-					elif (callable (path)):path = apply (path, ())
+					elif (callable (path)):path = path()
 				#self.log.debug ("Dereferenced to %s" % path)
 			try:
 				if (isinstance (val, ContextVariable)): temp = val.value((index,pathList))
-				elif (callable (val)):temp = apply (val, ())
+				elif (callable (val)):temp = val()
 				else: temp = val
 			except ContextVariable, e:
 				# Fast path for those functions that return values
@@ -619,7 +619,7 @@ class Context:
 		if (canCall):
 			try:
 				if (isinstance (val, ContextVariable)): result = val.value((index,pathList))
-				elif (callable (val)):result = apply (val, ())
+				elif (callable (val)):result = val()
 				else: result = val
 			except ContextVariable, e:
 				# Fast path for those functions that return values
