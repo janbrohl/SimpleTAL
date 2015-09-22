@@ -31,8 +31,9 @@
 		
 """
 
+from __future__ import unicode_literals
 import unittest, os
-import StringIO
+import io
 import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
@@ -68,10 +69,10 @@ class PythonPathTests (unittest.TestCase):
 		self.context.addGlobal ('data', {'one': 1, 'zero': 0})
 		
 		template = simpleTAL.compileHTMLTemplate (txt)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
-		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.assertEqual (realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 
 	def testPythonPathException (self):
 		self._runTest_ ("""<html tal:content="python:exceptFunc ('Test exception!')">Exists</html>"""

@@ -31,8 +31,9 @@
 		
 """
 
+from __future__ import unicode_literals
 import unittest, os
-import StringIO
+import io
 import logging, logging.config
 import xml.dom
 
@@ -67,10 +68,10 @@ class CompileDOMTemplateTestCases (unittest.TestCase):
 		if (not use_dom2sax):
 			return
 		template = simpleTAL.compileDOMTemplate (dom)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		template.expand (self.context, file, outputEncoding="iso-8859-1")
 		realResult = file.getvalue()
-		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, dom.toxml(), realResult, result, template))
+		self.assertEqual (realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, dom.toxml(), realResult, result, template))
 						
 	def testContentNothing (self):
 		domImpl = xml.dom.getDOMImplementation()

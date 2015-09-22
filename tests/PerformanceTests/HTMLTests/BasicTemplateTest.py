@@ -29,6 +29,7 @@
 		Performance test cases.
 		
 """
+from __future__ import unicode_literals
 from __future__ import print_function
 from simpletal import simpleTAL, simpleTALES, simpleTALUtils
 
@@ -123,7 +124,7 @@ context.addGlobal ("title", "Performance testing!")
 context.addGlobal ("myList", ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight"])
 
 def NGTemplates (count):
-	tempFile = StringIO.StringIO (performanceTemplate)
+	tempFile = io.StringIO (performanceTemplate)
 	compiler = simpleTAL.HTMLTemplateCompiler()
 	compiler.parseTemplate (tempFile)
 	template = compiler.getTemplate()
@@ -139,7 +140,7 @@ def NGTemplateOverhead (count):
 	file = simpleTALUtils.FastStringOutput()
 	start = time.clock()
 	for attempt in xrange (count):
-		tempFile = StringIO.StringIO (performanceTemplate)
+		tempFile = io.StringIO (performanceTemplate)
 		compiler = simpleTAL.HTMLTemplateCompiler()
 		compiler.parseTemplate (tempFile)
 		template = compiler.getTemplate()

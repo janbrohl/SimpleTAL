@@ -31,8 +31,9 @@
 		
 """
 
+from __future__ import unicode_literals
 import unittest, os
-import StringIO
+import io
 import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
@@ -52,10 +53,10 @@ class TALHandlerTestCases (unittest.TestCase):
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileHTMLTemplate (txt)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
-		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.assertEqual (realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 						
 	def testEmptyFile (self):
 		self._runTest_ ("", "", "Empty template contains more text than given.")
@@ -81,7 +82,7 @@ class TALHandlerTestCases (unittest.TestCase):
 	def testUnbalancedCloseTag (self):
 		try:
 			template = simpleTAL.compileHTMLTemplate ("<p>Hello</b> World</p>")
-			file = StringIO.StringIO ()
+			file = io.StringIO ()
 			template.expand (self.context, file)
 			realResult = file.getvalue()
 			self.fail ("No exception raised during parsing of unbalanced tag.")

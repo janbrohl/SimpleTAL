@@ -30,10 +30,11 @@
 		Unit test cases.
 		
 """
+from __future__ import unicode_literals
 from __future__ import print_function
 
 import unittest, os
-import StringIO
+import io
 import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
@@ -61,14 +62,14 @@ class TALRepeatTestCases (unittest.TestCase):
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileHTMLTemplate (txt)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		try:
 			template.expand (self.context, file)
 		except Exception as e:
 			print("Error, template compiled to: " + str (template))
 			raise e
 		realResult = file.getvalue()
-		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.assertEqual (realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 					
 	def testInvalidPath (self):
 		self._runTest_ ('<html><p tal:repeat="entry wibble">Hello</p></html>', "<html></html>", "Repeat of non-existant element failed")

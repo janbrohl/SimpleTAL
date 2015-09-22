@@ -31,8 +31,9 @@
 		
 """
 
+from __future__ import unicode_literals
 import unittest, os
-import StringIO
+import io
 import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
@@ -52,10 +53,10 @@ class TALConditionTestCases (unittest.TestCase):
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileXMLTemplate (txt)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		template.expand (self.context, file, outputEncoding="iso-8859-1")
 		realResult = file.getvalue()
-		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.assertEqual (realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 						
 	def testConditionDefault (self):
 		self._runTest_ ('<html tal:condition="default">Hello</html>', '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>Hello</html>', "Condition 'default' did not evaluate to true")

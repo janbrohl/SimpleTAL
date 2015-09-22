@@ -31,8 +31,9 @@
 		
 """
 
+from __future__ import unicode_literals
 import unittest, os
-import StringIO
+import io
 import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
@@ -66,16 +67,16 @@ class DefineMacroTests (unittest.TestCase):
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		macroTemplate = simpleTAL.compileXMLTemplate (txt)
 		self.context.addGlobal ("site", macroTemplate)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		pageTemplate.expand (self.context, file, outputEncoding="iso-8859-1")
 		realResult = file.getvalue()
-		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, pageTemplate))
+		self.assertEqual (realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, pageTemplate))
 	
 	def _runCompileTest_ (self, txt, result, errMsg="Error"):
 		try:
 			macroTemplate = simpleTAL.compileXMLTemplate (txt)
 		except simpleTAL.TemplateParseException as e:
-			self.failUnless (str (e) == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, str(e), result, pageTemplate))
+			self.assertEqual (str (e), result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, str(e), result, pageTemplate))
 			return
 		self.fail ("Expected exception '%s' during compile - but got no exception" % result)				
 					

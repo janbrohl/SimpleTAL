@@ -31,8 +31,9 @@
 		
 """
 
+from __future__ import unicode_literals
 import unittest, os
-import StringIO
+import io
 import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
@@ -53,10 +54,10 @@ class TALOmitTagTestCases (unittest.TestCase):
 		
 	def _runTest_ (self, txt, result, errMsg="Error", minimizeBooleanAtts = 1):
 		template = simpleTAL.compileHTMLTemplate (txt, minimizeBooleanAtts = minimizeBooleanAtts)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
-		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.assertEqual (realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 						
 	def testTemplateWithBooleanAtt (self):
 		self._runTest_ ('<html><input checked>Hello</html>'

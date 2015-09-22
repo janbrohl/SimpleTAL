@@ -31,8 +31,9 @@
 		
 """
 
+from __future__ import unicode_literals
 import unittest, os
-import StringIO
+import io
 import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
@@ -60,11 +61,11 @@ class NoCallTests (unittest.TestCase):
 		
 	def _runTest_ (self, txt, result, errMsg="Error", expectedRecorderVal=0):
 		template = simpleTAL.compileHTMLTemplate (txt)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
-		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
-		self.failUnless (self.recorder.called == expectedRecorderVal, 'Call recorder detected that the call recorder object has state %s' % str (self.recorder.called))
+		self.assertEqual (realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.assertEqual (self.recorder.called, expectedRecorderVal, 'Call recorder detected that the call recorder object has state %s' % str (self.recorder.called))
 			
 	def testNoCallString (self):
 		self._runTest_ ('<html tal:define="test nocall:top"><b tal:condition="exists:test">Exists</b></html>'

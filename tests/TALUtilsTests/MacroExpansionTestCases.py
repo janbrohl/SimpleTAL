@@ -31,8 +31,9 @@
 		
 """
 
+from __future__ import unicode_literals
 import unittest, os, codecs
-import StringIO
+import io
 import logging, logging.config
 
 from simpletal import simpleTALUtils, simpleTALES, simpleTAL
@@ -59,7 +60,7 @@ class MacroExpansionTestCases (unittest.TestCase):
 		
 	def _runTest_ (self, template, txt, result, errMsg="Error"):
 		realResult = simpleTALUtils.ExpandMacros (self.context, template)
-		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.assertEqual (realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 			
 	def testMacroExpansionSlots (self):
 		txt = '<html><div metal:use-macro="mac/macros/one">Hello<b metal:fill-slot="blue">Blue</b></div></html>'

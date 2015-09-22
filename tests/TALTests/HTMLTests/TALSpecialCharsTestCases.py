@@ -31,8 +31,9 @@
 		
 """
 
+from __future__ import unicode_literals
 import unittest, os
-import StringIO
+import io
 import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
@@ -52,10 +53,10 @@ class TALSpecialCharsTestCases (unittest.TestCase):
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileHTMLTemplate (txt)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
-		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.assertEqual (realResult, result, "%s - \npassed in: %r \ngot back %r \nexpected %r\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 						
 	def testLessThanGreaterThanAmpersand (self):
 		self._runTest_ ('<html tal:content="test">Hello</html>'
@@ -69,7 +70,7 @@ class TALSpecialCharsTestCases (unittest.TestCase):
 						
 	def testAmpInTemplate (self):
 		#logging.getLogger().setLevel(logging.DEBUG)
-		NBSP = u"\xa0".encode ("iso-8859-1")
+		NBSP = b"\xa0".decode("iso-8859-1")
 		self._runTest_ ('<html test="&amp;nbsp;&nbsp;" tal:attributes="test2 string: Boo &nbsp; There ${test}">Hello Bye Bye</html>'
 							,"""<html test2="Boo """ + NBSP + """ There &lt; testing &gt; experimenting &amp; twice as useful" test="&amp;nbsp;""" + NBSP + """">Hello Bye Bye</html>"""
 							,"&amp; in template failed.")

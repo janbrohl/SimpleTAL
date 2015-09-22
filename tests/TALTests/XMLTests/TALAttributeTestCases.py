@@ -30,10 +30,11 @@
 		Unit test cases.
 		
 """
+from __future__ import unicode_literals
 from __future__ import print_function
 
 import unittest, os
-import StringIO
+import io
 import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
@@ -110,7 +111,7 @@ CHECKSUMPARSER.setDTDHandler (CHECKSUMHANDLER)
 CHECKSUMPARSER.setErrorHandler (CHECKSUMHANDLER)
 
 def getXMLChecksum (doc):
-	CHECKSUMPARSER.parse (StringIO.StringIO (doc))
+	CHECKSUMPARSER.parse (io.StringIO (doc))
 	return CHECKSUMHANDLER.getDigest()
 	
 class TALAttributesTestCases (unittest.TestCase):
@@ -124,7 +125,7 @@ class TALAttributesTestCases (unittest.TestCase):
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileXMLTemplate (txt)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		template.expand (self.context, file, outputEncoding="iso-8859-1")
 		realResult = file.getvalue()
 		try:
@@ -137,7 +138,7 @@ class TALAttributesTestCases (unittest.TestCase):
 		except Exception as e:
 			self.fail ("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s" % (str (e), realResult, str (template)))
 		
-		self.failUnless (expectedChecksum == realChecksum, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
+		self.assertEqual (expectedChecksum, realChecksum, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 						
 	def testAddingAnAttribute (self):
 		self._runTest_ ('<html tal:attributes="link link" href="owlfish.com">Hello</html>'
