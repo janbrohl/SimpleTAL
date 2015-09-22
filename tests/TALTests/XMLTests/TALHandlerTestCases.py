@@ -43,8 +43,8 @@ try:
 except ImportError:
     use_lexical_handler = 0
     class LexicalHandler:
-        pass
-            
+	pass
+	    
 from simpletal import simpleTAL, simpleTALES
 
 if (os.path.exists ("logging.ini")):
@@ -222,9 +222,9 @@ class TALHandlerTestCases (unittest.TestCase):
 		template = simpleTAL.compileXMLTemplate (txt)
 		fh = StringIO.StringIO ()
 		if use_lexical_handler:
-                    template.expand (self.context, fh)
-                else:
-                    template.expand (self.context, fh, docType="""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">""")
+		    template.expand (self.context, fh)
+		else:
+		    template.expand (self.context, fh, docType="""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">""")
 		realResult = fh.getvalue()
 		expectedResult = u"""<?xml version="1.0"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n<html><p>Test\xa0Space</p></html>""".encode ("utf-8")
 		self.failUnless (realResult == expectedResult, "NBSP expansion failed - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (txt, realResult, expectedResult, template))
@@ -242,7 +242,7 @@ class TALHandlerTestCases (unittest.TestCase):
 		if not use_lexical_handler:
 		    return
 		self._runTest_ ("""<?xml version="1.0" encoding="iso-8859-1"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"><html><head><title>Hi</title></head><body></body></html>""", 
-		                """<?xml version="1.0" encoding="iso-8859-1"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">\n<html><head><title>Hi</title></head><body></body></html>""")
+				"""<?xml version="1.0" encoding="iso-8859-1"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">\n<html><head><title>Hi</title></head><body></body></html>""")
 	
 	def testSampleXHTML11Doc (self):
 		"""

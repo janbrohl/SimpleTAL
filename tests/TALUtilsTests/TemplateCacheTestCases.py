@@ -51,8 +51,8 @@ EXPXML_TEMPLATE_NAME='TemplateCacheTestCasesXmlTemplate.xhtml'
 
 class TemplateCacheTestCases (unittest.TestCase):
 	def setUp (self):
-                self.temp_dir = tempfile.mkdtemp()
-                
+		self.temp_dir = tempfile.mkdtemp()
+		
 		self.context = simpleTALES.Context()
 		self.cache = simpleTALUtils.TemplateCache()
 		
@@ -60,7 +60,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		self.context.addGlobal ('message', 'Testing the cache...')
 
 	def tearDown (self):
-                shutil.rmtree (self.temp_dir)
+		shutil.rmtree (self.temp_dir)
 		
 	def _runTest_ (self, template, txt, result, errMsg="Error"):
 		realResult = simpleTALUtils.ExpandMacros (self.context, template)

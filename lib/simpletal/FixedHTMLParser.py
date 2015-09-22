@@ -36,9 +36,9 @@
 """
 
 try:
-        import html
+	import html
 except ImportError:
-        import HTMLParser as html
+	import HTMLParser as html
 
 
 class HTMLParser (html.HTMLParser):

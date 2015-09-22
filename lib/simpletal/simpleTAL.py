@@ -45,10 +45,10 @@ import copy, sys
 import simpletal.FixedHTMLParser
 
 try:
-        import io
+	import io
 except ImportError:
-        import StringIO as io
-        
+	import StringIO as io
+	
 
 
 try:
@@ -58,7 +58,7 @@ try:
 except ImportError:
     use_lexical_handler = 0
     class LexicalHandler:
-        pass
+	pass
 
 try:
 	# Is PyXML's DOM2SAX available?
@@ -315,14 +315,14 @@ class TemplateInterpreter:
 		except:
 			# Not a natural sequence, can it produce an iterator?
 			try:
-                                it=iter(result)
-                        except TypeError:
-                                # Just a plain object, let's not loop
+				it=iter(result)
+			except TypeError:
+				# Just a plain object, let's not loop
 				# Delete the tags and their contents
 				self.outputTag = 0
 				self.programCounter = self.symbolTable [args[2]]
 				return
-                        else:
+			else:
 				# We can get an iterator!
 				self.repeatVariable = simpleTALES.IteratorRepeatVariable (it)
 				
@@ -835,7 +835,7 @@ class TemplateCompiler:
 		""" Used to add a tag to the stack.  Various properties can be passed in the dictionary
 		    as being information required by the tag.
 		    Currently supported properties are:
-		    		'command'         - The (command,args) tuple associated with this command
+		    		'command'	 - The (command,args) tuple associated with this command
 		    		'originalAtts'    - The original attributes that include any metal/tal attributes
 		    		'endTagSymbol'    - The symbol associated with the end tag for this element
 		    		'popFunctionList' - A list of functions to execute when this tag is popped

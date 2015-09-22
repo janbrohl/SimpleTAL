@@ -83,7 +83,7 @@ class ExampleCGI:
 	def expandTemplate (self, templateName):
 		# Print out the headers
 		sys.stdout.write ("Content-Type: text/html\n")     # HTML is following
-		sys.stdout.write ("\n")                            # blank line, end of headers
+		sys.stdout.write ("\n")			    # blank line, end of headers
 		
 		# Expand the template and print it out
 		templateFile = open (templateName, 'r')

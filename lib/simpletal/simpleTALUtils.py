@@ -37,9 +37,9 @@
 
 import os, stat, threading, sys, codecs, cgi, re
 try:
-        import io
+	import io
 except ImportError:
-        import StringIO as io
+	import StringIO as io
 import simpletal.simpleTAL
 
 
