@@ -55,7 +55,7 @@ class TALEncodingTestCases (unittest.TestCase):
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileHTMLTemplate (txt)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		template.expand (self.context, file, outputEncoding="iso-8859-1")
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
@@ -63,7 +63,7 @@ class TALEncodingTestCases (unittest.TestCase):
 	def testISOToUTF8 (self):
 		utf8Pound = "\xc2\xa3"
 		template = simpleTAL.compileXMLTemplate ('<?xml version="1.0" encoding="iso-8859-1"?>\n<html>£3.12?  <b tal:replace="HighBC"></b></html>')
-		file = StringIO.StringIO()
+		file = io.StringIO()
 		template.expand (self.context, file, 'utf-8')
 		result = file.getvalue()
 		expectedResult = '<?xml version="1.0"?>\n<html>' + utf8Pound + "3.12?  This cost nothing, yep " + utf8Pound + "0!</html>"
@@ -71,7 +71,7 @@ class TALEncodingTestCases (unittest.TestCase):
 		
 	def testISOToISO (self):
 		template = simpleTAL.compileXMLTemplate ('<?xml version="1.0" encoding="iso-8859-1"?>\n<html>£3.12?  <b tal:replace="HighBC"></b></html>')
-		file = StringIO.StringIO()
+		file = io.StringIO()
 		template.expand (self.context, file, 'iso-8859-1')
 		result = file.getvalue()
 		expectedResult = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>£3.12?  This cost nothing, yep £0!</html>'
@@ -79,7 +79,7 @@ class TALEncodingTestCases (unittest.TestCase):
 	
 	def testUTF8ToISO (self):
 		template = simpleTAL.compileXMLTemplate ('<?xml version="1.0"?>\n<html>\xc2\xa33.12?  <b tal:replace="HighBC"></b></html>')
-		file = StringIO.StringIO()
+		file = io.StringIO()
 		template.expand (self.context, file, 'iso-8859-1')
 		result = file.getvalue()
 		expectedResult = '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>£3.12?  This cost nothing, yep £0!</html>'

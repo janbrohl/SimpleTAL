@@ -32,7 +32,10 @@
 """
 
 import unittest, os
-import StringIO
+try:
+	import io
+except ImportError:
+	import StringIO as io
 import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
@@ -66,7 +69,7 @@ class DefineMacroTests (unittest.TestCase):
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		macroTemplate = simpleTAL.compileXMLTemplate (txt)
 		self.context.addGlobal ("site", macroTemplate)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		pageTemplate.expand (self.context, file, outputEncoding="iso-8859-1")
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, pageTemplate))

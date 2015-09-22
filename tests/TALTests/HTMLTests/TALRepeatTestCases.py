@@ -32,7 +32,10 @@
 """
 
 import unittest, os
-import StringIO
+try:
+	import io
+except ImportError:
+	import StringIO as io
 import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
@@ -60,7 +63,7 @@ class TALRepeatTestCases (unittest.TestCase):
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileHTMLTemplate (txt)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		try:
 			template.expand (self.context, file)
 		except Exception, e:

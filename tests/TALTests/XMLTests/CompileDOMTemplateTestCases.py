@@ -32,7 +32,10 @@
 """
 
 import unittest, os
-import StringIO
+try:
+	import io
+except ImportError:
+	import StringIO as io
 import logging, logging.config
 import xml.dom
 
@@ -67,7 +70,7 @@ class CompileDOMTemplateTestCases (unittest.TestCase):
 		if (not use_dom2sax):
 			return
 		template = simpleTAL.compileDOMTemplate (dom)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		template.expand (self.context, file, outputEncoding="iso-8859-1")
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, dom.toxml(), realResult, result, template))

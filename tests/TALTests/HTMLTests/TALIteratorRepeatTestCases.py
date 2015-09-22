@@ -32,7 +32,10 @@
 """
 
 import unittest, os, sys
-import StringIO
+try:
+	import io
+except ImportError:
+	import StringIO as io
 import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
@@ -85,7 +88,7 @@ class TALIteratorRepeatTestCases (unittest.TestCase):
 		if (not ITERATOR_SUPPORT):
 			return
 		template = simpleTAL.compileHTMLTemplate (txt)
-		file = StringIO.StringIO ()
+		file = io.StringIO ()
 		try:
 			template.expand (self.context, file)
 		except Exception, e:
