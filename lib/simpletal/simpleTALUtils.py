@@ -115,7 +115,7 @@ class TemplateCache:
 			tempFile.close()
 			self.templateCache [name] = (template, os.stat (name)[stat.ST_MTIME])
 			self.misses += 1
-		except Exception, e:
+		except Exception as e:
 			self.cacheLock.release()
 			raise e
 			

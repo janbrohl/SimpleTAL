@@ -191,7 +191,7 @@ class IteratorRepeatVariable (RepeatVariable):
 			self.iterStatus = 1
 			try:
 				self.curValue = self.sequence.next()
-			except StopIteration, e:
+			except StopIteration as e:
 				self.iterStatus = 2
 				raise IndexError ("Repeat Finished")
 		return self.curValue
@@ -201,7 +201,7 @@ class IteratorRepeatVariable (RepeatVariable):
 		self.position += 1
 		try:
 			self.curValue = self.sequence.next()
-		except StopIteration, e:
+		except StopIteration as e:
 			self.iterStatus = 2
 			raise IndexError ("Repeat Finished")
 			
@@ -362,7 +362,7 @@ class Context:
 			else:
 				# Not specified - so it's a path
 				return self.evaluatePath (expr)
-		except PathNotFoundException, e:
+		except PathNotFoundException as e:
 			if (suppressException):
 				return None
 			raise e
@@ -393,7 +393,7 @@ class Context:
 			if (isinstance (result, ContextVariable)):
 				return result.value()
 			return result
-		except Exception, e:
+		except Exception as e:
 			# An exception occured evaluating the template, return the exception as text
 			self.log.warn ("Exception occurred evaluating python path, exception: " + str (e))
 			return "Exception: %s" % str (e)
@@ -406,7 +406,7 @@ class Context:
 				# Evaluate this path
 				try:
 					return self.evaluate (path.strip ())
-				except PathNotFoundException, e:
+				except PathNotFoundException as e:
 					# Path didn't exist, try the next one
 					pass
 			# No paths evaluated - raise exception.
@@ -424,7 +424,7 @@ class Context:
 		try:
 			result = self.traversePath (allPaths[0], canCall = 0)
 			return self.true
-		except PathNotFoundException, e:
+		except PathNotFoundException as e:
 			# Look at the rest of the paths.
 			pass
 			
@@ -435,7 +435,7 @@ class Context:
 				# If this is part of a "exists: path1 | exists: path2" path then we need to look at the actual result.
 				if (pathResult):
 					return self.true
-			except PathNotFoundException, e:
+			except PathNotFoundException as e:
 				pass
 		# If we get this far then there are *no* paths that exist.
 		return self.false
@@ -446,7 +446,7 @@ class Context:
 		# The first path is for us
 		try:
 			return self.traversePath (allPaths[0], canCall = 0)
-		except PathNotFoundException, e:
+		except PathNotFoundException as e:
 			# Try the rest of the paths.
 			pass
 			
@@ -454,7 +454,7 @@ class Context:
 			# Evaluate this path
 			try:
 				return self.evaluate (path.strip ())
-			except PathNotFoundException, e:
+			except PathNotFoundException as e:
 				pass
 		# No path evaluated - raise error
 		raise PATHNOTFOUNDEXCEPTION
@@ -465,7 +465,7 @@ class Context:
 		# Evaluate what I was passed
 		try:
 			pathResult = self.evaluate (expr)
-		except PathNotFoundException, e:
+		except PathNotFoundException as e:
 			# In SimpleTAL the result of "not: no/such/path" should be TRUE not FALSE.
 			return self.true
 			
@@ -510,7 +510,7 @@ class Context:
 								# Evaluate the path - missing paths raise exceptions as normal.
 								try:
 									pathResult = self.evaluate (path)
-								except PathNotFoundException, e:
+								except PathNotFoundException as e:
 									# This part of the path didn't evaluate to anything - leave blank
 									pathResult = u''
 								if (pathResult is not None):
@@ -530,7 +530,7 @@ class Context:
 							# Evaluate the variable - missing paths raise exceptions as normal.
 							try:
 								pathResult = self.traversePath (path)
-							except PathNotFoundException, e:
+							except PathNotFoundException as e:
 								# This part of the path didn't evaluate to anything - leave blank
 								pathResult = u''
 							if (pathResult is not None):
@@ -541,7 +541,7 @@ class Context:
 									# Use Unicode in Context if you aren't using Ascii!
 									result += unicode (pathResult)
 							skipCount = endPos - position - 1
-					except IndexError, e:
+					except IndexError as e:
 						# Trailing $ sign - just suppress it
 						self.log.warn ("Trailing $ detected")
 						pass
@@ -599,7 +599,7 @@ class Context:
 				if (isinstance (val, ContextVariable)): temp = val.value((index,pathList))
 				elif (callable (val)):temp = val()
 				else: temp = val
-			except ContextVariable, e:
+			except ContextVariable as e:
 				# Fast path for those functions that return values
 				return e.value()
 				
@@ -621,7 +621,7 @@ class Context:
 				if (isinstance (val, ContextVariable)): result = val.value((index,pathList))
 				elif (callable (val)):result = val()
 				else: result = val
-			except ContextVariable, e:
+			except ContextVariable as e:
 				# Fast path for those functions that return values
 				return e.value()
 		else:
