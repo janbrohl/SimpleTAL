@@ -41,6 +41,8 @@
 		Module Dependencies: simpleTALES, elementtree
 """
 
+from __future__ import absolute_import
+
 from elementtree import ElementTree
 import simpletal.SimpleTALES
 

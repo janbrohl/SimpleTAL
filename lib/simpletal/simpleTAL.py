@@ -35,19 +35,21 @@
 		Module Dependencies: logging, simpleTALES, simpleTALTemplates
 """
 
+from __future__ import absolute_import
+
 try:
 	import logging
 except ImportError:
 	import simpletal.DummyLogger as logging
 	
-import xml.sax, cgi, codecs, re, sgmlentitynames
+import xml.sax, cgi, codecs, re
 import copy, sys
+import simpletal.sgmlentitynames
 import simpletal.FixedHTMLParser
+import simpletal.simpleTALES
 
-try:
-	import io
-except ImportError:
-	import StringIO as io
+import io
+
 	
 
 
@@ -67,7 +69,6 @@ try:
 except ImportError:
 	use_dom2sax = 0
 
-import simpleTALES
 
 # Name-space URIs
 METAL_NAME_URI="http://xml.zope.org/namespaces/metal"
@@ -297,7 +298,7 @@ class TemplateInterpreter:
 		
 		# The first time through this command
 		result = self.context.evaluate (args[1], self.originalAttributes)
-		if (result is not None and result == simpleTALES.DEFAULTVALUE):
+		if (result is not None and result == simpletal.simpleTALES.DEFAULTVALUE):
 			# Leave everything un-touched.
 			self.programCounter += 1
 			return
@@ -306,7 +307,7 @@ class TemplateInterpreter:
 			isSequence = len (result)
 			if (isSequence):
 				# Only setup if we have a sequence with length
-				self.repeatVariable = simpleTALES.RepeatVariable (result)
+				self.repeatVariable = simpletal.simpleTALES.RepeatVariable (result)
 			else:
 				# Delete the tags and their contents
 				self.outputTag = 0
@@ -324,7 +325,7 @@ class TemplateInterpreter:
 				return
 			else:
 				# We can get an iterator!
-				self.repeatVariable = simpleTALES.IteratorRepeatVariable (it)
+				self.repeatVariable = simpletal.simpleTALES.IteratorRepeatVariable (it)
 				
 				
 		try:
@@ -357,7 +358,7 @@ class TemplateInterpreter:
 			self.movePCForward = self.symbolTable [args[3]]
 			self.programCounter += 1
 			return
-		elif (not result == simpleTALES.DEFAULTVALUE):
+		elif (not result == simpletal.simpleTALES.DEFAULTVALUE):
 			# We have content, so let's suppress the natural content and output this!
 			if (args[0]):
 				self.outputTag = 0
@@ -381,7 +382,7 @@ class TemplateInterpreter:
 			if (resultVal is None):
 				# Remove this attribute from the current attributes
 				attsToRemove [attName]=1
-			elif (not resultVal == simpleTALES.DEFAULTVALUE):
+			elif (not resultVal == simpletal.simpleTALES.DEFAULTVALUE):
 				# We have a value - let's use it!
 				attsToRemove [attName]=1
 				if (isinstance (resultVal, unicode)):
@@ -524,7 +525,7 @@ class TemplateInterpreter:
 			self.movePCForward = self.symbolTable [args[2]]
 			self.programCounter += 1
 			return
-		if (not value == simpleTALES.DEFAULTVALUE and isinstance (value, SubTemplate)):
+		if (not value == simpletal.simpleTALES.DEFAULTVALUE and isinstance (value, SubTemplate)):
 			# We have a macro, so let's use it
 			self.outputTag = 0
 			self.slotParameters = args[1]
@@ -626,7 +627,7 @@ class Template:
 			ourInterpreter.execute (self)
 		except UnicodeError as unierror:
 			logging.error ("UnicodeError caused by placing a non-Unicode string in the Context object.")
-			raise simpleTALES.ContextContentException ("Found non-unicode string in Context!")
+			raise simpletal.simpleTALES.ContextContentException ("Found non-unicode string in Context!")
 			
 	def getProgram (self):
 		""" Returns a tuple of (commandList, startPoint, endPoint, symbolTable) """
@@ -696,8 +697,10 @@ class HTMLTemplate (Template):
 		"""
 		# This method must wrap outputFile if required by the encoding, and write out
 		# any template pre-amble (DTD, Encoding, etc)
-		
-		encodingFile = codecs.lookup (outputEncoding)[3](outputFile, 'replace')
+		if isinstance(outputFile,io.TextIOBase):
+			encodingFile=outputFile
+		else:
+			encodingFile = codecs.lookup (outputEncoding)[3](outputFile, 'xmlcharrefreplace')
 		self.expandInline (context, encodingFile, interpreter)
 		
 	def expandInline (self, context, outputFile, interpreter=None):
@@ -717,7 +720,7 @@ class XMLTemplate (Template):
 		Template.__init__ (self, commands, macros, symbols)
 		self.doctype = doctype
 	
-	def expand (self, context, outputFile, outputEncoding="utf-8", docType=None, suppressXMLDeclaration=0,interpreter=None):
+	def expand (self, context, outputFile, outputEncoding=u"utf-8", docType=None, suppressXMLDeclaration=0,interpreter=None):
 		""" This method will write to the outputFile, using the encoding specified,
 			the expanded version of this template.  The context passed in is used to resolve
 			all expressions with the template.
@@ -726,12 +729,16 @@ class XMLTemplate (Template):
 		# any template pre-amble (DTD, Encoding, etc)
 		
 		# Write out the XML prolog
-		encodingFile = codecs.lookup (outputEncoding)[3](outputFile, 'replace')
+		if isinstance(outputFile,io.TextIOBase):
+			encodingFile=outputFile
+		else:
+			encodingFile = codecs.lookup (outputEncoding)[3](outputFile, 'xmlcharrefreplace')
 		if (not suppressXMLDeclaration):
-			if (outputEncoding.lower() != "utf-8"):
-				encodingFile.write ('<?xml version="1.0" encoding="%s"?>\n' % outputEncoding.lower())
+                        oel=unicode(outputEncoding).lower()
+			if (oel != u"utf-8"):
+				encodingFile.write (u'<?xml version="1.0" encoding="%s"?>\n' % oel)
 			else:
-				encodingFile.write ('<?xml version="1.0"?>\n')
+				encodingFile.write (u'<?xml version="1.0"?>\n')
 		if not docType and self.doctype:
 			docType = self.doctype
 		if docType:
@@ -1347,7 +1354,7 @@ class HTMLTemplateCompiler (TemplateCompiler, simpletal.FixedHTMLParser.HTMLPars
 						goodAttValue.append (unichr (refValue))
 					else:
 						# A named reference.
-						goodAttValue.append (unichr (sgmlentitynames.htmlNameToUnicodeNumber.get (ref[1:-1], 65533)))
+						goodAttValue.append (unichr (simpletal.sgmlentitynames.htmlNameToUnicodeNumber.get (ref[1:-1], 65533)))
 					last = match.end()
 					match = ENTITY_REF_REGEX.search (attValue, last)
 				goodAttValue.append (attValue [last:])
@@ -1380,7 +1387,7 @@ class HTMLTemplateCompiler (TemplateCompiler, simpletal.FixedHTMLParser.HTMLPars
 	def handle_entityref (self, ref):
 		self.log.debug ("Got Ref: %s", ref)
 		# Use handle_data so that <&> are re-encoded as required.
-		self.handle_data( unichr (sgmlentitynames.htmlNameToUnicodeNumber.get (ref, 65533)))
+		self.handle_data( unichr (simpletal.sgmlentitynames.htmlNameToUnicodeNumber.get (ref, 65533)))
 		
 	# Handle document type declarations
 	def handle_decl (self, data):
@@ -1469,7 +1476,7 @@ class XMLTemplateCompiler (TemplateCompiler, xml.sax.handler.ContentHandler, xml
 		
 	def skippedEntity (self, name):
 		self.log.info ("Recieved skipped entity: %s" % name)
-		self.characters( unichr (sgmlentitynames.htmlNameToUnicodeNumber.get (name, 65533)))
+		self.characters( unichr (simpletal.sgmlentitynames.htmlNameToUnicodeNumber.get (name, 65533)))
 		
 	def characters (self, data):
 		#self.log.debug ("Recieved Real Data: " + data)
@@ -1493,9 +1500,11 @@ def compileHTMLTemplate (template, inputEncoding="ISO-8859-1", minimizeBooleanAt
 			To use the resulting template object call:
 				template.expand (context, outputFile)
 	"""
-	if (isinstance (template, str) or isinstance (template, unicode)):
+	if isinstance (template, unicode):
 		# It's a string!
 		templateFile = io.StringIO (template)
+	elif isinstance (template, str):
+                templateFile = io.BytesIO (template)
 	else:
 		templateFile = template
 	compiler = HTMLTemplateCompiler()
@@ -1507,9 +1516,12 @@ def compileXMLTemplate (template):
 			To use the resulting template object call:
 				template.expand (context, outputFile)
 	"""
-	if (isinstance (template, str)):
+	if isinstance (template, unicode):
 		# It's a string!
 		templateFile = io.StringIO (template)
+	elif (isinstance (template, str)):
+		# It's a string!
+		templateFile = io.BytesIO (template)
 	else:
 		templateFile = template
 	compiler = XMLTemplateCompiler()

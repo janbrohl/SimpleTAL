@@ -36,12 +36,12 @@
 """
 
 try:
-	import html
+	import html.parser as HTMLParser
 except ImportError:
-	import HTMLParser as html
+	import HTMLParser
 
 
-class HTMLParser (html.HTMLParser):
+class HTMLParser (HTMLParser.HTMLParser):
 	def unescape(self, s):
 		# Just return the data - we don't partially unescaped data!
 		return s

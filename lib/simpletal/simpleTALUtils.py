@@ -35,11 +35,11 @@
 		Module Dependencies: None
 """
 
+from __future__ import absolute_import
+
 import os, stat, threading, sys, codecs, cgi, re
-try:
-	import io
-except ImportError:
-	import StringIO as io
+
+import io
 import simpletal.simpleTAL
 
 
@@ -119,7 +119,7 @@ class TemplateCache:
 			tempFile.close()
 			self.templateCache [name] = (template, os.stat (name)[stat.ST_MTIME])
 			self.misses += 1
-		except Exception, e:
+		except Exception as e:
 			self.cacheLock.release()
 			raise e
 			
