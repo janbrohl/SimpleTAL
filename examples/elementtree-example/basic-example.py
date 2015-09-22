@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: iso-8859-1 -*-
 """ Example TAL program
 
 		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)

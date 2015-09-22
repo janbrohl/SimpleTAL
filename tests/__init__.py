@@ -1,3 +1,4 @@
+# -*- coding: iso-8859-1 -*-
 import unittest
 
 def load_tests(loader, tests, pattern):

@@ -1,3 +1,4 @@
+# -*- coding: iso-8859-1 -*-
 """ Fixed up HTMLParser
 
 		Copyright (c) 2005 Colin Stewart (http://www.owlfish.com/)

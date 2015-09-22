@@ -1,3 +1,4 @@
+# -*- coding: iso-8859-1 -*-
 """ simpleTALES Implementation
 
 		Copyright (c) 2005 Colin Stewart (http://www.owlfish.com/)

@@ -1,3 +1,4 @@
+# -*- coding: iso-8859-1 -*-
 """ ElementTree integration for SimpleTAL 
 
 		Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
