@@ -32,10 +32,7 @@
 """
 
 import unittest, os
-try:
-	import io
-except ImportError:
-	import StringIO as io
+import StringIO
 import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
@@ -58,7 +55,7 @@ class DefineSlotsTests (unittest.TestCase):
 		pageTemplate = simpleTAL.compileHTMLTemplate (page)
 		self.context.addGlobal ("site", macroTemplate)
 		self.context.addGlobal ("here", pageTemplate)
-		file = io.StringIO ()
+		file = StringIO.StringIO ()
 		pageTemplate.expand (self.context, file)
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in macro: %s \npage: %s\ngot back %s \nexpected %s\n" % (errMsg, macros, page, realResult, result))

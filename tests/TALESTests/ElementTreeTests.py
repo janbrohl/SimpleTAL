@@ -32,10 +32,7 @@
 """
 
 import unittest, os
-try:
-	import io
-except ImportError:
-	import StringIO as io
+import StringIO
 import logging, logging.config
 
 try:
@@ -78,11 +75,11 @@ class ElementTreeTestCases (unittest.TestCase):
 		self.context.addGlobal ('data', {'one': 1, 'zero': 0})
 		
 		testXML = '<?xml version="1.0" encoding="utf-8"?><root><title type="Example">This is a test</title></root>'
-		xmlTree = simpleElementTree.parseFile (io.StringIO (testXML))
+		xmlTree = simpleElementTree.parseFile (StringIO.StringIO (testXML))
 		self.context.addGlobal ("xml", xmlTree)
 		
 		template = simpleTAL.compileHTMLTemplate (txt)
-		file = io.StringIO ()
+		file = StringIO.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))

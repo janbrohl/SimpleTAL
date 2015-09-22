@@ -32,10 +32,7 @@
 """
 
 import unittest, os
-try:
-	import io
-except ImportError:
-	import StringIO as io
+import StringIO
 import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
@@ -71,7 +68,7 @@ class PythonPathTests (unittest.TestCase):
 		self.context.addGlobal ('data', {'one': 1, 'zero': 0})
 		
 		template = simpleTAL.compileHTMLTemplate (txt)
-		file = io.StringIO ()
+		file = StringIO.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))

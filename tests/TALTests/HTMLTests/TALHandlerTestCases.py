@@ -32,10 +32,7 @@
 """
 
 import unittest, os
-try:
-	import io
-except ImportError:
-	import StringIO as io
+import StringIO
 import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
@@ -55,7 +52,7 @@ class TALHandlerTestCases (unittest.TestCase):
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileHTMLTemplate (txt)
-		file = io.StringIO ()
+		file = StringIO.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
@@ -84,7 +81,7 @@ class TALHandlerTestCases (unittest.TestCase):
 	def testUnbalancedCloseTag (self):
 		try:
 			template = simpleTAL.compileHTMLTemplate ("<p>Hello</b> World</p>")
-			file = io.StringIO ()
+			file = StringIO.StringIO ()
 			template.expand (self.context, file)
 			realResult = file.getvalue()
 			self.fail ("No exception raised during parsing of unbalanced tag.")

@@ -32,10 +32,7 @@
 """
 
 import unittest, os, codecs
-try:
-	import io
-except ImportError:
-	import StringIO as io
+import StringIO
 import logging, logging.config
 
 from simpletal import simpleTALUtils, simpleTALES, simpleTAL

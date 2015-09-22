@@ -67,7 +67,7 @@ class TALEncodingTestCases (unittest.TestCase):
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileHTMLTemplate (txt)
-		file = io.StringIO ()
+		file = StringIO.StringIO ()
 		template.expand (self.context, file)
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
@@ -75,7 +75,7 @@ class TALEncodingTestCases (unittest.TestCase):
 	def testISOToUTF8 (self):
 		utf8Pound = "\xc2\xa3"
 		template = simpleTAL.compileHTMLTemplate ('<html>£3.12?  <b tal:replace="HighBC"></b></html>', 'iso-8859-1')
-		file = io.StringIO()
+		file = StringIO.StringIO()
 		template.expand (self.context, file, 'utf-8')
 		result = file.getvalue()
 		expectedResult = "<html>" + utf8Pound + "3.12?  This cost nothing, yep " + utf8Pound + "0!</html>"
@@ -83,7 +83,7 @@ class TALEncodingTestCases (unittest.TestCase):
 		
 	def testISOToISO (self):
 		template = simpleTAL.compileHTMLTemplate ('<html>£3.12?  <b tal:replace="HighBC"></b></html>', 'iso-8859-1')
-		file = io.StringIO()
+		file = StringIO.StringIO()
 		template.expand (self.context, file, 'iso-8859-1')
 		result = file.getvalue()
 		expectedResult = "<html>£3.12?  This cost nothing, yep £0!</html>"
@@ -91,7 +91,7 @@ class TALEncodingTestCases (unittest.TestCase):
 	
 	def testUTF8ToISO (self):
 		template = simpleTAL.compileHTMLTemplate ('<html>\xc2\xa33.12?  <b tal:replace="HighBC"></b></html>', 'utf-8')
-		file = io.StringIO()
+		file = StringIO.StringIO()
 		template.expand (self.context, file, 'iso-8859-1')
 		result = file.getvalue()
 		expectedResult = "<html>£3.12?  This cost nothing, yep £0!</html>"
@@ -101,7 +101,7 @@ class TALEncodingTestCases (unittest.TestCase):
 		if (oldPython):
 			return
 		template = simpleTAL.compileHTMLTemplate ('<html tal:content="inheritance"></html>', 'utf-8')
-		file = io.StringIO()
+		file = StringIO.StringIO()
 		template.expand (self.context, file, 'utf-8')
 		result = file.getvalue()
 		expectedResult = u"<html>\u2018subclass\u2019</html>".encode('utf-8')
@@ -109,7 +109,7 @@ class TALEncodingTestCases (unittest.TestCase):
 	
 #	def testBadAscii (self):
 #		template = simpleTAL.compileHTMLTemplate ('<html><p tal:replace="badascii"></p></html>')
-#		file = io.StringIO()
+#		file = StringIO.StringIO()
 #		template.expand (self.context, file, 'iso-8859-1')
 #		result = file.getvalue()
 #		expectedResult = "<html>£3.12?  This cost nothing, yep £0!</html>"

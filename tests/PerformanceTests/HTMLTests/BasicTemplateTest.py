@@ -122,7 +122,7 @@ context.addGlobal ("title", "Performance testing!")
 context.addGlobal ("myList", ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight"])
 
 def NGTemplates (count):
-	tempFile = io.StringIO (performanceTemplate)
+	tempFile = StringIO.StringIO (performanceTemplate)
 	compiler = simpleTAL.HTMLTemplateCompiler()
 	compiler.parseTemplate (tempFile)
 	template = compiler.getTemplate()
@@ -138,7 +138,7 @@ def NGTemplateOverhead (count):
 	file = simpleTALUtils.FastStringOutput()
 	start = time.clock()
 	for attempt in xrange (count):
-		tempFile = io.StringIO (performanceTemplate)
+		tempFile = StringIO.StringIO (performanceTemplate)
 		compiler = simpleTAL.HTMLTemplateCompiler()
 		compiler.parseTemplate (tempFile)
 		template = compiler.getTemplate()

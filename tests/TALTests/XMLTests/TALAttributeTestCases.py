@@ -32,10 +32,7 @@
 """
 
 import unittest, os
-try:
-	import io
-except ImportError:
-	import StringIO as io
+import StringIO
 import logging, logging.config
 
 from simpletal import simpleTAL, simpleTALES
@@ -112,7 +109,7 @@ CHECKSUMPARSER.setDTDHandler (CHECKSUMHANDLER)
 CHECKSUMPARSER.setErrorHandler (CHECKSUMHANDLER)
 
 def getXMLChecksum (doc):
-	CHECKSUMPARSER.parse (io.StringIO (doc))
+	CHECKSUMPARSER.parse (StringIO.StringIO (doc))
 	return CHECKSUMHANDLER.getDigest()
 	
 class TALAttributesTestCases (unittest.TestCase):
@@ -126,7 +123,7 @@ class TALAttributesTestCases (unittest.TestCase):
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileXMLTemplate (txt)
-		file = io.StringIO ()
+		file = StringIO.StringIO ()
 		template.expand (self.context, file, outputEncoding="iso-8859-1")
 		realResult = file.getvalue()
 		try:

@@ -32,10 +32,7 @@
 """
 
 import unittest, os, sys
-try:
-	import io
-except ImportError:
-	import StringIO as io
+import StringIO
 import logging, logging.config
 import xml.sax, xml.sax.handler
 from hashlib import md5
@@ -133,7 +130,7 @@ if use_lexical_handler:
     CHECKSUMPARSER.setProperty(xml.sax.handler.property_lexical_handler, CHECKSUMHANDLER) 
 
 def getXMLChecksum (doc):
-	CHECKSUMPARSER.parse (io.StringIO (doc))
+	CHECKSUMPARSER.parse (StringIO.StringIO (doc))
 	return CHECKSUMHANDLER.getDigest()
 
 class TALHandlerTestCases (unittest.TestCase):
@@ -146,7 +143,7 @@ class TALHandlerTestCases (unittest.TestCase):
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileXMLTemplate (txt)
-		fh = io.StringIO ()
+		fh = StringIO.StringIO ()
 		template.expand (self.context, fh, outputEncoding="iso-8859-1")
 		realResult = fh.getvalue()
 		expectedChecksum = getXMLChecksum (result)
@@ -205,7 +202,7 @@ class TALHandlerTestCases (unittest.TestCase):
 	def testDocumentTypeDeclaration (self):
 		txt = """<?xml version="1.0" encoding="iso-8859-1"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n<html><p>Test</p></html>"""
 		template = simpleTAL.compileXMLTemplate (txt)
-		fh = io.StringIO ()
+		fh = StringIO.StringIO ()
 		template.expand (self.context, fh, docType="""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3c.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">""", outputEncoding="iso-8859-1")
 		realResult = fh.getvalue()
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3c.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n<html><p>Test</p></html>"""
@@ -214,7 +211,7 @@ class TALHandlerTestCases (unittest.TestCase):
 	def testXMLDeclarationSuppressionWithDocType (self):
 		txt = """<?xml version="1.0" encoding="iso-8859-1"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n<html><p>Test</p></html>"""
 		template = simpleTAL.compileXMLTemplate (txt)
-		fh = io.StringIO ()
+		fh = StringIO.StringIO ()
 		template.expand (self.context, fh, docType="""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3c.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">""", suppressXMLDeclaration=1)
 		realResult = fh.getvalue()
 		expectedResult = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3c.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n<html><p>Test</p></html>"""
@@ -223,7 +220,7 @@ class TALHandlerTestCases (unittest.TestCase):
 	def testNBSPparsing (self):
 		txt = """<?xml version="1.0" encoding="iso-8859-1"?>\n<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n<html><p>Test&nbsp;Space</p></html>"""
 		template = simpleTAL.compileXMLTemplate (txt)
-		fh = io.StringIO ()
+		fh = StringIO.StringIO ()
 		if use_lexical_handler:
 		    template.expand (self.context, fh)
 		else:
@@ -235,7 +232,7 @@ class TALHandlerTestCases (unittest.TestCase):
 	def testXMLDeclarationSuppressionWithNoDocType (self):
 		txt = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p>Test</p></html>"""
 		template = simpleTAL.compileXMLTemplate (txt)
-		fh = io.StringIO ()
+		fh = StringIO.StringIO ()
 		template.expand (self.context, fh, suppressXMLDeclaration=1)
 		realResult = fh.getvalue()
 		expectedResult = """<html><p>Test</p></html>"""

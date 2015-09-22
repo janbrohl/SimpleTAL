@@ -32,10 +32,7 @@
 """
 
 import unittest, os
-try:
-	import io
-except ImportError:
-	import StringIO as io
+import StringIO
 import logging, logging.config
 import xml.sax, xml.sax.handler
 from hashlib import md5
@@ -111,7 +108,7 @@ CHECKSUMPARSER.setDTDHandler (CHECKSUMHANDLER)
 CHECKSUMPARSER.setErrorHandler (CHECKSUMHANDLER)
 
 def getXMLChecksum (doc):
-	CHECKSUMPARSER.parse (io.StringIO (doc))
+	CHECKSUMPARSER.parse (StringIO.StringIO (doc))
 	return CHECKSUMHANDLER.getDigest()
 
 class TALSingletonTests (unittest.TestCase):
@@ -124,7 +121,7 @@ class TALSingletonTests (unittest.TestCase):
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileXMLTemplate (txt)
-		file = io.StringIO ()
+		file = StringIO.StringIO ()
 		template.expand (self.context, file, outputEncoding="iso-8859-1")
 		realResult = file.getvalue()
 		try:
@@ -144,7 +141,7 @@ class TALSingletonTests (unittest.TestCase):
 		pageTemplate = simpleTAL.compileXMLTemplate (page)
 		self.context.addGlobal ("site", macroTemplate)
 		self.context.addGlobal ("here", pageTemplate)
-		file = io.StringIO ()
+		file = StringIO.StringIO ()
 		pageTemplate.expand (self.context, file)
 		realResult = file.getvalue()
 		try:

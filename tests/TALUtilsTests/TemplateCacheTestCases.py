@@ -34,10 +34,7 @@
 import unittest, os, codecs, os.path, time
 import tempfile
 import shutil
-try:
-	import io
-except ImportError:
-	import StringIO as io
+import StringIO
 import logging, logging.config
 
 from simpletal import simpleTALUtils, simpleTALES, simpleTAL
@@ -99,7 +96,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		
 		# Get the template
 		template = self.cache.getTemplate (name)
-		outputFile = io.StringIO ()
+		outputFile = StringIO.StringIO ()
 		template.expand (self.context, outputFile)
 		expectedResult = """<html><body><h1>Cache Test</h1></body></html>"""
 		self.failUnless (outputFile.getvalue() == expectedResult
@@ -107,7 +104,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		self.failUnless (self.cache.misses == 1, "Cache miss not recorded!")
 		# Get the cached template
 		template = self.cache.getTemplate (name)
-		outputFile = io.StringIO ()
+		outputFile = StringIO.StringIO ()
 		template.expand (self.context, outputFile)
 		expectedResult = """<html><body><h1>Cache Test</h1></body></html>"""
 		self.failUnless (outputFile.getvalue() == expectedResult
@@ -123,7 +120,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		
 		# Get the template
 		template = self.cache.getTemplate (name)
-		outputFile = io.StringIO ()
+		outputFile = StringIO.StringIO ()
 		template.expand (self.context, outputFile)
 		expectedResult = """<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
 		self.failUnless (outputFile.getvalue() == expectedResult
@@ -131,7 +128,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		self.failUnless (self.cache.misses == 2, "Cache miss not recorded!")
 		# Get the cached template
 		template = self.cache.getTemplate (name)
-		outputFile = io.StringIO ()
+		outputFile = StringIO.StringIO ()
 		template.expand (self.context, outputFile)
 		expectedResult = """<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
 		self.failUnless (outputFile.getvalue() == expectedResult
@@ -168,7 +165,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		
 		# Get the template
 		template = self.cache.getTemplate (name)
-		outputFile = io.StringIO ()
+		outputFile = StringIO.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1></body></html>"""
 		self.failUnless (outputFile.getvalue() == expectedResult
@@ -176,7 +173,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		self.failUnless (self.cache.misses == 1, "Cache miss not recorded!")
 		# Get the cached template
 		template = self.cache.getTemplate (name)
-		outputFile = io.StringIO ()
+		outputFile = StringIO.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1></body></html>"""
 		self.failUnless (outputFile.getvalue() == expectedResult
@@ -192,7 +189,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		
 		# Get the template
 		template = self.cache.getTemplate (name)
-		outputFile = io.StringIO ()
+		outputFile = StringIO.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
 		self.failUnless (outputFile.getvalue() == expectedResult
@@ -200,7 +197,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		self.failUnless (self.cache.misses == 2, "Cache miss not recorded!")
 		# Get the cached template
 		template = self.cache.getTemplate (name)
-		outputFile = io.StringIO ()
+		outputFile = StringIO.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
 		self.failUnless (outputFile.getvalue() == expectedResult
@@ -222,7 +219,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		
 		# Get the template
 		template = self.cache.getXMLTemplate (name)
-		outputFile = io.StringIO ()
+		outputFile = StringIO.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1></body></html>"""
 		self.failUnless (outputFile.getvalue() == expectedResult
@@ -230,7 +227,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		self.failUnless (self.cache.misses == 1, "Cache miss not recorded!")
 		# Get the cached template
 		template = self.cache.getXMLTemplate (name)
-		outputFile = io.StringIO ()
+		outputFile = StringIO.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1></body></html>"""
 		self.failUnless (outputFile.getvalue() == expectedResult
@@ -246,7 +243,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		
 		# Get the template
 		template = self.cache.getXMLTemplate (name)
-		outputFile = io.StringIO ()
+		outputFile = StringIO.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
 		self.failUnless (outputFile.getvalue() == expectedResult
@@ -254,7 +251,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		self.failUnless (self.cache.misses == 2, "Cache miss not recorded!")
 		# Get the cached template
 		template = self.cache.getXMLTemplate (name)
-		outputFile = io.StringIO ()
+		outputFile = StringIO.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
 		self.failUnless (outputFile.getvalue() == expectedResult
