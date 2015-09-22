@@ -13,7 +13,7 @@ found test suites into one big test suite and run them all at once.
 * Modified to use os.path.walk to find all the test scripts
 * Modified to find all python scripts, not just ones of the form *test.py
 """
-import sys, os, re, unittest, imp
+import sys, os, re, unittest
 
 # If logging is available, suppress it to avoid confusion.
 try:
@@ -27,34 +27,8 @@ except:
 #or else we would be testing the system one and not the one with the changes :)
 import sys
 sys.path.insert(0, os.path.join(os.getcwd(),'lib'))
-print "System path is: " + str (sys.path)
-def path_vistor(files, dirname, names):
-	"""Visits each file in the and appends the filename to the given list"""
-	if (dirname.find ("PerformanceTests") > 0):
-		return
-	for name in names:
-		files.append(os.path.join(dirname, name))
+print ("System path is: " + str (sys.path))
 
-def regressionTest():
-	#Find all the files to run
-	files = []
-	os.path.walk("tests", path_vistor, files)					
-	test = re.compile(".*\.py$", re.IGNORECASE)
-	files = filter(test.search, files)
-	
-	#load each test into the testsuite	 
-	modules = []
-	modCount = 1
-	for filename in files:
-		modules.append (imp.load_source ("TestModule%s" % str (modCount), filename))
-		modCount += 1
-	#modules = map(__import__, moduleNames)
-	load = unittest.defaultTestLoader.loadTestsFromModule
-	suite = []
-	for module in modules:
-		suite.append (load (module))
-	return unittest.TestSuite (suite)
-	#return unittest.TestSuite(map(load, modules))
+suite=unittest.defaultTestLoader.loadTestsFromName("tests")
+unittest.TextTestRunner().run(suite)
 
-if __name__ == "__main__":
-	unittest.main(defaultTest="regressionTest")
