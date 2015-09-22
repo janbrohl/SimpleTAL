@@ -33,16 +33,14 @@
 		Module Dependencies: logging
 """
 
-import types, sys
+import sys
 
 try:
 	import logging
-except:
-	import DummyLogger as logging
+except ImportError:
+	import simpletal.DummyLogger as logging
 	
-import simpletal, simpleTAL
 
-__version__ = simpletal.__version__
 
 DEFAULTVALUE = "This represents a Default value."
 
@@ -191,7 +189,7 @@ class IteratorRepeatVariable (RepeatVariable):
 			self.iterStatus = 1
 			try:
 				self.curValue = self.sequence.next()
-			except StopIteration as e:
+			except StopIteration, e:
 				self.iterStatus = 2
 				raise IndexError ("Repeat Finished")
 		return self.curValue
@@ -201,7 +199,7 @@ class IteratorRepeatVariable (RepeatVariable):
 		self.position += 1
 		try:
 			self.curValue = self.sequence.next()
-		except StopIteration as e:
+		except StopIteration, e:
 			self.iterStatus = 2
 			raise IndexError ("Repeat Finished")
 			
@@ -362,7 +360,7 @@ class Context:
 			else:
 				# Not specified - so it's a path
 				return self.evaluatePath (expr)
-		except PathNotFoundException as e:
+		except PathNotFoundException, e:
 			if (suppressException):
 				return None
 			raise e
@@ -393,7 +391,7 @@ class Context:
 			if (isinstance (result, ContextVariable)):
 				return result.value()
 			return result
-		except Exception as e:
+		except Exception, e:
 			# An exception occured evaluating the template, return the exception as text
 			self.log.warn ("Exception occurred evaluating python path, exception: " + str (e))
 			return "Exception: %s" % str (e)
@@ -406,7 +404,7 @@ class Context:
 				# Evaluate this path
 				try:
 					return self.evaluate (path.strip ())
-				except PathNotFoundException as e:
+				except PathNotFoundException, e:
 					# Path didn't exist, try the next one
 					pass
 			# No paths evaluated - raise exception.
@@ -424,7 +422,7 @@ class Context:
 		try:
 			result = self.traversePath (allPaths[0], canCall = 0)
 			return self.true
-		except PathNotFoundException as e:
+		except PathNotFoundException, e:
 			# Look at the rest of the paths.
 			pass
 			
@@ -435,7 +433,7 @@ class Context:
 				# If this is part of a "exists: path1 | exists: path2" path then we need to look at the actual result.
 				if (pathResult):
 					return self.true
-			except PathNotFoundException as e:
+			except PathNotFoundException, e:
 				pass
 		# If we get this far then there are *no* paths that exist.
 		return self.false
@@ -446,7 +444,7 @@ class Context:
 		# The first path is for us
 		try:
 			return self.traversePath (allPaths[0], canCall = 0)
-		except PathNotFoundException as e:
+		except PathNotFoundException, e:
 			# Try the rest of the paths.
 			pass
 			
@@ -454,7 +452,7 @@ class Context:
 			# Evaluate this path
 			try:
 				return self.evaluate (path.strip ())
-			except PathNotFoundException as e:
+			except PathNotFoundException, e:
 				pass
 		# No path evaluated - raise error
 		raise PATHNOTFOUNDEXCEPTION
@@ -465,7 +463,7 @@ class Context:
 		# Evaluate what I was passed
 		try:
 			pathResult = self.evaluate (expr)
-		except PathNotFoundException as e:
+		except PathNotFoundException, e:
 			# In SimpleTAL the result of "not: no/such/path" should be TRUE not FALSE.
 			return self.true
 			
@@ -510,11 +508,11 @@ class Context:
 								# Evaluate the path - missing paths raise exceptions as normal.
 								try:
 									pathResult = self.evaluate (path)
-								except PathNotFoundException as e:
+								except PathNotFoundException, e:
 									# This part of the path didn't evaluate to anything - leave blank
 									pathResult = u''
 								if (pathResult is not None):
-									if (isinstance (pathResult, types.UnicodeType)):
+									if (isinstance (pathResult, unicode)):
 										result += pathResult
 									else:
 										# THIS IS NOT A BUG!
@@ -530,18 +528,18 @@ class Context:
 							# Evaluate the variable - missing paths raise exceptions as normal.
 							try:
 								pathResult = self.traversePath (path)
-							except PathNotFoundException as e:
+							except PathNotFoundException, e:
 								# This part of the path didn't evaluate to anything - leave blank
 								pathResult = u''
 							if (pathResult is not None):
-								if (isinstance (pathResult, types.UnicodeType)):
+								if (isinstance (pathResult, unicode)):
 										result += pathResult
 								else:
 									# THIS IS NOT A BUG!
 									# Use Unicode in Context if you aren't using Ascii!
 									result += unicode (pathResult)
 							skipCount = endPos - position - 1
-					except IndexError as e:
+					except IndexError, e:
 						# Trailing $ sign - just suppress it
 						self.log.warn ("Trailing $ detected")
 						pass
@@ -599,7 +597,7 @@ class Context:
 				if (isinstance (val, ContextVariable)): temp = val.value((index,pathList))
 				elif (callable (val)):temp = val()
 				else: temp = val
-			except ContextVariable as e:
+			except ContextVariable, e:
 				# Fast path for those functions that return values
 				return e.value()
 				
@@ -621,7 +619,7 @@ class Context:
 				if (isinstance (val, ContextVariable)): result = val.value((index,pathList))
 				elif (callable (val)):result = val()
 				else: result = val
-			except ContextVariable as e:
+			except ContextVariable, e:
 				# Fast path for those functions that return values
 				return e.value()
 		else:

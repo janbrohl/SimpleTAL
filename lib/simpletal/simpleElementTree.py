@@ -41,7 +41,7 @@
 """
 
 from elementtree import ElementTree
-import simpleTALES
+import simpletal.SimpleTALES
 
 class SimpleElementTreeVar (ElementTree._ElementInterface, simpleTALES.ContextVariable):
 	def __init__(self, tag, attrib):

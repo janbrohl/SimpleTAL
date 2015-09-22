@@ -34,10 +34,9 @@
 		Module Dependencies: None
 """
 
-import StringIO, os, stat, threading, sys, codecs, cgi, re, types
-import simpletal, simpleTAL
+import StringIO, os, stat, threading, sys, codecs, cgi, re
+import simpletal.simpleTAL
 
-__version__ = simpletal.__version__
 
 # This is used to check for already escaped attributes.
 ESCAPED_TEXT_REGEX=re.compile (r"\&\S+?;")
@@ -103,19 +102,19 @@ class TemplateCache:
 			tempFile = open (name, 'r')
 			if (xmlTemplate):
 				# We know it is XML
-				template = simpleTAL.compileXMLTemplate (tempFile)
+				template = simpletal.simpleTAL.compileXMLTemplate (tempFile)
 			else:
 				# We have to guess...
 				firstline = tempFile.readline()
 				tempFile.seek(0)
 				if (name [-3:] == "xml") or (firstline.strip ()[:5] == '<?xml') or (firstline [:9] == '<!DOCTYPE' and firstline.find('XHTML') != -1):
-					template = simpleTAL.compileXMLTemplate (tempFile)
+					template = simpletal.simpleTAL.compileXMLTemplate (tempFile)
 				else:
-					template = simpleTAL.compileHTMLTemplate (tempFile, inputEncoding)
+					template = simpletal.simpleTAL.compileHTMLTemplate (tempFile, inputEncoding)
 			tempFile.close()
 			self.templateCache [name] = (template, os.stat (name)[stat.ST_MTIME])
 			self.misses += 1
-		except Exception as e:
+		except Exception, e:
 			self.cacheLock.release()
 			raise e
 			
@@ -133,24 +132,24 @@ def tagAsText (tag,atts):
 	result += ">"
 	return result
 
-class MacroExpansionInterpreter (simpleTAL.TemplateInterpreter):
+class MacroExpansionInterpreter (simpletal.simpleTAL.TemplateInterpreter):
 	def __init__ (self):
-		simpleTAL.TemplateInterpreter.__init__ (self)
+		simpletal.simpleTAL.TemplateInterpreter.__init__ (self)
 		# Override the standard interpreter way of doing things.
 		self.macroStateStack = []
-		self.commandHandler [simpleTAL.TAL_DEFINE] = self.cmdNoOp
-		self.commandHandler [simpleTAL.TAL_CONDITION] = self.cmdNoOp
-		self.commandHandler [simpleTAL.TAL_REPEAT] = self.cmdNoOp
-		self.commandHandler [simpleTAL.TAL_CONTENT] = self.cmdNoOp
-		self.commandHandler [simpleTAL.TAL_ATTRIBUTES] = self.cmdNoOp
-		self.commandHandler [simpleTAL.TAL_OMITTAG] = self.cmdNoOp
-		self.commandHandler [simpleTAL.TAL_START_SCOPE] = self.cmdStartScope
-		self.commandHandler [simpleTAL.TAL_OUTPUT] = self.cmdOutput
-		self.commandHandler [simpleTAL.TAL_STARTTAG] = self.cmdOutputStartTag
-		self.commandHandler [simpleTAL.TAL_ENDTAG_ENDSCOPE] = self.cmdEndTagEndScope
-		self.commandHandler [simpleTAL.METAL_USE_MACRO] = self.cmdUseMacro
-		self.commandHandler [simpleTAL.METAL_DEFINE_SLOT] = self.cmdDefineSlot
-		self.commandHandler [simpleTAL.TAL_NOOP] = self.cmdNoOp
+		self.commandHandler [simpletal.simpleTAL.TAL_DEFINE] = self.cmdNoOp
+		self.commandHandler [simpletal.simpleTAL.TAL_CONDITION] = self.cmdNoOp
+		self.commandHandler [simpletal.simpleTAL.TAL_REPEAT] = self.cmdNoOp
+		self.commandHandler [simpletal.simpleTAL.TAL_CONTENT] = self.cmdNoOp
+		self.commandHandler [simpletal.simpleTAL.TAL_ATTRIBUTES] = self.cmdNoOp
+		self.commandHandler [simpletal.simpleTAL.TAL_OMITTAG] = self.cmdNoOp
+		self.commandHandler [simpletal.simpleTAL.TAL_START_SCOPE] = self.cmdStartScope
+		self.commandHandler [simpletal.simpleTAL.TAL_OUTPUT] = self.cmdOutput
+		self.commandHandler [simpletal.simpleTAL.TAL_STARTTAG] = self.cmdOutputStartTag
+		self.commandHandler [simpletal.simpleTAL.TAL_ENDTAG_ENDSCOPE] = self.cmdEndTagEndScope
+		self.commandHandler [simpletal.simpleTAL.METAL_USE_MACRO] = self.cmdUseMacro
+		self.commandHandler [simpletal.simpleTAL.METAL_DEFINE_SLOT] = self.cmdDefineSlot
+		self.commandHandler [simpletal.simpleTAL.TAL_NOOP] = self.cmdNoOp
 		
 		self.inMacro = None
 		self.macroArg = None
@@ -159,11 +158,11 @@ class MacroExpansionInterpreter (simpleTAL.TemplateInterpreter):
 		
 	def popProgram (self):
 		self.inMacro = self.macroStateStack.pop()
-		simpleTAL.TemplateInterpreter.popProgram (self)
+		simpletal.simpleTAL.TemplateInterpreter.popProgram (self)
 		
 	def pushProgram (self):
 		self.macroStateStack.append (self.inMacro)
-		simpleTAL.TemplateInterpreter.pushProgram (self)
+		simpletal.simpleTAL.TemplateInterpreter.pushProgram (self)
 		
 	def cmdOutputStartTag (self, command, args):
 		newAtts = []
@@ -176,10 +175,10 @@ class MacroExpansionInterpreter (simpleTAL.TemplateInterpreter):
 				newAtts.append ((att, value))
 		self.macroArg = None
 		self.currentAttributes = newAtts
-		simpleTAL.TemplateInterpreter.cmdOutputStartTag (self, command, args)
+		simpletal.simpleTAL.TemplateInterpreter.cmdOutputStartTag (self, command, args)
 		
 	def cmdUseMacro (self, command, args):
-		simpleTAL.TemplateInterpreter.cmdUseMacro (self, command, args)
+		simpletal.simpleTAL.TemplateInterpreter.cmdUseMacro (self, command, args)
 		if (self.tagContent is not None):
 			# We have a macro, add the args to the in-macro list
 			self.inMacro = 1
@@ -190,7 +189,7 @@ class MacroExpansionInterpreter (simpleTAL.TemplateInterpreter):
 		if (self.tagContent is not None):
 			contentType, resultVal = self.tagContent
 			if (contentType):
-				if (isinstance (resultVal, simpleTAL.Template)):
+				if (isinstance (resultVal, simpletal.simpleTAL.Template)):
 					# We have another template in the context, evaluate it!
 					# Save our state!
 					self.pushProgram()
@@ -202,16 +201,16 @@ class MacroExpansionInterpreter (simpleTAL.TemplateInterpreter):
 					# End of the macro
 					self.inMacro = 0
 				else:
-					if (isinstance (resultVal, types.UnicodeType)):
+					if (isinstance (resultVal, unicode)):
 						self.file.write (resultVal)
-					elif (isinstance (resultVal, types.StringType)):
+					elif (isinstance (resultVal, str)):
 						self.file.write (unicode (resultVal, 'ascii'))
 					else:
 						self.file.write (unicode (str (resultVal), 'ascii'))
 			else:
-				if (isinstance (resultVal, types.UnicodeType)):
+				if (isinstance (resultVal, unicode)):
 					self.file.write (cgi.escape (resultVal))
-				elif (isinstance (resultVal, types.StringType)):
+				elif (isinstance (resultVal, str)):
 					self.file.write (cgi.escape (unicode (resultVal, 'ascii')))
 				else:
 					self.file.write (cgi.escape (unicode (str (resultVal), 'ascii')))

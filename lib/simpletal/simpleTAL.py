@@ -36,14 +36,14 @@
 
 try:
 	import logging
-except:
-	import DummyLogger as logging
+except ImportError:
+	import simpletal.DummyLogger as logging
 	
-import xml.sax, cgi, StringIO, codecs, re, sgmlentitynames, types
-import simpletal, copy, sys
-import FixedHTMLParser
+import xml.sax, cgi, StringIO, codecs, re, sgmlentitynames
+import copy, sys
+import simpletal.FixedHTMLParser
 
-__version__ = simpletal.__version__
+
 
 try:
     # Is PyXML's LexicalHandler available? 
@@ -378,9 +378,9 @@ class TemplateInterpreter:
 			elif (not resultVal == simpleTALES.DEFAULTVALUE):
 				# We have a value - let's use it!
 				attsToRemove [attName]=1
-				if (isinstance (resultVal, types.UnicodeType)):
+				if (isinstance (resultVal, unicode)):
 					escapedAttVal = resultVal
-				elif (isinstance (resultVal, types.StringType)):
+				elif (isinstance (resultVal, str)):
 					# THIS IS NOT A BUG!
 					# Use Unicode in the Context object if you are not using Ascii
 					escapedAttVal = unicode (resultVal, 'ascii')
@@ -437,9 +437,9 @@ class TemplateInterpreter:
 					# End of the macro expansion (if any) so clear the parameters
 					self.slotParameters = {}
 				else:
-					if (isinstance (resultVal, types.UnicodeType)):
+					if (isinstance (resultVal, unicode)):
 						self.file.write (resultVal)
-					elif (isinstance (resultVal, types.StringType)):
+					elif (isinstance (resultVal, str)):
 						# THIS IS NOT A BUG!
 						# Use Unicode in the Context object if you are not using Ascii
 						self.file.write (unicode (resultVal, 'ascii'))
@@ -448,9 +448,9 @@ class TemplateInterpreter:
 						# Use Unicode in the Context object if you are not using Ascii
 						self.file.write (unicode (resultVal))
 			else:
-				if (isinstance (resultVal, types.UnicodeType)):
+				if (isinstance (resultVal, unicode)):
 					self.file.write (cgi.escape (resultVal))
-				elif (isinstance (resultVal, types.StringType)):
+				elif (isinstance (resultVal, str)):
 					# THIS IS NOT A BUG!
 					# Use Unicode in the Context object if you are not using Ascii
 					self.file.write (cgi.escape (unicode (resultVal, 'ascii')))
@@ -1271,10 +1271,10 @@ class TemplateParseException (Exception):
 		return "[" + self.location + "] " + self.errorDescription
 
 
-class HTMLTemplateCompiler (TemplateCompiler, FixedHTMLParser.HTMLParser):
+class HTMLTemplateCompiler (TemplateCompiler, simpletal.FixedHTMLParser.HTMLParser):
 	def __init__ (self):
 		TemplateCompiler.__init__ (self)
-		FixedHTMLParser.HTMLParser.__init__ (self)
+		simpletal.FixedHTMLParser.HTMLParser.__init__ (self)
 		self.log = logging.getLogger ("simpleTAL.HTMLTemplateCompiler")
 		
 	def parseTemplate (self, file, encoding="iso-8859-1", minimizeBooleanAtts = 0):
@@ -1487,7 +1487,7 @@ def compileHTMLTemplate (template, inputEncoding="ISO-8859-1", minimizeBooleanAt
 			To use the resulting template object call:
 				template.expand (context, outputFile)
 	"""
-	if (isinstance (template, types.StringType) or isinstance (template, types.UnicodeType)):
+	if (isinstance (template, str) or isinstance (template, unicode)):
 		# It's a string!
 		templateFile = StringIO.StringIO (template)
 	else:
@@ -1501,7 +1501,7 @@ def compileXMLTemplate (template):
 			To use the resulting template object call:
 				template.expand (context, outputFile)
 	"""
-	if (isinstance (template, types.StringType)):
+	if (isinstance (template, str)):
 		# It's a string!
 		templateFile = StringIO.StringIO (template)
 	else:
