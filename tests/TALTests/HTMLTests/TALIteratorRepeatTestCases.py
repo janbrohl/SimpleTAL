@@ -51,6 +51,9 @@ class ActualIter:
 	def __init__ (self, size):
 		self.size = size
 		self.cur = 0
+
+	def __iter__ (self):
+                return self
 		
 	def next (self):
 		if (self.cur == self.size):

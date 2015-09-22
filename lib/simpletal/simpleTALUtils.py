@@ -34,7 +34,11 @@
 		Module Dependencies: None
 """
 
-import StringIO, os, stat, threading, sys, codecs, cgi, re
+import os, stat, threading, sys, codecs, cgi, re
+try:
+        import io
+except ImportError:
+        import StringIO as io
 import simpletal.simpleTAL
 
 
@@ -229,7 +233,7 @@ class MacroExpansionInterpreter (simpletal.simpleTAL.TemplateInterpreter):
 		self.programCounter += 1
 			
 def ExpandMacros (context, template, outputEncoding="ISO-8859-1"):
-	out = StringIO.StringIO()
+	out = io.StringIO()
 	interp = MacroExpansionInterpreter()
 	interp.initialise (context, out)
 	template.expand (context, out, outputEncoding=outputEncoding, interpreter=interp)

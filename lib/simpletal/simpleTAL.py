@@ -39,10 +39,15 @@ try:
 except ImportError:
 	import simpletal.DummyLogger as logging
 	
-import xml.sax, cgi, StringIO, codecs, re, sgmlentitynames
+import xml.sax, cgi, codecs, re, sgmlentitynames
 import copy, sys
 import simpletal.FixedHTMLParser
 
+try:
+        import io
+except ImportError:
+        import StringIO as io
+        
 
 
 try:
@@ -308,18 +313,18 @@ class TemplateInterpreter:
 				return
 		except:
 			# Not a natural sequence, can it produce an iterator?
-			if (hasattr (result, "__iter__") and callable (result.__iter__)):
-				# We can get an iterator!
-				self.repeatVariable = simpleTALES.IteratorRepeatVariable (result.__iter__())
-			elif (hasattr (result, "next") and callable (result.next)):
-				# Treat as an iterator
-				self.repeatVariable = simpleTALES.IteratorRepeatVariable (result)
-			else:
-				# Just a plain object, let's not loop
+			try:
+                                it=iter(result)
+                        except TypeError:
+                                # Just a plain object, let's not loop
 				# Delete the tags and their contents
 				self.outputTag = 0
 				self.programCounter = self.symbolTable [args[2]]
 				return
+                        else:
+				# We can get an iterator!
+				self.repeatVariable = simpleTALES.IteratorRepeatVariable (it)
+				
 				
 		try:
 			curValue = self.repeatVariable.getCurrentValue()
@@ -1489,7 +1494,7 @@ def compileHTMLTemplate (template, inputEncoding="ISO-8859-1", minimizeBooleanAt
 	"""
 	if (isinstance (template, str) or isinstance (template, unicode)):
 		# It's a string!
-		templateFile = StringIO.StringIO (template)
+		templateFile = io.StringIO (template)
 	else:
 		templateFile = template
 	compiler = HTMLTemplateCompiler()
@@ -1503,7 +1508,7 @@ def compileXMLTemplate (template):
 	"""
 	if (isinstance (template, str)):
 		# It's a string!
-		templateFile = StringIO.StringIO (template)
+		templateFile = io.StringIO (template)
 	else:
 		templateFile = template
 	compiler = XMLTemplateCompiler()

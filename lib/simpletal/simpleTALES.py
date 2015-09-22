@@ -188,7 +188,7 @@ class IteratorRepeatVariable (RepeatVariable):
 		if (self.iterStatus == 0):
 			self.iterStatus = 1
 			try:
-				self.curValue = self.sequence.next()
+				self.curValue = next(self.sequence)
 			except StopIteration, e:
 				self.iterStatus = 2
 				raise IndexError ("Repeat Finished")
@@ -198,7 +198,7 @@ class IteratorRepeatVariable (RepeatVariable):
 		# Need this for the repeat variable functions.
 		self.position += 1
 		try:
-			self.curValue = self.sequence.next()
+			self.curValue = next(self.sequence)
 		except StopIteration, e:
 			self.iterStatus = 2
 			raise IndexError ("Repeat Finished")

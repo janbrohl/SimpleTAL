@@ -34,10 +34,13 @@
 		Module Dependencies: logging, simpleTALES, simpleTALTemplates
 """
 
-import HTMLParser
+try:
+        import html
+except ImportError:
+        import HTMLParser as html
 
 
-class HTMLParser (HTMLParser.HTMLParser):
+class HTMLParser (html.HTMLParser):
 	def unescape(self, s):
 		# Just return the data - we don't partially unescaped data!
 		return s
