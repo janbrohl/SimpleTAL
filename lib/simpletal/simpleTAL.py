@@ -55,13 +55,13 @@ import io
 
 
 try:
-    # Is PyXML's LexicalHandler available? 
-    from xml.sax.saxlib import LexicalHandler
-    use_lexical_handler = 1
+	# Is PyXML's LexicalHandler available? 
+	from xml.sax.saxlib import LexicalHandler
+	use_lexical_handler = 1
 except ImportError:
-    use_lexical_handler = 0
-    class LexicalHandler:
-	pass
+	use_lexical_handler = 0
+	class LexicalHandler:
+		pass
 
 try:
 	# Is PyXML's DOM2SAX available?
@@ -735,7 +735,7 @@ class XMLTemplate (Template):
 		else:
 			encodingFile = codecs.lookup (outputEncoding)[3](outputFile, 'xmlcharrefreplace')
 		if (not suppressXMLDeclaration):
-                        oel=unicode(outputEncoding).lower()
+			oel=unicode(outputEncoding).lower()
 			if (oel != u"utf-8"):
 				encodingFile.write (u'<?xml version="1.0" encoding="%s"?>\n' % oel)
 			else:
@@ -843,10 +843,10 @@ class TemplateCompiler:
 		""" Used to add a tag to the stack.  Various properties can be passed in the dictionary
 		    as being information required by the tag.
 		    Currently supported properties are:
-		    		'command'	 - The (command,args) tuple associated with this command
-		    		'originalAtts'    - The original attributes that include any metal/tal attributes
-		    		'endTagSymbol'    - The symbol associated with the end tag for this element
-		    		'popFunctionList' - A list of functions to execute when this tag is popped
+				'command'	 - The (command,args) tuple associated with this command
+				'originalAtts'    - The original attributes that include any metal/tal attributes
+				'endTagSymbol'    - The symbol associated with the end tag for this element
+				'popFunctionList' - A list of functions to execute when this tag is popped
 					'singletonTag'    - A boolean to indicate that this is a singleton flag
 		"""
 		# Add the tag to the tagStack (list of tuples (tag, properties, useMacroLocation))
@@ -1505,7 +1505,7 @@ def compileHTMLTemplate (template, inputEncoding="ISO-8859-1", minimizeBooleanAt
 		# It's a string!
 		templateFile = io.StringIO (template)
 	elif isinstance (template, str):
-                templateFile = io.BytesIO (template)
+		templateFile = io.BytesIO (template)
 	else:
 		templateFile = template
 	compiler = HTMLTemplateCompiler()
