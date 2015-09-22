@@ -5,5 +5,5 @@ python:
   - "3.2"
   - "3.3"
   - "3.4"
-install: python setup.py install
-script: runtests.py
+install: true
+script: python runtests.py
