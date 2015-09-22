@@ -30,6 +30,7 @@
 		Unit test cases.
 		
 """
+from __future__ import print_function
 
 import unittest, os, sys
 import StringIO
@@ -88,8 +89,8 @@ class TALIteratorRepeatTestCases (unittest.TestCase):
 		file = StringIO.StringIO ()
 		try:
 			template.expand (self.context, file)
-		except Exception, e:
-			print "Error, template compiled to: " + str (template)
+		except Exception as e:
+			print("Error, template compiled to: " + str (template))
 			raise e
 		realResult = file.getvalue()
 		self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
@@ -132,7 +133,7 @@ class TALIteratorRepeatTestCases (unittest.TestCase):
 #		self._runTest_ ('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/end">Hello</p></html>', "<html><p>0</p><p>1</p></html>", "Repeat of two length actual iterator failed to end.")
 
 	def testLengthAct (self):
-		self._runTest_ ('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/length">Hello</p></html>', "<html><p>%s</p><p>%s</p></html>" % (str (sys.maxint), str (sys.maxint)), "Repeat of two length actual iterator failed to generate length.")
+		self._runTest_ ('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/length">Hello</p></html>', "<html><p>%s</p><p>%s</p></html>" % (str (sys.maxsize), str (sys.maxsize)), "Repeat of two length actual iterator failed to generate length.")
 
 	def testLetterSmallAct (self):
 		self._runTest_ ('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/letter">Hello</p></html>', "<html><p>a</p><p>b</p></html>", "Repeat of two length actual iterator failed to letter.")

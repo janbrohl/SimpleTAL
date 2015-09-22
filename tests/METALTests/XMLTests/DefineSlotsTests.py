@@ -63,7 +63,7 @@ class DefineSlotsTests (unittest.TestCase):
 	def _runCompileTest_ (self, txt, result, errMsg="Error"):
 		try:
 			macroTemplate = simpleTAL.compileXMLTemplate (txt)
-		except simpleTAL.TemplateParseException, e:
+		except simpleTAL.TemplateParseException as e:
 			self.failUnless (str (e) == result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, str(e), result, pageTemplate))
 			return
 		self.fail ("Expected exception '%s' during compile - but got no exception" % result)				

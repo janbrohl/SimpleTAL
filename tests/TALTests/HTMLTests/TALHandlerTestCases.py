@@ -85,7 +85,7 @@ class TALHandlerTestCases (unittest.TestCase):
 			template.expand (self.context, file)
 			realResult = file.getvalue()
 			self.fail ("No exception raised during parsing of unbalanced tag.")
-		except simpleTAL.TemplateParseException, e:
+		except simpleTAL.TemplateParseException as e:
 			pass
     
 	def testEncodedCharsSection (self):

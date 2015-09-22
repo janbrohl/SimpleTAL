@@ -60,7 +60,7 @@ class TALNameSpaceTests (unittest.TestCase):
 	def _runErrTest_ (self, txt, result, errMsg="Error"):
 		try:
 			template = simpleTAL.compileXMLTemplate (txt)
-		except simpleTAL.TemplateParseException, e:
+		except simpleTAL.TemplateParseException as e:
 			realResult = str (e)
 			self.failUnless (realResult == result, "%s - \npassed in: %s \ngot back exception %s \nexpected exception %s\n" % (errMsg, txt, realResult, result))
 			return

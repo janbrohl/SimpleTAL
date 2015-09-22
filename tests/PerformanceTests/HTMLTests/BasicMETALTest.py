@@ -29,6 +29,7 @@
 		Performance test cases.
 		
 """
+from __future__ import print_function
 from simpletal import simpleTAL, simpleTALES, simpleTALUtils
 
 import time, StringIO, cStringIO, sys
@@ -117,6 +118,6 @@ expanded = simpleTALUtils.ExpandMacros (context, template)
 #print expanded
 realTemplate = simpleTAL.compileHTMLTemplate (expanded)
 
-print "Timing macro expansion..."
+print("Timing macro expansion...")
 result = METALTime (4000, realTemplate)
-print "Total time %s for 4000 itterations" % (str (result))
+print("Total time %s for 4000 itterations" % (str (result)))

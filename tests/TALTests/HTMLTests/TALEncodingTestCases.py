@@ -46,7 +46,7 @@ isoDecoder = codecs.lookup ("iso-8859-1")[1]
 
 import types
 try:
-	class UnicodeSubclass(types.UnicodeType):
+	class UnicodeSubclass(unicode):
 		pass
 	oldPython = 0
 except:

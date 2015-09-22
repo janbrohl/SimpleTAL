@@ -28,6 +28,7 @@
 		Performance test cases.
 		
 """
+from __future__ import print_function
 from simpletal import simpleTAL, simpleTALES, simpleTALUtils
 
 import time, StringIO, cStringIO, sys
@@ -94,11 +95,11 @@ def NGTemplateOverhead (count):
 	return (end - start)
 
 
-print "Timing TAL templates"
+print("Timing TAL templates")
 result = NGTemplates (1000)
-print "Result: " + str(result) + " for 1000 template expansions"
+print("Result: " + str(result) + " for 1000 template expansions")
 
-print "Timing TAL templates (with template parsing)"
+print("Timing TAL templates (with template parsing)")
 result = NGTemplateOverhead (1000)
-print "Result: " + str(result) + " for 1000 template expansions"
+print("Result: " + str(result) + " for 1000 template expansions")
 

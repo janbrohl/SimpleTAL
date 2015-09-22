@@ -30,6 +30,7 @@
 		Unit test cases.
 		
 """
+from __future__ import print_function
 
 import unittest, os
 import StringIO
@@ -93,10 +94,10 @@ class XMLChecksumHandler (xml.sax.handler.ContentHandler, xml.sax.handler.DTDHan
 		self.digest.update (ndata)
 		
 	def error (self, excpt):
-		print "Error: %s" % str (excpt)
+		print("Error: %s" % str (excpt))
 		
 	def warning (self, excpt):
-		print "Warning: %s" % str (excpt)
+		print("Warning: %s" % str (excpt))
 		
 	def getDigest (self):
 		return self.digest.hexdigest()
@@ -126,12 +127,12 @@ class TALSingletonTests (unittest.TestCase):
 		realResult = file.getvalue()
 		try:
 			expectedChecksum = getXMLChecksum (result)
-		except Exception, e:
+		except Exception as e:
 			self.fail ("Exception (%s) thrown parsing XML expected result: %s" % (str (e), result))
 			
 		try:
 			realChecksum = getXMLChecksum (realResult)
-		except Exception, e:
+		except Exception as e:
 			self.fail ("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s" % (str (e), realResult, str (template)))
 		
 		self.failUnless (expectedChecksum == realChecksum, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
@@ -146,12 +147,12 @@ class TALSingletonTests (unittest.TestCase):
 		realResult = file.getvalue()
 		try:
 			expectedChecksum = getXMLChecksum (result)
-		except Exception, e:
+		except Exception as e:
 			self.fail ("Exception (%s) thrown parsing XML expected result: %s" % (str (e), result))
 			
 		try:
 			realChecksum = getXMLChecksum (realResult)
-		except Exception, e:
+		except Exception as e:
 			self.fail ("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s\nMacro Template: %s" % (str (e), realResult, str (pageTemplate), str (macroTemplate)))
 		
 		self.failUnless (expectedChecksum == realChecksum, "%s - \npassed in macro: %s \n and page: %s\ngot back %s \nexpected %s\n\nPage Template: %s" % (errMsg, macros,page, realResult, result, pageTemplate))

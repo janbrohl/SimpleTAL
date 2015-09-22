@@ -30,6 +30,7 @@
 		Unit test cases.
 		
 """
+from __future__ import print_function
 
 import unittest, os, sys
 import StringIO
@@ -107,10 +108,10 @@ class XMLChecksumHandler (xml.sax.handler.ContentHandler, xml.sax.handler.DTDHan
 		self.digest.update (ndata)
 		
 	def error (self, excpt):
-		print "Error: %s" % str (excpt)
+		print("Error: %s" % str (excpt))
 		
 	def warning (self, excpt):
-		print "Warning: %s" % str (excpt)
+		print("Warning: %s" % str (excpt))
 		
 	def startDTD(self, name, publicId, systemId):
 		self.digest.update (name)
@@ -149,7 +150,7 @@ class TALHandlerTestCases (unittest.TestCase):
 		expectedChecksum = getXMLChecksum (result)
 		try:
 			realChecksum = getXMLChecksum (realResult)
-		except Exception, e:
+		except Exception as e:
 			self.fail ("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s" % (str (e), realResult, str (template)))
 		
 		self.failUnless (expectedChecksum == realChecksum, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))

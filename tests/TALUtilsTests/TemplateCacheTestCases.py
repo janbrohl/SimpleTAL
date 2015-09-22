@@ -77,7 +77,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		try:
 			template = self.cache.getTemplate (name)
 			self.fail ("Expected exception trying to retrieve anavailable template")
-		except Exception, e:
+		except Exception as e:
 			# Pass!
 			pass
 			
@@ -146,7 +146,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		try:
 			template = self.cache.getTemplate (name)
 			self.fail ("Expected exception trying to retrieve anavailable template")
-		except Exception, e:
+		except Exception as e:
 			# Pass!
 			pass
 			

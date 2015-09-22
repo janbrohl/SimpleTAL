@@ -28,6 +28,7 @@
 		Performance test cases.
 		
 """
+from __future__ import print_function
 from simpletal import simpleTAL, simpleTALES, simpleTALUtils
 
 import time, StringIO, cStringIO, sys
@@ -37,7 +38,7 @@ import time, StringIO, cStringIO, sys
 import profile, pstats
 
 import gc
-print "Disabling garbage collection!"
+print("Disabling garbage collection!")
 
 gc.disable()
 
@@ -103,14 +104,14 @@ def NGTemplateOverhead (count):
 	return (end - start)
 
 
-print "Timing TAL templates"
+print("Timing TAL templates")
 #profiler = hotshot.Profile ("profile.data")
 profiler = profile.run("NGTemplates (20)", "profile.data")
 #profiler = profile.run("NGTemplateOverhead (20)", "profile.data")
 #profiler.runcall (NGTemplates, 20)
-print "Re-enabling garbage collection."
+print("Re-enabling garbage collection.")
 gc.enable()
-print "Loading profile data."
+print("Loading profile data.")
 
 #data = hotshot.stats.load ("profile.data")
 data = pstats.Stats("profile.data")
