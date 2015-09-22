@@ -71,7 +71,7 @@ class TALSpecialCharsTestCases (unittest.TestCase):
 	def testAmpInTemplate (self):
 		#logging.getLogger().setLevel(logging.DEBUG)
 		NBSP = b"\xa0".decode("iso-8859-1")
-		self._runTest_ ('<html test="&amp;nbsp;&nbsp;" tal:attributes="test2 string: Boo &nbsp; There ${test}">Hello Bye Bye</html>'
+		self._runTest_ (b'<html test="&amp;nbsp;&nbsp;" tal:attributes="test2 string: Boo &nbsp; There ${test}">Hello Bye Bye</html>'
 							,"""<html test2="Boo """ + NBSP + """ There &lt; testing &gt; experimenting &amp; twice as useful" test="&amp;nbsp;""" + NBSP + """">Hello Bye Bye</html>"""
 							,"&amp; in template failed.")
 						

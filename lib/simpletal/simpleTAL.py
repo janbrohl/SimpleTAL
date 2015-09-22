@@ -44,6 +44,7 @@ except ImportError:
 	import simpletal.DummyLogger as logging
 	
 import xml.sax, cgi, codecs, re
+import xml.sax.saxutils
 import copy, sys
 import simpletal.sgmlentitynames
 import simpletal.FixedHTMLParser
@@ -51,6 +52,10 @@ import simpletal.simpleTALES
 
 import io
 
+if sys.version_info.major>=3:
+        unicode=str
+        unichr=chr
+        
 	
 
 
@@ -113,7 +118,7 @@ METAL_FILL_SLOT=16
 METAL_DEFINE_MACRO=17
 											
 METAL_NAME_REGEX = re.compile ("[a-zA-Z_][a-zA-Z0-9_]*")
-SINGLETON_XML_REGEX = re.compile ('^<[^\s/>]+(?:\s*[^=>]+="[^">]+")*\s*/>')
+SINGLETON_XML_REGEX = re.compile (b'^<[^\s/>]+(?:\s*[^=>]+="[^">]+")*\s*/>')
 ENTITY_REF_REGEX = re.compile (r'(?:&[a-zA-Z][\-\.a-zA-Z0-9]*[^\-\.a-zA-Z0-9])|(?:&#[xX]?[a-eA-E0-9]*[^0-9a-eA-E])')
 
 # The list of elements in HTML that can not have end tags - done as a dictionary for fast
@@ -161,9 +166,8 @@ class TemplateInterpreter:
 		for attName, attValue in atts:
 			result.append (' ')
 			result.append (attName)
-			result.append ('="')
-			result.append (cgi.escape (attValue, quote=1))
-			result.append ('"')
+			result.append ('=')
+			result.append (xml.sax.saxutils.quoteattr(attValue))
 		if (singletonFlag):
 			result.append (" />")
 		else:
@@ -218,7 +222,7 @@ class TemplateInterpreter:
 		cmndList = self.commandList
 		while (self.programCounter < programLength):
 			cmnd = cmndList [self.programCounter]
-			#print "PC: %s  -  Executing command: %s" % (str (self.programCounter), str (cmnd))
+			#print "PC: %s  -  Executing command: %s" % (unicode (self.programCounter), unicode (cmnd))
 			self.commandHandler[cmnd[0]] (cmnd[0], cmnd[1])
 	
 	def cmdDefine (self, command, args):
@@ -376,19 +380,19 @@ class TemplateInterpreter:
 		""" args: [(attributeName, expression)]
 				Add, leave, or remove attributes from the start tag
 		"""
-		attsToRemove = {}
+		attsToRemove = set()
 		newAtts = []
 		for attName, attExpr in args:
 			resultVal = self.context.evaluate (attExpr, self.originalAttributes)
 			if (resultVal is None):
 				# Remove this attribute from the current attributes
-				attsToRemove [attName]=1
+				attsToRemove.add(attName)
 			elif (not resultVal == simpletal.simpleTALES.DEFAULTVALUE):
 				# We have a value - let's use it!
-				attsToRemove [attName]=1
+				attsToRemove.add(attName)
 				if (isinstance (resultVal, unicode)):
 					escapedAttVal = resultVal
-				elif (isinstance (resultVal, str)):
+				elif (isinstance (resultVal, bytes)):
 					# THIS IS NOT A BUG!
 					# Use Unicode in the Context object if you are not using Ascii
 					escapedAttVal = unicode (resultVal, 'ascii')
@@ -397,7 +401,7 @@ class TemplateInterpreter:
 					# Use Unicode in the Context object if you are not using Ascii
 					escapedAttVal = unicode (resultVal)
 				newAtts.append ((attName, escapedAttVal))
-		# Copy over the old attributes 
+		# Copy over the old attributes
 		for oldAttName, oldAttValue in self.currentAttributes:
 			if (oldAttName not in attsToRemove):
 				newAtts.append ((oldAttName, oldAttValue))
@@ -447,7 +451,7 @@ class TemplateInterpreter:
 				else:
 					if (isinstance (resultVal, unicode)):
 						self.file.write (resultVal)
-					elif (isinstance (resultVal, str)):
+					elif (isinstance (resultVal, bytes)):
 						# THIS IS NOT A BUG!
 						# Use Unicode in the Context object if you are not using Ascii
 						self.file.write (unicode (resultVal, 'ascii'))
@@ -458,7 +462,7 @@ class TemplateInterpreter:
 			else:
 				if (isinstance (resultVal, unicode)):
 					self.file.write (cgi.escape (resultVal))
-				elif (isinstance (resultVal, str)):
+				elif (isinstance (resultVal, bytes)):
 					# THIS IS NOT A BUG!
 					# Use Unicode in the Context object if you are not using Ascii
 					self.file.write (cgi.escape (unicode (resultVal, 'ascii')))
@@ -580,9 +584,8 @@ class HTMLTemplateInterpreter (TemplateInterpreter):
 			else:
 				result.append (' ')
 				result.append (attName)
-				result.append ('="')
-				result.append (cgi.escape (attValue, quote=1))
-				result.append ('"')
+				result.append ('=')
+				result.append (xml.sax.saxutils.quoteattr (attValue))
 		if (singletonFlag):
 			result.append (" />")
 		else:
@@ -639,20 +642,20 @@ class Template:
 		index = 0
 		for cmd in self.commandList:
 			if (cmd[0] != METAL_USE_MACRO):
-				result = result + "\n[%s] %s" % (str (index), str (cmd))
+				result = result + "\n[%s] %s" % (unicode (index), unicode (cmd))
 			else:
-				result = result + "\n[%s] %s, (%s{" % (str (index), str (cmd[0]), str (cmd[1][0]))
+				result = result + "\n[%s] %s, (%s{" % (unicode (index), unicode (cmd[0]), unicode (cmd[1][0]))
 				for slot in cmd[1][1].keys():
-					result = result + "%s: %s" % (slot, str (cmd[1][1][slot]))
-				result = result + "}, %s)" % str (cmd[1][2])
+					result = result + "%s: %s" % (slot, unicode (cmd[1][1][slot]))
+				result = result + "}, %s)" % unicode (cmd[1][2])
 			index += 1
 		result = result + "\n\nSymbols:\n"
 		for symbol in self.symbolTable.keys():
-			result = result + "Symbol: " + str (symbol) + " points to: " + str (self.symbolTable[symbol]) + ", which is command: " + str (self.commandList[self.symbolTable[symbol]]) + "\n"	
+			result = result + "Symbol: " + unicode (symbol) + " points to: " + unicode (self.symbolTable[symbol]) + ", which is command: " + unicode (self.commandList[self.symbolTable[symbol]]) + "\n"	
 		
 		result = result + "\n\nMacros:\n"
 		for macro in self.macros.keys():
-			result = result + "Macro: " + str (macro) + " value of: " + str (self.macros[macro])
+			result = result + "Macro: " + unicode (macro) + " value of: " + unicode (self.macros[macro])
 		return result
 		
 class SubTemplate (Template):
@@ -681,7 +684,7 @@ class SubTemplate (Template):
 						
 	def __str__ (self):
 		endRange = self.symbolTable [self.endRangeSymbol]
-		result = "SubTemplate from %s to %s\n" % (str (self.startRange), str (endRange))
+		result = "SubTemplate from %s to %s\n" % (unicode (self.startRange), unicode (endRange))
 		return result
 		
 class HTMLTemplate (Template):
@@ -691,7 +694,7 @@ class HTMLTemplate (Template):
 		self.minimizeBooleanAtts = minimizeBooleanAtts
 		Template.__init__ (self, commands, macros, symbols, doctype = None)
 	
-	def expand (self, context, outputFile, outputEncoding="ISO-8859-1",interpreter=None):
+	def expand (self, context, outputFile, outputEncoding="utf-8",interpreter=None):
 		""" This method will write to the outputFile, using the encoding specified,
 			the expanded version of this template.  The context passed in is used to resolve
 			all expressions with the template.
@@ -701,7 +704,8 @@ class HTMLTemplate (Template):
 		if isinstance(outputFile,io.TextIOBase):
 			encodingFile=outputFile
 		else:
-			encodingFile = codecs.lookup (outputEncoding)[3](outputFile, 'xmlcharrefreplace')
+			writer=codecs.getwriter(outputEncoding)
+			encodingFile = writer(outputFile, errors='xmlcharrefreplace')
 		self.expandInline (context, encodingFile, interpreter)
 		
 	def expandInline (self, context, outputFile, interpreter=None):
@@ -733,7 +737,8 @@ class XMLTemplate (Template):
 		if isinstance(outputFile,io.TextIOBase):
 			encodingFile=outputFile
 		else:
-			encodingFile = codecs.lookup (outputEncoding)[3](outputFile, 'xmlcharrefreplace')
+			writer=codecs.getwriter(outputEncoding)
+			encodingFile = writer(outputFile, errors='xmlcharrefreplace')
 		if (not suppressXMLDeclaration):
 			oel=unicode(outputEncoding).lower()
 			if (oel != u"utf-8"):
@@ -1186,7 +1191,7 @@ class TemplateCompiler:
 			self.log.error (msg)
 			raise TemplateParseException (self.tagAsText (self.currentStartTag), msg)
 		cmnd = (METAL_USE_MACRO, (argument, {}, self.endTagSymbol))
-		self.log.debug ("Returning METAL_USE_MACRO: %s" % str (cmnd))
+		self.log.debug ("Returning METAL_USE_MACRO: %s" % unicode (cmnd))
 		return cmnd
 		
 	def compileMetalDefineMacro (self, argument):
@@ -1240,7 +1245,7 @@ class TemplateCompiler:
 		
 		# Get the use-macro command we are going to adjust
 		cmnd, args = self.commandList [ourMacroLocation]
-		self.log.debug ("Use macro argument: %s" % str (args))
+		self.log.debug ("Use macro argument: %s" % unicode (args))
 		macroName, slotMap, endSymbol = args
 		
 		# Check that the name of the slot is valid
@@ -1292,10 +1297,13 @@ class HTMLTemplateCompiler (TemplateCompiler, simpletal.FixedHTMLParser.HTMLPars
 		self.log = logging.getLogger ("simpleTAL.HTMLTemplateCompiler")
 		
 	def parseTemplate (self, file, encoding="iso-8859-1", minimizeBooleanAtts = 0):
-		encodedFile = codecs.lookup (encoding)[2](file, 'replace')
+		if isinstance(file,io.TextIOBase):
+			s=file.read()
+		else:
+			s=file.read().decode(encoding,'replace')
 		self.encoding = encoding
 		self.minimizeBooleanAtts = minimizeBooleanAtts
-		self.feed (encodedFile.read())
+		self.feed (s)
 		self.close()
 		
 	def tagAsText (self, tag_atts, singletonFlag=0):
@@ -1328,7 +1336,7 @@ class HTMLTemplateCompiler (TemplateCompiler, simpletal.FixedHTMLParser.HTMLPars
 			self.handle_endtag(tag)
 		
 	def handle_starttag (self, tag, attributes):
-		self.log.debug ("Recieved Start Tag: " + tag + " Attributes: " + str (attributes))
+		self.log.debug ("Recieved Start Tag: " + tag + " Attributes: " + unicode (attributes))
 		atts = []
 		for att, attValue in attributes:
 			# We need to spot empty tal:omit-tags 
@@ -1338,28 +1346,7 @@ class HTMLTemplateCompiler (TemplateCompiler, simpletal.FixedHTMLParser.HTMLPars
 				else:
 					atts.append ((att, att))
 			else:
-				# Expand any SGML entity references or char references
-				goodAttValue = []
-				last = 0
-				match = ENTITY_REF_REGEX.search (attValue)
-				while (match):
-					goodAttValue.append (attValue[last:match.start()])
-					ref = attValue[match.start():match.end()]
-					if (ref.startswith ('&#')):
-						# A char reference
-						if (ref[2] in ['x', 'X']):
-							# Hex
-							refValue = int (ref[3:-1], 16)
-						else:
-							refValue = int (ref[2:-1])
-						goodAttValue.append (unichr (refValue))
-					else:
-						# A named reference.
-						goodAttValue.append (unichr (simpletal.sgmlentitynames.htmlNameToUnicodeNumber.get (ref[1:-1], 65533)))
-					last = match.end()
-					match = ENTITY_REF_REGEX.search (attValue, last)
-				goodAttValue.append (attValue [last:])
-				atts.append ((att, u"".join (goodAttValue)))
+				atts.append((att,attValue))
 				
 		if (tag.upper() in HTML_FORBIDDEN_ENDTAG):
 			# This should have no end tag, so we just do the start and suppress the end
@@ -1454,10 +1441,10 @@ class XMLTemplateCompiler (TemplateCompiler, xml.sax.handler.ContentHandler, xml
 			self.doctype = '<!DOCTYPE %s SYSTEM "%s">' % (name, system_id,)
 
 	def startElement (self, tag, attributes):
-		self.log.debug ("Recieved Real Start Tag: " + tag + " Attributes: " + str (attributes))
+		self.log.debug ("Recieved Real Start Tag: " + tag + " Attributes: " + unicode (attributes))
 		try:
 			xmlText = self.ourParser.getProperty (xml.sax.handler.property_xml_string)
-			if (SINGLETON_XML_REGEX.match (xmlText)):
+			if (isinstance(xmlText,unicode) and SINGLETON_XML_REGEX.match (xmlText.encode("utf-8"))) or SINGLETON_XML_REGEX.match (xmlText):
 				# This is a singleton!
 				self.singletonElement=1
 		except xml.sax.SAXException as e:
@@ -1504,7 +1491,7 @@ def compileHTMLTemplate (template, inputEncoding="ISO-8859-1", minimizeBooleanAt
 	if isinstance (template, unicode):
 		# It's a string!
 		templateFile = io.StringIO (template)
-	elif isinstance (template, str):
+	elif isinstance (template, bytes):
 		templateFile = io.BytesIO (template)
 	else:
 		templateFile = template
@@ -1520,7 +1507,7 @@ def compileXMLTemplate (template):
 	if isinstance (template, unicode):
 		# It's a string!
 		templateFile = io.StringIO (template)
-	elif (isinstance (template, str)):
+	elif (isinstance (template, bytes)):
 		# It's a string!
 		templateFile = io.BytesIO (template)
 	else:

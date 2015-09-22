@@ -32,9 +32,12 @@
 """
 
 from __future__ import unicode_literals
-import unittest, os
+import unittest, os, sys
 import io
 import logging, logging.config
+
+if sys.version_info.major>=3:
+	unicode=str
 
 from simpletal import simpleTAL, simpleTALES
 

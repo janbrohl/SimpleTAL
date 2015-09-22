@@ -63,6 +63,7 @@ class ActualIter:
 			raise StopIteration ()
 		self.cur += 1
 		return self.cur
+	__next__=next
 	
 class IterContainer:
 	def __init__ (self, size):

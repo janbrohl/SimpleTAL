@@ -38,6 +38,9 @@
 from __future__ import absolute_import
 
 import os, stat, threading, sys, codecs, cgi, re
+import xml.sax, xml.sax.handler
+import hashlib
+
 
 import io
 import simpletal.simpleTAL
@@ -102,28 +105,22 @@ class TemplateCache:
 		return self._cacheTemplate_ (name, None, xmlTemplate=1)
 		
 	def _cacheTemplate_ (self, name, inputEncoding, xmlTemplate=0):
-		self.cacheLock.acquire ()
-		try:
-			tempFile = open (name, 'r')
-			if (xmlTemplate):
-				# We know it is XML
-				template = simpletal.simpleTAL.compileXMLTemplate (tempFile)
-			else:
-				# We have to guess...
-				firstline = tempFile.readline()
-				tempFile.seek(0)
-				if (name [-3:] == "xml") or (firstline.strip ()[:5] == '<?xml') or (firstline [:9] == '<!DOCTYPE' and firstline.find('XHTML') != -1):
+		with self.cacheLock:
+			with open (name, 'r') as tempFile:
+				if (xmlTemplate):
+					# We know it is XML
 					template = simpletal.simpleTAL.compileXMLTemplate (tempFile)
 				else:
-					template = simpletal.simpleTAL.compileHTMLTemplate (tempFile, inputEncoding)
-			tempFile.close()
-			self.templateCache [name] = (template, os.stat (name)[stat.ST_MTIME])
-			self.misses += 1
-		except Exception as e:
-			self.cacheLock.release()
-			raise e
-			
-		self.cacheLock.release()
+					# We have to guess...
+					firstline = tempFile.readline()
+					tempFile.seek(0)
+					if (name [-3:] == "xml") or (firstline.strip ()[:5] == '<?xml') or (firstline [:9] == '<!DOCTYPE' and firstline.find('XHTML') != -1):
+						template = simpletal.simpleTAL.compileXMLTemplate (tempFile)
+					else:
+						template = simpletal.simpleTAL.compileHTMLTemplate (tempFile, inputEncoding)
+				tempFile.close()
+				self.templateCache [name] = (template, os.stat (name)[stat.ST_MTIME])
+				self.misses += 1
 		return template
 
 def tagAsText (tag,atts):
@@ -233,13 +230,74 @@ class MacroExpansionInterpreter (simpletal.simpleTAL.TemplateInterpreter):
 		self.movePCForward,self.movePCBack,self.outputTag,self.originalAttributes,self.currentAttributes,self.repeatVariable,self.tagContent,self.localVarsDefined = self.scopeStack.pop()			
 		self.programCounter += 1
 			
-def ExpandMacros (context, template, outputEncoding="ISO-8859-1"):
+def ExpandMacros (context, template, outputEncoding="utf-8"):
 	out = io.StringIO()
 	interp = MacroExpansionInterpreter()
 	interp.initialise (context, out)
 	template.expand (context, out, outputEncoding=outputEncoding, interpreter=interp)
-	# StringIO returns unicode, so we need to turn it back into native string
-	result = out.getvalue()
-	reencoder = codecs.lookup (outputEncoding)[0]
-	return reencoder (result)[0]
+	return out.getvalue().encode(outputEncoding)
 
+class XMLListHandler (xml.sax.handler.ContentHandler, xml.sax.handler.DTDHandler, xml.sax.handler.ErrorHandler):
+	def __init__ (self, parser):
+		xml.sax.handler.ContentHandler.__init__ (self)
+		self.ourParser = parser
+		
+	def startDocument (self):
+		self.list = []
+		
+	def startPrefixMapping (self, prefix, uri):
+		self.list.append (prefix)
+		self.list.append (uri)
+		
+	def endPrefixMapping (self, prefix):
+		self.list.append (prefix)
+		
+	def startElement (self, name, atts):
+		self.list.append (name)
+		allAtts = atts.getNames()
+		allAtts.sort()
+		for att in allAtts:
+			self.list.append (att)
+			self.list.append (atts [att])
+			
+	def endElement (self, name):
+		self.list.append (name)
+		
+	def characters (self, data):
+		self.list.append (data)
+		
+	def processingInstruction (self, target, data):
+		self.list.append (target)
+		self.list.append (data)
+		
+	def skippedEntity (self, name):
+		self.list.append (name)
+		
+	# DTD Handler
+	def notationDecl(self, name, publicId, systemId):
+		self.list.append (name)
+		self.list.append (publicId)
+		self.list.append (systemId)
+		
+	def unparsedEntityDecl(name, publicId, systemId, ndata):
+		self.list.append (name)
+		self.list.append (publicId)
+		self.list.append (systemId)
+		self.list.append (ndata)
+		
+	def error (self, excpt):
+		print("Error: %s" % str (excpt))
+		
+	def warning (self, excpt):
+		print("Warning: %s" % str (excpt))
+		
+
+LISTPARSER = xml.sax.make_parser()
+LISTHANDLER = XMLListHandler(LISTPARSER)
+LISTPARSER.setContentHandler (LISTHANDLER)
+LISTPARSER.setDTDHandler (LISTHANDLER)
+LISTPARSER.setErrorHandler (LISTHANDLER)
+
+def getXMLChecksum (doc):
+	LISTPARSER.parse (io.StringIO (doc))
+	return hashlib.md5("".join(LISTHANDLER.list).encode("utf-8")).hexdigest()

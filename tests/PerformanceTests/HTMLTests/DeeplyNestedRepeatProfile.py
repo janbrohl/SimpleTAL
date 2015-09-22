@@ -85,7 +85,7 @@ def NGTemplates (count):
 	template = compiler.getTemplate()
 	file = simpleTALUtils.FastStringOutput()
 	start = time.clock()
-	for attempt in xrange (count):
+	for attempt in range (count):
 		template.expand (context, file)
 	end = time.clock()
 	#print "Resuling file: " + file.getvalue()
@@ -94,7 +94,7 @@ def NGTemplates (count):
 def NGTemplateOverhead (count):
 	file = file = simpleTALUtils.FastStringOutput()
 	start = time.clock()
-	for attempt in xrange (count):
+	for attempt in range (count):
 		tempFile = io.StringIO (performanceTemplate)
 		compiler = simpleTAL.HTMLTemplateCompiler()
 		compiler.parseTemplate (tempFile)

@@ -92,27 +92,27 @@ class TALAttributesTestCases (unittest.TestCase):
 
 	def testMultipleAttributesEscaped (self):
 		self._runTest_ ('<html old="still &quot; here" class="test" tal:attributes="href default ; class string: Semi-colon;;test;new test " href="owlfish.com">Hello</html>'
-										,'<html class="Semi-colon;test" new="testing" old="still &quot; here" href="owlfish.com">Hello</html>'
+										,'''<html class="Semi-colon;test" new="testing" old='still " here' href="owlfish.com">Hello</html>'''
 										,"Setting multiple attributes at once, with spaces between semi-colons, failed.")
 
 	def testAttributeEscaping (self):
 		self._runTest_ ('<html existingAtt="&quot;Testing&quot;" tal:attributes="href needsQuoting">Hello</html>'
-										,"""<html href="Does &quot;this&quot; work?" existingatt="&quot;Testing&quot;">Hello</html>"""
+										,"""<html href='Does "this" work?' existingatt='"Testing"'>Hello</html>"""
 										,"Escaping of new attributes failed.")
 										
 	def testNumberAttributeEscaping (self):
 		self._runTest_ ('<html existingAtt="&quot;Testing&quot;" tal:attributes="href number">Hello</html>'
-						,"""<html href="5" existingatt="&quot;Testing&quot;">Hello</html>"""
+						,"""<html href="5" existingatt='"Testing"'>Hello</html>"""
 						,"Escaping of new attributes failed.")
 		
 	def testNumberAttributeEscaping (self):
 		self._runTest_ ('<html existingAtt="&quot;Testing&quot;" tal:attributes="href uniQuote">Hello</html>'
-						,"""<html href="Does &quot;this&quot; work?" existingatt="&quot;Testing&quot;">Hello</html>"""
+						,"""<html href='Does "this" work?' existingatt='"Testing"'>Hello</html>"""
 						,"Escaping of new attributes failed.")
 						
 	def testOriginalAttributes (self):
 		self._runTest_ ('<html existingAtt="&quot;Testing&quot;" tal:attributes="newAtt attrs/existingatt" tal:content="attrs/existingatt">Hello</html>'
-						,"""<html newAtt="&quot;Testing&quot;" existingatt="&quot;Testing&quot;">"Testing"</html>"""
+						,"""<html newAtt='"Testing"' existingatt='"Testing"'>"Testing"</html>"""
 						,"Accessing existing attributes failed.")
 						
 	def testMultipleOriginalAttributes (self):

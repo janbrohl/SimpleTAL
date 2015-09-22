@@ -104,7 +104,7 @@ context.addGlobal ("macTemp", macTemplate)
 def METALTime (count, template):
 	file = simpleTALUtils.FastStringOutput()
 	start = time.clock()
-	for attempt in xrange (count):
+	for attempt in range (count):
 		template.expand (context, file)
 	end = time.clock()
 	#print "Resuling file: " + file.getvalue()
