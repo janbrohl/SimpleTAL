@@ -516,7 +516,7 @@ class Context:
 									pathResult = self.evaluate (path)
 								except PathNotFoundException as e:
 									# This part of the path didn't evaluate to anything - leave blank
-									pathResult = u''
+									pathResult = ''
 								if (pathResult is not None):
 									if (isinstance (pathResult, unicode)):
 										result += pathResult
@@ -536,7 +536,7 @@ class Context:
 								pathResult = self.traversePath (path)
 							except PathNotFoundException as e:
 								# This part of the path didn't evaluate to anything - leave blank
-								pathResult = u''
+								pathResult = ''
 							if (pathResult is not None):
 								if (isinstance (pathResult, unicode)):
 										result += pathResult
