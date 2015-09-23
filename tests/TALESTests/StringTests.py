@@ -57,7 +57,7 @@ class StringTests (unittest.TestCase):
 		self.context.addGlobal ('holder', {'helloFunc': simpleFunction
 										  								,'falseFunc': simpleFalseFunc})		
 		self.context.addGlobal ('version', 3.1)
-		self.context.addGlobal ('uniString', u"Hello")
+		self.context.addGlobal ('uniString', "Hello")
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileHTMLTemplate (txt)
 		file = io.StringIO ()

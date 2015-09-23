@@ -725,7 +725,7 @@ class XMLTemplate (Template):
 		Template.__init__ (self, commands, macros, symbols)
 		self.doctype = doctype
 	
-	def expand (self, context, outputFile, outputEncoding=u"utf-8", docType=None, suppressXMLDeclaration=0,interpreter=None):
+	def expand (self, context, outputFile, outputEncoding="utf-8", docType=None, suppressXMLDeclaration=0,interpreter=None):
 		""" This method will write to the outputFile, using the encoding specified,
 			the expanded version of this template.  The context passed in is used to resolve
 			all expressions with the template.
@@ -741,10 +741,10 @@ class XMLTemplate (Template):
 			encodingFile = writer(outputFile, errors='xmlcharrefreplace')
 		if (not suppressXMLDeclaration):
 			oel=unicode(outputEncoding).lower()
-			if (oel != u"utf-8"):
-				encodingFile.write (u'<?xml version="1.0" encoding="%s"?>\n' % oel)
+			if (oel != "utf-8"):
+				encodingFile.write ('<?xml version="1.0" encoding="%s"?>\n' % oel)
 			else:
-				encodingFile.write (u'<?xml version="1.0"?>\n')
+				encodingFile.write ('<?xml version="1.0"?>\n')
 		if not docType and self.doctype:
 			docType = self.doctype
 		if docType:

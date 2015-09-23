@@ -62,7 +62,7 @@ class TALEncodingTestCases (unittest.TestCase):
 		self.context.addGlobal ('three', [1,"Two",3])
 		self.context.addGlobal ('badascii', 'This costs nothing, yep £0')
 		if (not oldPython):
-			self.context.addGlobal ('inheritance', UnicodeSubclass(u'\u2018subclass\u2019'))
+			self.context.addGlobal ('inheritance', UnicodeSubclass('\u2018subclass\u2019'))
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileHTMLTemplate (txt)
