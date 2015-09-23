@@ -33,15 +33,13 @@
 
 from __future__ import unicode_literals
 import unittest, os
-import io
+import io,sys
 import logging, logging.config
 
-try:
-	from simpletal import simpleElementTree
+if sys.version_info.major==2:
+        from simpletal import simpleElementTree
+
 	
-	ELEMENT_TREE_SUPPORT = 1
-except:
-	ELEMENT_TREE_SUPPORT = 0
 
 from simpletal import simpleTAL, simpleTALES
 
@@ -56,7 +54,7 @@ def simpleFunction (param):
 def helloFunction ():
 	return "Hello"
 
-@unittest.skipUnless(ELEMENT_TREE_SUPPORT, "No ElementTree support found.")				
+@unittest.skipIf(sys.version_info.major!=2,"SimpleElementTree only supported for Python 2.")				
 class ElementTreeTestCases (unittest.TestCase):
 	def setUp (self):
 		pass
