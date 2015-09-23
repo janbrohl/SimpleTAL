@@ -1377,15 +1377,15 @@ class HTMLTemplateCompiler (TemplateCompiler, simpletal.FixedHTMLParser.HTMLPars
 		
 	# Handle document type declarations
 	def handle_decl (self, data):
-		self.parseData (u'<!%s>' % data)
+		self.parseData ('<!%s>' % data)
 		
 	# Pass comments through un-affected.
 	def handle_comment (self, data):
-		self.parseData (u'<!--%s-->' % data)
+		self.parseData ('<!--%s-->' % data)
 
 	def handle_pi (self, data):
 		self.log.debug ("Recieved processing instruction.")
-		self.parseData (u'<?%s>' % data)
+		self.parseData ('<?%s>' % data)
 		
 	def report_unbalanced (self, tag):
 		self.log.warning ("End tag %s present with no corresponding open tag.")
@@ -1471,11 +1471,11 @@ class XMLTemplateCompiler (TemplateCompiler, xml.sax.handler.ContentHandler, xml
 		
 	def processingInstruction (self, target, data):
 		self.log.debug ("Recieved processing instruction.")
-		self.parseData (u'<?%s %s?>' % (target, data))
+		self.parseData ('<?%s %s?>' % (target, data))
 		
 	def comment (self, data):
 		# This is only called if your XML parser supports the LexicalHandler interface.
-		self.parseData (u'<!--%s-->' % data)
+		self.parseData ('<!--%s-->' % data)
 		
 	def getTemplate (self):
 		template = XMLTemplate (self.commandList, self.macroMap, self.symbolLocationTable, self.doctype)
