@@ -38,17 +38,11 @@
 from __future__ import unicode_literals
 from __future__ import absolute_import
 
-try:
-	import logging
-except ImportError:
-	import simpletal.DummyLogger as logging
-	
 import xml.sax, cgi, codecs, re
 import xml.sax.saxutils
 import copy, sys
-import simpletal.sgmlentitynames
-import simpletal.FixedHTMLParser
 import simpletal.simpleTALES
+import logging
 
 import io
 
@@ -57,7 +51,12 @@ if sys.version_info.major>=3:
         unichr=chr
         
 	
-
+try:
+	import html.parser as HTMLParser
+	import html.entities as htmlentitydefs
+except ImportError:
+	import HTMLParser
+	import htmlentitydefs
 
 try:
 	# Is PyXML's LexicalHandler available? 
@@ -1289,10 +1288,10 @@ class TemplateParseException (Exception):
 		return "[" + self.location + "] " + self.errorDescription
 
 
-class HTMLTemplateCompiler (TemplateCompiler, simpletal.FixedHTMLParser.HTMLParser):
+class HTMLTemplateCompiler (TemplateCompiler, HTMLParser.HTMLParser):
 	def __init__ (self):
 		TemplateCompiler.__init__ (self)
-		simpletal.FixedHTMLParser.HTMLParser.__init__ (self)
+		HTMLParser.HTMLParser.__init__ (self)
 		self.log = logging.getLogger ("simpleTAL.HTMLTemplateCompiler")
 		
 	def parseTemplate (self, file, encoding="iso-8859-1", minimizeBooleanAtts = 0):
@@ -1373,7 +1372,7 @@ class HTMLTemplateCompiler (TemplateCompiler, simpletal.FixedHTMLParser.HTMLPars
 	def handle_entityref (self, ref):
 		self.log.debug ("Got Ref: %s", ref)
 		# Use handle_data so that <&> are re-encoded as required.
-		self.handle_data( unichr (simpletal.sgmlentitynames.htmlNameToUnicodeNumber.get (ref, 65533)))
+		self.handle_data( unichr (htmlentitydefs.name2codepoint.get (ref, 65533)))
 		
 	# Handle document type declarations
 	def handle_decl (self, data):
@@ -1462,7 +1461,7 @@ class XMLTemplateCompiler (TemplateCompiler, xml.sax.handler.ContentHandler, xml
 		
 	def skippedEntity (self, name):
 		self.log.info ("Recieved skipped entity: %s" % name)
-		self.characters( unichr (simpletal.sgmlentitynames.htmlNameToUnicodeNumber.get (name, 65533)))
+		self.characters( unichr (htmlentitydefs.name2codepoint.get (name, 65533)))
 		
 	def characters (self, data):
 		#self.log.debug ("Recieved Real Data: " + data)
