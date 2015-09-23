@@ -55,16 +55,13 @@ def simpleFunction (param):
 	
 def helloFunction ():
 	return "Hello"
-				
+
+@unittest.skipUnless(ELEMENT_TREE_SUPPORT, "No ElementTree support found.")				
 class ElementTreeTestCases (unittest.TestCase):
 	def setUp (self):
 		pass
 			
-	def _runTest_ (self, txt, result, errMsg="Error", allowPythonPath=0):
-		if (not ELEMENT_TREE_SUPPORT):
-			logging.warn ("No ElementTree support found, skipping test.")
-			return
-			
+	def _runTest_ (self, txt, result, errMsg="Error", allowPythonPath=0):			
 		self.context = simpleTALES.Context(allowPythonPath=allowPythonPath)
 		self.context.addGlobal ('top', 'Hello from the top')
 		self.context.addGlobal ('helloFunc', simpleFunction)

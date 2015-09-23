@@ -461,15 +461,15 @@ class TemplateInterpreter:
 						self.file.write (unicode (resultVal))
 			else:
 				if (isinstance (resultVal, unicode)):
-					self.file.write (cgi.escape (resultVal))
+					self.file.write (xml.sax.saxutils.escape (resultVal))
 				elif (isinstance (resultVal, bytes)):
 					# THIS IS NOT A BUG!
 					# Use Unicode in the Context object if you are not using Ascii
-					self.file.write (cgi.escape (unicode (resultVal, 'ascii')))
+					self.file.write (xml.sax.saxutils.escape (unicode (resultVal, 'ascii')))
 				else:
 					# THIS IS NOT A BUG!
 					# Use Unicode in the Context object if you are not using Ascii
-					self.file.write (cgi.escape (unicode (resultVal)))
+					self.file.write (xml.sax.saxutils.escape (unicode (resultVal)))
 					
 		if (self.outputTag and not args[1]):
 			# Do NOT output end tag if a singleton with no content
@@ -824,9 +824,8 @@ class TemplateCompiler:
 		for attName, attValue in atts:
 			result.append (' ')
 			result.append (attName)
-			result.append ('="')
-			result.append (cgi.escape (attValue, quote=1))
-			result.append ('"')
+			result.append ('=')
+			result.append (xml.sax.saxutils.quoteattr (attValue))
 		if (singletonFlag):
 			result.append (" />")
 		else:
@@ -993,7 +992,7 @@ class TemplateCompiler:
 				# It's a TAL attribute
 				cmnd = self.tal_attribute_map [commandAttName]
 				if (cmnd == TAL_OMITTAG and TALElementNameSpace):
-					self.log.warn ("Supressing omit-tag command present on TAL or METAL element")
+					self.log.warning ("Supressing omit-tag command present on TAL or METAL element")
 				else:
 					foundCommandsArgs [cmnd] = value
 					foundTALAtts.append (cmnd)
@@ -1321,9 +1320,8 @@ class HTMLTemplateCompiler (TemplateCompiler, simpletal.FixedHTMLParser.HTMLPars
 			else:
 				result.append (' ')
 				result.append (attName)
-				result.append ('="')
-				result.append (cgi.escape (attValue, quote=1))
-				result.append ('"')
+				result.append ('=')
+				result.append (xml.sax.saxutils.quoteattr (attValue))
 		if (singletonFlag):
 			result.append (" />")
 		else:
@@ -1359,13 +1357,13 @@ class HTMLTemplateCompiler (TemplateCompiler, simpletal.FixedHTMLParser.HTMLPars
 	def handle_endtag (self, tag):
 		self.log.debug ("Recieved End Tag: " + tag)
 		if (tag.upper() in HTML_FORBIDDEN_ENDTAG):
-			self.log.warn ("HTML 4.01 forbids end tags for the %s element" % tag)
+			self.log.warning ("HTML 4.01 forbids end tags for the %s element" % tag)
 		else:
 			# Normal end tag
 			self.popTag ((tag, None))
 			
 	def handle_data (self, data):
-		self.parseData (cgi.escape (data))
+		self.parseData (xml.sax.saxutils.escape (data))
 		
 	# These two methods are required so that we expand all character and entity references prior to parsing the template.
 	def handle_charref (self, ref):
@@ -1390,7 +1388,7 @@ class HTMLTemplateCompiler (TemplateCompiler, simpletal.FixedHTMLParser.HTMLPars
 		self.parseData (u'<?%s>' % data)
 		
 	def report_unbalanced (self, tag):
-		self.log.warn ("End tag %s present with no corresponding open tag.")
+		self.log.warning ("End tag %s present with no corresponding open tag.")
 			
 	def getTemplate (self):
 		template = HTMLTemplate (self.commandList, self.macroMap, self.symbolLocationTable, minimizeBooleanAtts = self.minimizeBooleanAtts)
@@ -1469,7 +1467,7 @@ class XMLTemplateCompiler (TemplateCompiler, xml.sax.handler.ContentHandler, xml
 	def characters (self, data):
 		#self.log.debug ("Recieved Real Data: " + data)
 		# Escape any data we recieve - we don't want any: <&> in there.
-		self.parseData (cgi.escape (data))
+		self.parseData (xml.sax.saxutils.escape (data))
 		
 	def processingInstruction (self, target, data):
 		self.log.debug ("Recieved processing instruction.")

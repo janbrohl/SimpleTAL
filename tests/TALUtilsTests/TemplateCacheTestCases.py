@@ -100,7 +100,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile)
 		expectedResult = """<html><body><h1>Cache Test</h1></body></html>"""
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertEqual (outputFile.getvalue(), expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
 		self.assertEqual (self.cache.misses, 1, "Cache miss not recorded!")
 		# Get the cached template
@@ -108,7 +108,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile)
 		expectedResult = """<html><body><h1>Cache Test</h1></body></html>"""
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertEqual (outputFile.getvalue(), expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
 		self.assertEqual (self.cache.hits, 1, "Cache hit not recorded!")
 		
@@ -124,7 +124,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile)
 		expectedResult = """<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertEqual (outputFile.getvalue(), expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
 		self.assertEqual (self.cache.misses, 2, "Cache miss not recorded!")
 		# Get the cached template
@@ -132,7 +132,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile)
 		expectedResult = """<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertEqual (outputFile.getvalue(), expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
 		self.assertEqual (self.cache.hits, 2, "Cache hit not recorded!")
 		
@@ -169,7 +169,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1></body></html>"""
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertEqual (outputFile.getvalue(), expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
 		self.assertEqual (self.cache.misses, 1, "Cache miss not recorded!")
 		# Get the cached template
@@ -177,7 +177,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1></body></html>"""
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertEqual (outputFile.getvalue(), expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
 		self.assertEqual (self.cache.hits, 1, "Cache hit not recorded!")
 		
@@ -193,7 +193,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertEqual (outputFile.getvalue(), expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
 		self.assertEqual (self.cache.misses, 2, "Cache miss not recorded!")
 		# Get the cached template
@@ -201,7 +201,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertEqual (outputFile.getvalue(), expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
 		self.assertEqual (self.cache.hits, 2, "Cache hit not recorded!")
 		
@@ -223,7 +223,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1></body></html>"""
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertEqual (outputFile.getvalue(), expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
 		self.assertEqual (self.cache.misses, 1, "Cache miss not recorded!")
 		# Get the cached template
@@ -231,7 +231,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1></body></html>"""
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertEqual (outputFile.getvalue(), expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
 		self.assertEqual (self.cache.hits, 1, "Cache hit not recorded!")
 		
@@ -247,7 +247,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertEqual (outputFile.getvalue(), expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
 		self.assertEqual (self.cache.misses, 2, "Cache miss not recorded!")
 		# Get the cached template
@@ -255,7 +255,7 @@ class TemplateCacheTestCases (unittest.TestCase):
 		outputFile = io.StringIO ()
 		template.expand (self.context, outputFile, outputEncoding="iso-8859-1")
 		expectedResult = """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body><h1>Cache Test</h1><p>Testing the cache...</p></body></html>"""
-		self.failUnless (outputFile.getvalue() == expectedResult
+		self.assertEqual (outputFile.getvalue(), expectedResult
 										,"Error: template did not expand to expected result.  Expected: %s got: %s" % (expectedResult, outputFile.getvalue()))
 		self.assertEqual (self.cache.hits, 2, "Cache hit not recorded!")
 		
