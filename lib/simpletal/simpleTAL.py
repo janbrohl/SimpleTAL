@@ -1340,7 +1340,7 @@ class HTMLTemplateCompiler (TemplateCompiler, simpletal.FixedHTMLParser.HTMLPars
 			# We need to spot empty tal:omit-tags 
 			if (attValue is None):
 				if (att == self.tal_namespace_omittag):
-					atts.append ((att, u""))
+					atts.append ((att, ""))
 				else:
 					atts.append ((att, att))
 			else:
