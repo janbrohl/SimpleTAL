@@ -55,7 +55,7 @@ class TALAttributesTestCases (unittest.TestCase):
 		self.context.addGlobal ('link', 'www.owlfish.com')
 		self.context.addGlobal ('needsQuoting', """Does "this" work?""")
 		self.context.addGlobal ('number', '5')
-		self.context.addGlobal ('uniQuote', u'Does "this" work?')
+		self.context.addGlobal ('uniQuote', 'Does "this" work?')
 		
 	def _runTest_ (self, txt, result, errMsg="Error"):
 		template = simpleTAL.compileXMLTemplate (txt)

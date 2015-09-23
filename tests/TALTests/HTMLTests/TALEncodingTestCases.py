@@ -103,7 +103,7 @@ class TALEncodingTestCases (unittest.TestCase):
 		file = io.BytesIO()
 		template.expand (self.context, file, 'utf-8')
 		result = file.getvalue()
-		expectedResult = u"<html>\u2018subclass\u2019</html>".encode('utf-8')
+		expectedResult = "<html>\u2018subclass\u2019</html>".encode('utf-8')
 		self.assertEqual (result, expectedResult, "Unicode subclass failed.  \nResult was: %r\nExpected result: %r" %(result, expectedResult))
 	
 #	def testBadAscii (self):

@@ -1,2 +1,4 @@
 *.pyc
 *.pyproj
+*__pycache__*
+autoedit.py
