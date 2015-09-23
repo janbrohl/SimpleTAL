@@ -13,22 +13,16 @@ found test suites into one big test suite and run them all at once.
 * Modified to use os.path.walk to find all the test scripts
 * Modified to find all python scripts, not just ones of the form *test.py
 """
-import sys, os, re, unittest
+import sys, os.path, unittest
 
-# If logging is available, suppress it to avoid confusion.
-try:
-	import logging
-	rootLogger = logging.getLogger ()
-	rootLogger.setLevel (logging.CRITICAL)
-except:
-	pass
 
 #ensure that the module in this directory is used instead of the system one
 #or else we would be testing the system one and not the one with the changes :)
 import sys
-sys.path.insert(0, os.path.join(os.getcwd(),'lib'))
+sys.path.insert(0, os.path.abspath('lib'))
 print ("System path is: " + str (sys.path))
 
-suite=unittest.defaultTestLoader.loadTestsFromName("tests")
-unittest.TextTestRunner().run(suite)
+
+if __name__ == '__main__':
+    unittest.main("tests",verbosity=1)
 
