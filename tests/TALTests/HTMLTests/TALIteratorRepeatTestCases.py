@@ -33,121 +33,147 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 
-import unittest, os, sys
+import unittest
+import os
+import sys
 import io
-import logging, logging.config
+import logging
+import logging.config
 
 from simpletal import simpleTAL, simpleTALES
 
-if (os.path.exists ("logging.ini")):
-	logging.config.fileConfig ("logging.ini")
+if (os.path.exists("logging.ini")):
+    logging.config.fileConfig("logging.ini")
 else:
-	logging.basicConfig()
-	
-try:
-	b = StopIteration()
-	ITERATOR_SUPPORT = 1
-except:
-	ITERATOR_SUPPORT = 0
-	
-class ActualIter:
-	def __init__ (self, size):
-		self.size = size
-		self.cur = 0
+    logging.basicConfig()
 
-	def __iter__ (self):
-		return self
-		
-	def next (self):
-		if (self.cur == self.size):
-			raise StopIteration ()
-		self.cur += 1
-		return self.cur
-	__next__=next
-	
+try:
+    b = StopIteration()
+    ITERATOR_SUPPORT = 1
+except:
+    ITERATOR_SUPPORT = 0
+
+
+class ActualIter:
+
+    def __init__(self, size):
+        self.size = size
+        self.cur = 0
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        if (self.cur == self.size):
+            raise StopIteration()
+        self.cur += 1
+        return self.cur
+    __next__ = next
+
+
 class IterContainer:
-	def __init__ (self, size):
-		self.size = size
-		
-	def __iter__ (self):
-		return ActualIter (self.size)
-	
+
+    def __init__(self, size):
+        self.size = size
+
+    def __iter__(self):
+        return ActualIter(self.size)
+
+
 class TALIteratorRepeatTestCases (unittest.TestCase):
-	def setUp (self):
-		self.context = simpleTALES.Context()
-		self.context.addGlobal ('test', 'testing')
-		self.context.addGlobal ('zeroCont', IterContainer (0))
-		self.context.addGlobal ('oneCont', IterContainer (1))
-		self.context.addGlobal ('twoCont', IterContainer (2))
-		
-		self.context.addGlobal ('zeroAct', ActualIter (0))
-		self.context.addGlobal ('oneAct', ActualIter (1))
-		self.context.addGlobal ('twoAct', ActualIter (2))
-		
-	def _runTest_ (self, txt, result, errMsg="Error"):
-		if (not ITERATOR_SUPPORT):
-			return
-		template = simpleTAL.compileHTMLTemplate (txt)
-		file = io.StringIO ()
-		try:
-			template.expand (self.context, file)
-		except Exception as e:
-			print("Error, template compiled to: " + str (template))
-			raise e
-		realResult = file.getvalue()
-		self.assertEqual (realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
-					
-	def testZeroCont (self):
-		self._runTest_ ('<html><p tal:repeat="entry zeroCont">Hello</p></html>', "<html></html>", "Repeat of zero length container failed.")
-		
-	def testOneCont (self):
-		self._runTest_ ('<html><p tal:repeat="entry oneCont">Hello</p></html>', "<html><p>Hello</p></html>", "Repeat of single length container failed.")
-	
-	def testTwoCont (self):
-		self._runTest_ ('<html><p tal:repeat="entry twoCont">Hello</p></html>', "<html><p>Hello</p><p>Hello</p></html>", "Repeat of two length container failed.")
-		
-	def testZeroAct (self):
-		self._runTest_ ('<html><p tal:repeat="entry zeroAct">Hello</p></html>', "<html></html>", "Repeat of zero length actual failed.")
-		
-	def testOneAct (self):
-		self._runTest_ ('<html><p tal:repeat="entry oneAct">Hello</p></html>', "<html><p>Hello</p></html>", "Repeat of single length actual failed.")
-	
-	def testTwoAct (self):
-		self._runTest_ ('<html><p tal:repeat="entry twoAct">Hello</p></html>', "<html><p>Hello</p><p>Hello</p></html>", "Repeat of two length actual failed.")
-	
-	def testIndexAct (self):
-		self._runTest_ ('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/index">Hello</p></html>', "<html><p>0</p><p>1</p></html>", "Repeat of two length actual iterator failed to generate index.")
-		
-	def testNumberAct (self):
-		self._runTest_ ('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/number">Hello</p></html>', "<html><p>1</p><p>2</p></html>", "Repeat of two length actual iterator failed to generate numbers.")
-		
-	def testEvenAct (self):
-		self._runTest_ ('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/even">Hello</p></html>', "<html><p>1</p><p>0</p></html>", "Repeat of two length actual iterator failed to even.")
-	
-	def testOddAct (self):
-		self._runTest_ ('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/odd">Hello</p></html>', "<html><p>0</p><p>1</p></html>", "Repeat of two length actual iterator failed to odd.")
-	
-	def testStartAct (self):
-		self._runTest_ ('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/start">Hello</p></html>', "<html><p>1</p><p>0</p></html>", "Repeat of two length actual iterator failed to start.")
+
+    def setUp(self):
+        self.context = simpleTALES.Context()
+        self.context.addGlobal('test', 'testing')
+        self.context.addGlobal('zeroCont', IterContainer(0))
+        self.context.addGlobal('oneCont', IterContainer(1))
+        self.context.addGlobal('twoCont', IterContainer(2))
+
+        self.context.addGlobal('zeroAct', ActualIter(0))
+        self.context.addGlobal('oneAct', ActualIter(1))
+        self.context.addGlobal('twoAct', ActualIter(2))
+
+    def _runTest_(self, txt, result, errMsg="Error"):
+        if (not ITERATOR_SUPPORT):
+            return
+        template = simpleTAL.compileHTMLTemplate(txt)
+        file = io.StringIO()
+        try:
+            template.expand(self.context, file)
+        except Exception as e:
+            print("Error, template compiled to: " + str(template))
+            raise e
+        realResult = file.getvalue()
+        self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
+                         (errMsg, txt, realResult, result, template))
+
+    def testZeroCont(self):
+        self._runTest_('<html><p tal:repeat="entry zeroCont">Hello</p></html>',
+                       "<html></html>", "Repeat of zero length container failed.")
+
+    def testOneCont(self):
+        self._runTest_('<html><p tal:repeat="entry oneCont">Hello</p></html>',
+                       "<html><p>Hello</p></html>", "Repeat of single length container failed.")
+
+    def testTwoCont(self):
+        self._runTest_('<html><p tal:repeat="entry twoCont">Hello</p></html>',
+                       "<html><p>Hello</p><p>Hello</p></html>", "Repeat of two length container failed.")
+
+    def testZeroAct(self):
+        self._runTest_('<html><p tal:repeat="entry zeroAct">Hello</p></html>',
+                       "<html></html>", "Repeat of zero length actual failed.")
+
+    def testOneAct(self):
+        self._runTest_('<html><p tal:repeat="entry oneAct">Hello</p></html>',
+                       "<html><p>Hello</p></html>", "Repeat of single length actual failed.")
+
+    def testTwoAct(self):
+        self._runTest_('<html><p tal:repeat="entry twoAct">Hello</p></html>',
+                       "<html><p>Hello</p><p>Hello</p></html>", "Repeat of two length actual failed.")
+
+    def testIndexAct(self):
+        self._runTest_('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/index">Hello</p></html>',
+                       "<html><p>0</p><p>1</p></html>", "Repeat of two length actual iterator failed to generate index.")
+
+    def testNumberAct(self):
+        self._runTest_('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/number">Hello</p></html>',
+                       "<html><p>1</p><p>2</p></html>", "Repeat of two length actual iterator failed to generate numbers.")
+
+    def testEvenAct(self):
+        self._runTest_('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/even">Hello</p></html>',
+                       "<html><p>1</p><p>0</p></html>", "Repeat of two length actual iterator failed to even.")
+
+    def testOddAct(self):
+        self._runTest_('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/odd">Hello</p></html>',
+                       "<html><p>0</p><p>1</p></html>", "Repeat of two length actual iterator failed to odd.")
+
+    def testStartAct(self):
+        self._runTest_('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/start">Hello</p></html>',
+                       "<html><p>1</p><p>0</p></html>", "Repeat of two length actual iterator failed to start.")
 
 # The only way to see inside an iterator is to cheat, and call it early.  Doing this might be unexpected, so iterators don't support end.
 #	def testEndAct (self):
 #		self._runTest_ ('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/end">Hello</p></html>', "<html><p>0</p><p>1</p></html>", "Repeat of two length actual iterator failed to end.")
 
-	def testLengthAct (self):
-		self._runTest_ ('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/length">Hello</p></html>', "<html><p>%s</p><p>%s</p></html>" % (str (sys.maxsize), str (sys.maxsize)), "Repeat of two length actual iterator failed to generate length.")
+    def testLengthAct(self):
+        self._runTest_('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/length">Hello</p></html>', "<html><p>%s</p><p>%s</p></html>" %
+                       (str(sys.maxsize), str(sys.maxsize)), "Repeat of two length actual iterator failed to generate length.")
 
-	def testLetterSmallAct (self):
-		self._runTest_ ('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/letter">Hello</p></html>', "<html><p>a</p><p>b</p></html>", "Repeat of two length actual iterator failed to letter.")
-	
-	def testLetterAct (self):
-		self._runTest_ ('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/Letter">Hello</p></html>', "<html><p>A</p><p>B</p></html>", "Repeat of two length actual iterator failed to Letter.")
-		
-	def testSmallRomanNumAct (self):
-		self._runTest_ ('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/roman">Hello</p></html>', "<html><p>i</p><p>ii</p></html>", "Repeat of two length actual iterator failed to generate roman numerals.")
-	
-	def testRomanNumAct (self):
-		self._runTest_ ('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/Roman">Hello</p></html>', "<html><p>I</p><p>II</p></html>", "Repeat of two length actual iterator failed to generate roman numerals.")
-		
+    def testLetterSmallAct(self):
+        self._runTest_('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/letter">Hello</p></html>',
+                       "<html><p>a</p><p>b</p></html>", "Repeat of two length actual iterator failed to letter.")
+
+    def testLetterAct(self):
+        self._runTest_('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/Letter">Hello</p></html>',
+                       "<html><p>A</p><p>B</p></html>", "Repeat of two length actual iterator failed to Letter.")
+
+    def testSmallRomanNumAct(self):
+        self._runTest_('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/roman">Hello</p></html>',
+                       "<html><p>i</p><p>ii</p></html>", "Repeat of two length actual iterator failed to generate roman numerals.")
+
+    def testRomanNumAct(self):
+        self._runTest_('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/Roman">Hello</p></html>',
+                       "<html><p>I</p><p>II</p></html>", "Repeat of two length actual iterator failed to generate roman numerals.")
+
 if __name__ == '__main__':
-	unittest.main()
+    unittest.main()

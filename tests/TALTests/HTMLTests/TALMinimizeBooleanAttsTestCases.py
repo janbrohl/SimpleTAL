@@ -32,88 +32,81 @@
 """
 
 from __future__ import unicode_literals
-import unittest, os
+import unittest
+import os
 import io
-import logging, logging.config
+import logging
+import logging.config
 
 from simpletal import simpleTAL, simpleTALES
 
-if (os.path.exists ("logging.ini")):
-	logging.config.fileConfig ("logging.ini")
+if (os.path.exists("logging.ini")):
+    logging.config.fileConfig("logging.ini")
 else:
-	logging.basicConfig()
-	
+    logging.basicConfig()
+
+
 class TALOmitTagTestCases (unittest.TestCase):
-	def setUp (self):
-		self.context = simpleTALES.Context()
-		self.context.addGlobal ('test', 'testing')
-		self.context.addGlobal ('link', 'www.owlfish.com')
-		self.context.addGlobal ('bob', 'bob')
-		self.context.addGlobal ('disabled', 'disabled')
-		self.context.addGlobal ('notdisabled', 'notdisabled')
-		
-	def _runTest_ (self, txt, result, errMsg="Error", minimizeBooleanAtts = 1):
-		template = simpleTAL.compileHTMLTemplate (txt, minimizeBooleanAtts = minimizeBooleanAtts)
-		file = io.StringIO ()
-		template.expand (self.context, file)
-		realResult = file.getvalue()
-		self.assertEqual (realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
-						
-	def testTemplateWithBooleanAtt (self):
-		self._runTest_ ('<html><input checked>Hello</html>'
-								,'<html><input checked>Hello</html>'
-								,"Template minimized boolean att failed.")
-								
-	def testTemplateWithBooleanAttWithBooleanDisabled (self):
-		self._runTest_ ('<html><input checked>Hello</html>'
-								,'<html><input checked="checked">Hello</html>'
-								,"Template minimized boolean att failed to output full form with support disabled."
-								, 0)
-				
-	def testTemplateWithFullAtt (self):
-		self._runTest_ ('<html><input checked="checked">Hello</html>'
-								,'<html><input checked>Hello</html>'
-								,"Template full att failed.")
-								
-	def testTemplateWithFullAttWithBooleanDisabled (self):
-		self._runTest_ ('<html><input checked="checked">Hello</html>'
-								,'<html><input checked="checked">Hello</html>'
-								,"Template full boolean att failed to output full form with support disabled."
-								, 0)
 
-	def testTemplateWithBadBooleanAtt (self):
-		self._runTest_ ('<html><input checked="notchecked">Hello</html>'
-								,'<html><input checked>Hello</html>'
-								,"Template bad boolean att failed.")
-								
-	def testTALRemoveBooleanAtt (self):
-		self._runTest_ ('<html><input disabled tal:attributes="disabled nothing">Hello</html>'
-								,'<html><input>Hello</html>'
-								,"TAL failed to remove minimized boolean tag")
-	
-	def testTALAddBooleanAtt (self):
-		self._runTest_ ('<html><input tal:attributes="disabled disabled">Hello</html>'
-								,'<html><input disabled>Hello</html>'
-								,"TAL failed to add minimized boolean tag")
-								
-	def testTALBadBooleanAtt (self):
-		self._runTest_ ('<html><input tal:attributes="disabled notdisabled">Hello</html>'
-								,'<html><input disabled>Hello</html>'
-								,"TAL failed to add with bad minimized boolean tag")
-								
-	def testTALNonBooleanAtt (self):
-		self._runTest_ ('<html><input tal:attributes="bob bob">Hello</html>'
-								,'<html><input bob="bob">Hello</html>'
-								,"TAL failed to add non-boolean tag")
-								
-	def testTALBooleanAttSupportDisabled (self):
-		self._runTest_ ('<html><input tal:attributes="disabled disabled">Hello</html>'
-								,'<html><input disabled="disabled">Hello</html>'
-								,"TAL failed to keep long form when support for minimized form disabled"
-								,0)
-								
-	def testTemplateAllBooleanAtts (self):
-		self._runTest_ ("""<html>
+    def setUp(self):
+        self.context = simpleTALES.Context()
+        self.context.addGlobal('test', 'testing')
+        self.context.addGlobal('link', 'www.owlfish.com')
+        self.context.addGlobal('bob', 'bob')
+        self.context.addGlobal('disabled', 'disabled')
+        self.context.addGlobal('notdisabled', 'notdisabled')
+
+    def _runTest_(self, txt, result, errMsg="Error", minimizeBooleanAtts=1):
+        template = simpleTAL.compileHTMLTemplate(
+            txt, minimizeBooleanAtts=minimizeBooleanAtts)
+        file = io.StringIO()
+        template.expand(self.context, file)
+        realResult = file.getvalue()
+        self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
+                         (errMsg, txt, realResult, result, template))
+
+    def testTemplateWithBooleanAtt(self):
+        self._runTest_('<html><input checked>Hello</html>',
+                       '<html><input checked>Hello</html>', "Template minimized boolean att failed.")
+
+    def testTemplateWithBooleanAttWithBooleanDisabled(self):
+        self._runTest_('<html><input checked>Hello</html>', '<html><input checked="checked">Hello</html>',
+                       "Template minimized boolean att failed to output full form with support disabled.", 0)
+
+    def testTemplateWithFullAtt(self):
+        self._runTest_('<html><input checked="checked">Hello</html>',
+                       '<html><input checked>Hello</html>', "Template full att failed.")
+
+    def testTemplateWithFullAttWithBooleanDisabled(self):
+        self._runTest_('<html><input checked="checked">Hello</html>', '<html><input checked="checked">Hello</html>',
+                       "Template full boolean att failed to output full form with support disabled.", 0)
+
+    def testTemplateWithBadBooleanAtt(self):
+        self._runTest_('<html><input checked="notchecked">Hello</html>',
+                       '<html><input checked>Hello</html>', "Template bad boolean att failed.")
+
+    def testTALRemoveBooleanAtt(self):
+        self._runTest_('<html><input disabled tal:attributes="disabled nothing">Hello</html>',
+                       '<html><input>Hello</html>', "TAL failed to remove minimized boolean tag")
+
+    def testTALAddBooleanAtt(self):
+        self._runTest_('<html><input tal:attributes="disabled disabled">Hello</html>',
+                       '<html><input disabled>Hello</html>', "TAL failed to add minimized boolean tag")
+
+    def testTALBadBooleanAtt(self):
+        self._runTest_('<html><input tal:attributes="disabled notdisabled">Hello</html>',
+                       '<html><input disabled>Hello</html>', "TAL failed to add with bad minimized boolean tag")
+
+    def testTALNonBooleanAtt(self):
+        self._runTest_('<html><input tal:attributes="bob bob">Hello</html>',
+                       '<html><input bob="bob">Hello</html>', "TAL failed to add non-boolean tag")
+
+    def testTALBooleanAttSupportDisabled(self):
+        self._runTest_('<html><input tal:attributes="disabled disabled">Hello</html>', '<html><input disabled="disabled">Hello</html>',
+                       "TAL failed to keep long form when support for minimized form disabled", 0)
+
+    def testTemplateAllBooleanAtts(self):
+        self._runTest_ ("""<html>
 									<area nohref>
 									<img ismap>
 									<object declare></object>
@@ -124,7 +117,7 @@ class TALOmitTagTestCases (unittest.TestCase):
 									<textarea disabled readonly></textarea>
 									<button disabled></button>
 									<script defer></script>"""
-								,"""<html>
+                        , """<html>
 									<area nohref>
 									<img ismap>
 									<object declare></object>
@@ -135,8 +128,7 @@ class TALOmitTagTestCases (unittest.TestCase):
 									<textarea disabled readonly></textarea>
 									<button disabled></button>
 									<script defer></script>"""
-								,"Template failed to handle every boolean option")
-								
+                        , "Template failed to handle every boolean option")
+
 if __name__ == '__main__':
-	unittest.main()
-
+    unittest.main()

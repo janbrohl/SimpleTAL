@@ -32,47 +32,53 @@
 """
 
 from __future__ import unicode_literals
-import unittest, os
+import unittest
+import os
 import io
-import logging, logging.config
+import logging
+import logging.config
 
 from simpletal import simpleTAL, simpleTALES
 
-if (os.path.exists ("logging.ini")):
-	logging.config.fileConfig ("logging.ini")
+if (os.path.exists("logging.ini")):
+    logging.config.fileConfig("logging.ini")
 else:
-	logging.basicConfig()
-	
-class TALConditionTestCases (unittest.TestCase):
-	def setUp (self):
-		self.context = simpleTALES.Context()
-		self.context.addGlobal ('test', 'testing')
-		self.context.addGlobal ('one', [1])
-		self.context.addGlobal ('two', ["one", "two"])
-		self.context.addGlobal ('three', [1,"Two",3])
-		
-	def _runTest_ (self, txt, result, errMsg="Error"):
-		template = simpleTAL.compileXMLTemplate (txt)
-		file = io.StringIO ()
-		template.expand (self.context, file, outputEncoding="iso-8859-1")
-		realResult = file.getvalue()
-		self.assertEqual (realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
-						
-	def testConditionDefault (self):
-		self._runTest_ ('<html tal:condition="default">Hello</html>', '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>Hello</html>', "Condition 'default' did not evaluate to true")
-		
-	def testConditionExists (self):
-		self._runTest_ ('<html tal:condition="test">Hello</html>'
-						, '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>Hello</html>', 'Condition for something that exists evaluated false')
-						
-	def testConditionNothing (self):
-		self._runTest_ ('<html tal:condition="nothing">Hello</html>'
-						, '<?xml version="1.0" encoding="iso-8859-1"?>\n', 'Condition nothing evaluated to true')
+    logging.basicConfig()
 
-	def testConditionMissing (self):
-		self._runTest_ ('<html tal:condition="thisdoesnotexists">Hello</html>'
-						, '<?xml version="1.0" encoding="iso-8859-1"?>\n', 'Condition for something that does not exist evaluated to true')
-						
+
+class TALConditionTestCases (unittest.TestCase):
+
+    def setUp(self):
+        self.context = simpleTALES.Context()
+        self.context.addGlobal('test', 'testing')
+        self.context.addGlobal('one', [1])
+        self.context.addGlobal('two', ["one", "two"])
+        self.context.addGlobal('three', [1, "Two", 3])
+
+    def _runTest_(self, txt, result, errMsg="Error"):
+        template = simpleTAL.compileXMLTemplate(txt)
+        file = io.StringIO()
+        template.expand(self.context, file, outputEncoding="iso-8859-1")
+        realResult = file.getvalue()
+        self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
+                         (errMsg, txt, realResult, result, template))
+
+    def testConditionDefault(self):
+        self._runTest_('<html tal:condition="default">Hello</html>',
+                       '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>Hello</html>', "Condition 'default' did not evaluate to true")
+
+    def testConditionExists(self):
+        self._runTest_('<html tal:condition="test">Hello</html>', '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>Hello</html>',
+                       'Condition for something that exists evaluated false')
+
+    def testConditionNothing(self):
+        self._runTest_('<html tal:condition="nothing">Hello</html>',
+                       '<?xml version="1.0" encoding="iso-8859-1"?>\n', 'Condition nothing evaluated to true')
+
+    def testConditionMissing(self):
+        self._runTest_('<html tal:condition="thisdoesnotexists">Hello</html>',
+                       '<?xml version="1.0" encoding="iso-8859-1"?>\n', 'Condition for something that does not exist evaluated to true')
+
 
 if __name__ == '__main__':
-	unittest.main()
+    unittest.main()

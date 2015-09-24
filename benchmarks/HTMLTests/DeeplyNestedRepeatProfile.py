@@ -32,11 +32,15 @@ from __future__ import unicode_literals
 from __future__ import print_function
 from simpletal import simpleTAL, simpleTALES, simpleTALUtils
 
-import time, StringIO, cStringIO, sys
+import time
+import StringIO
+import cStringIO
+import sys
 
 #import hotshot, hotshot.stats
 
-import profile, pstats
+import profile
+import pstats
 
 import gc
 print("Disabling garbage collection!")
@@ -70,39 +74,44 @@ performanceTemplate = """<html>
 """
 
 # 3 X 7 X 8 = 168 itterations per template expansion.
-thirdLevelList = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight"]
-secondLevelList = [{"colour": "red", "num": thirdLevelList}, {"colour": "orange", "num": thirdLevelList}, {"colour": "yellow", "num": thirdLevelList}, {"colour": "green", "num": thirdLevelList}, {"colour": "blue", "num": thirdLevelList}, {"colour": "indigo", "num": thirdLevelList}, {"colour": "violet", "num": thirdLevelList}]
-firstLevelList = [{"title": "First", "content": secondLevelList}, {"title": "Second", "content": secondLevelList}, {"title": "Third", "content": secondLevelList}]
+thirdLevelList = ["One", "Two", "Three",
+                  "Four", "Five", "Six", "Seven", "Eight"]
+secondLevelList = [{"colour": "red", "num": thirdLevelList}, {"colour": "orange", "num": thirdLevelList}, {"colour": "yellow", "num": thirdLevelList}, {
+    "colour": "green", "num": thirdLevelList}, {"colour": "blue", "num": thirdLevelList}, {"colour": "indigo", "num": thirdLevelList}, {"colour": "violet", "num": thirdLevelList}]
+firstLevelList = [{"title": "First", "content": secondLevelList}, {
+    "title": "Second", "content": secondLevelList}, {"title": "Third", "content": secondLevelList}]
 
 context = simpleTALES.Context()
-context.addGlobal ("title", "Performance testing!")
-context.addGlobal ("myList", firstLevelList )
+context.addGlobal("title", "Performance testing!")
+context.addGlobal("myList", firstLevelList)
 
-def NGTemplates (count):
-	tempFile = io.StringIO (performanceTemplate)
-	compiler = simpleTAL.HTMLTemplateCompiler()
-	compiler.parseTemplate (tempFile)
-	template = compiler.getTemplate()
-	file = simpleTALUtils.FastStringOutput()
-	start = time.clock()
-	for attempt in range (count):
-		template.expand (context, file)
-	end = time.clock()
-	#print "Resuling file: " + file.getvalue()
-	return (end - start)
-	
-def NGTemplateOverhead (count):
-	file = file = simpleTALUtils.FastStringOutput()
-	start = time.clock()
-	for attempt in range (count):
-		tempFile = io.StringIO (performanceTemplate)
-		compiler = simpleTAL.HTMLTemplateCompiler()
-		compiler.parseTemplate (tempFile)
-		template = compiler.getTemplate()
-		#template.expand (context, file)
-	end = time.clock()
-	#print "Resuling file: " + file.getvalue()
-	return (end - start)
+
+def NGTemplates(count):
+    tempFile = io.StringIO(performanceTemplate)
+    compiler = simpleTAL.HTMLTemplateCompiler()
+    compiler.parseTemplate(tempFile)
+    template = compiler.getTemplate()
+    file = simpleTALUtils.FastStringOutput()
+    start = time.clock()
+    for attempt in range(count):
+        template.expand(context, file)
+    end = time.clock()
+    # print "Resuling file: " + file.getvalue()
+    return (end - start)
+
+
+def NGTemplateOverhead(count):
+    file = file = simpleTALUtils.FastStringOutput()
+    start = time.clock()
+    for attempt in range(count):
+        tempFile = io.StringIO(performanceTemplate)
+        compiler = simpleTAL.HTMLTemplateCompiler()
+        compiler.parseTemplate(tempFile)
+        template = compiler.getTemplate()
+        #template.expand (context, file)
+    end = time.clock()
+    # print "Resuling file: " + file.getvalue()
+    return (end - start)
 
 
 print("Timing TAL templates")
@@ -117,8 +126,8 @@ print("Loading profile data.")
 #data = hotshot.stats.load ("profile.data")
 data = pstats.Stats("profile.data")
 data = data.strip_dirs()
-sortedData = data.sort_stats ('time', 'calls')
-sortedData.print_stats (25)
+sortedData = data.sort_stats('time', 'calls')
+sortedData.print_stats(25)
 #sortedData.print_callees ('cmdRepeat')
 #sortedData.print_callees ('cmdContent')
-data.print_callees ('cmdEndTagEndScope')
+data.print_callees('cmdEndTagEndScope')

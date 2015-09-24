@@ -32,17 +32,19 @@
 """
 
 from __future__ import unicode_literals
-import unittest, os
+import unittest
+import os
 import io
-import logging, logging.config
+import logging
+import logging.config
 
 from simpletal import simpleTAL, simpleTALES
 
-if (os.path.exists ("logging.ini")):
-	logging.config.fileConfig ("logging.ini")
+if (os.path.exists("logging.ini")):
+    logging.config.fileConfig("logging.ini")
 else:
-	logging.basicConfig()
-	
+    logging.basicConfig()
+
 pageTemplate = simpleTAL.compileHTMLTemplate ("""<html>
 <body metal:use-macro="site/macros/one">
 <h1 metal:fill-slot="title">Expansion of macro one</h1>
@@ -55,16 +57,18 @@ pageTemplate2 = simpleTAL.compileHTMLTemplate ("""<html>
 </div>
 </body></html>""")
 
+
 class DefineMacroTests (unittest.TestCase):
-	def setUp (self):
-		self.context = simpleTALES.Context()
-		self.context.addGlobal ('test', 'testing')
-		self.context.addGlobal ('link', 'www.owlfish.com')
-		self.context.addGlobal ('needsQuoting', """Does "this" work?""")
-		
-	def _runTest_ (self, txt, result, errMsg="Error"):
-		macroTemplate = simpleTAL.compileHTMLTemplate (txt)
-		self.context.addGlobal ("site", macroTemplate)
-		file = io.StringIO ()
-		pageTemplate.expand (self.context, file)
-		realResult = file.getvalue()
+
+    def setUp(self):
+        self.context = simpleTALES.Context()
+        self.context.addGlobal('test', 'testing')
+        self.context.addGlobal('link', 'www.owlfish.com')
+        self.context.addGlobal ('needsQuoting', """Does "this" work?""")
+
+    def _runTest_(self, txt, result, errMsg="Error"):
+        macroTemplate = simpleTAL.compileHTMLTemplate(txt)
+        self.context.addGlobal("site", macroTemplate)
+        file = io.StringIO()
+        pageTemplate.expand(self.context, file)
+        realResult = file.getvalue()

@@ -32,158 +32,141 @@
 """
 
 from __future__ import unicode_literals
-import unittest, os
+import unittest
+import os
 import io
-import logging, logging.config
+import logging
+import logging.config
 
 from simpletal import simpleTAL, simpleTALES
 
-if (os.path.exists ("logging.ini")):
-	logging.config.fileConfig ("logging.ini")
+if (os.path.exists("logging.ini")):
+    logging.config.fileConfig("logging.ini")
 else:
-	logging.basicConfig()
+    logging.basicConfig()
 
-def simpleFunction ():
-	return "Hello World"
-	
-def nestedFunction ():
-	return {'nest': simpleFunction}
-		
-def pathFunction (thePath):
-	return thePath
-	
+
+def simpleFunction():
+    return "Hello World"
+
+
+def nestedFunction():
+    return {'nest': simpleFunction}
+
+
+def pathFunction(thePath):
+    return thePath
+
+
 class CallRecorder:
-	def __init__ (self):
-		self.called = 0
-		
-	def simpleFunction (self):
-		self.called += 1
-		return "Hello"
-	
+
+    def __init__(self):
+        self.called = 0
+
+    def simpleFunction(self):
+        self.called += 1
+        return "Hello"
+
+
 class PathTests (unittest.TestCase):
-	def setUp (self):
-		self.context = simpleTALES.Context()
-		self.recorder = CallRecorder()
-		self.context.addGlobal ('top', 'Hello from the top')
-		self.context.addGlobal ('alt', 'Wobble the way')
-		self.context.addGlobal ('theMap', {'top': 'Hello', 'onelevel': {'top': 'Bye'}})
-		self.context.addGlobal ('funcMap', {'simple': simpleFunction, 'nested': nestedFunction, 'pathFunc': simpleTALES.PathFunctionVariable (pathFunction)})
-		self.context.addGlobal ('topFunc', simpleFunction)
-		self.context.addGlobal ('pathFunc', simpleTALES.PathFunctionVariable (pathFunction))
-		self.context.addGlobal ('cacheFunc', simpleTALES.CachedFuncResult (self.recorder.simpleFunction))
-		self.context.addGlobal ('alist', [{'a': 'An A', 'b': 'A B'},"Hello!"])
-		
-	def _runTest_ (self, txt, result, errMsg="Error"):
-		template = simpleTAL.compileHTMLTemplate (txt)
-		file = io.StringIO ()
-		template.expand (self.context, file)
-		realResult = file.getvalue()
-		self.assertEqual (realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
-		
-	def _runCacheTest_ (self, txt, result, errMsg="Error"):
-		template = simpleTAL.compileHTMLTemplate (txt)
-		file = io.StringIO ()
-		template.expand (self.context, file)
-		realResult = file.getvalue()
-		self.assertEqual (realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
-		self.assertEqual (self.recorder.called, 1, 'Recorder shows function was called %s times!' % str (self.recorder.called))
-			
-	def testSimpleTopPath (self):
-		self._runTest_ ('<html tal:replace="top">Top</html>'
-					   ,'Hello from the top'
-					   ,'Simple top level path failed.'
-					   )
-					   
-	def testOneLevelMap (self):
-		self._runTest_ ('<html tal:replace="theMap/top">Map</html>'
-					   ,'Hello'
-					   ,'One level deep map access failed.'
-					   )
-					   
-	def testTwoLevelMap (self):
-		self._runTest_ ('<html tal:replace="theMap/onelevel/top">Map</html>'
-					   ,'Bye'
-					   ,'Two level deep map access failed.'
-					   )		
-	
-	def testOneLevelFuncMap (self):
-		self._runTest_ ('<html tal:replace="funcMap/simple">Map</html>'
-					   ,'Hello World'
-					   ,'One level deep function access failed.'
-					   )
 
-	def testTwoLevelFuncMap (self):
-		self._runTest_ ('<html tal:replace="funcMap/nested/nest">Map</html>'
-					   ,'Hello World'
-					   ,'Two level deep function access failed.'
-					   )
-					   
-	def testTopLevelFunc (self):
-		self._runTest_ ('<html tal:replace="topFunc">Map</html>'
-					   ,'Hello World'
-					   ,'Top level function access failed.'
-					   )
+    def setUp(self):
+        self.context = simpleTALES.Context()
+        self.recorder = CallRecorder()
+        self.context.addGlobal('top', 'Hello from the top')
+        self.context.addGlobal('alt', 'Wobble the way')
+        self.context.addGlobal(
+            'theMap', {'top': 'Hello', 'onelevel': {'top': 'Bye'}})
+        self.context.addGlobal('funcMap', {'simple': simpleFunction, 'nested': nestedFunction,
+                                           'pathFunc': simpleTALES.PathFunctionVariable(pathFunction)})
+        self.context.addGlobal('topFunc', simpleFunction)
+        self.context.addGlobal(
+            'pathFunc', simpleTALES.PathFunctionVariable(pathFunction))
+        self.context.addGlobal('cacheFunc', simpleTALES.CachedFuncResult(
+            self.recorder.simpleFunction))
+        self.context.addGlobal('alist', [{'a': 'An A', 'b': 'A B'}, "Hello!"])
 
-	def testFirstORPath (self):
-		self._runTest_ ('<html tal:replace="top | alt">hmm</html>'
-					   ,'Hello from the top'
-					   ,'First valid path was not selected.'
-					   )
-					   					   
-	def testSecondORPath (self):
-		self._runTest_ ('<html tal:replace="thingy | alt">hmm</html>'
-					   ,'Wobble the way'
-					   ,'Second valid path was not selected.'
-					   )
-					   
-	def testPathFunctionNoParams (self):
-		self._runTest_ ('<html tal:content="pathFunc">hmm</html>'
-						,'<html></html>'
-						,'Path Function with no parameters failed.'
-						)
-						
-	def testPathFunctionWithOnePath (self):
-		self._runTest_ ('<html tal:content="pathFunc/firstPath">hmm</html>'
-						,'<html>firstPath</html>'
-						,'Path Function with one parameter failed.'
-						)
-						
-	def testPathFunctionWithTwoPath (self):
-		self._runTest_ ('<html tal:content="pathFunc/firstPath/second">hmm</html>'
-						,'<html>firstPath/second</html>'
-						,'Path Function with two parameters failed.'
-						)
-						
-	def testPathFunctionWithOnePathOneDeep (self):
-		self._runTest_ ('<html tal:content="funcMap/pathFunc/firstPath">hmm</html>'
-						,'<html>firstPath</html>'
-						,'Path Function with one parameter, nested one deep, failed.'
-						)
-						
-	def testAList (self):
-		self._runTest_ ('<html tal:content="alist/0/a">hmm</html>'
-						,'<html>An A</html>'
-						,'Index into list then dictionary failed.'
-						)
-						
-	def testAList2ndItem (self):
-		self._runTest_ ('<html tal:content="alist/1">hmm</html>'
-						,'<html>Hello!</html>'
-						,'Index into list failed.'
-						)
-						
-	def testAListNoSuchItem (self):
-		self._runTest_ ('<html tal:content="alist/2">hmm</html>'
-						,'<html></html>'
-						,'Index past end of list failed.'
-						)
-						
-	def testCachedFuction (self):
-		self._runCacheTest_ ('<b tal:content="cacheFunc"></b><i tal:replace="cacheFunc"></i>'
-							,'<b>Hello</b>Hello'
-							,"Cached function didn't return as expected."
-							)
+    def _runTest_(self, txt, result, errMsg="Error"):
+        template = simpleTAL.compileHTMLTemplate(txt)
+        file = io.StringIO()
+        template.expand(self.context, file)
+        realResult = file.getvalue()
+        self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
+                         (errMsg, txt, realResult, result, template))
+
+    def _runCacheTest_(self, txt, result, errMsg="Error"):
+        template = simpleTAL.compileHTMLTemplate(txt)
+        file = io.StringIO()
+        template.expand(self.context, file)
+        realResult = file.getvalue()
+        self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
+                         (errMsg, txt, realResult, result, template))
+        self.assertEqual(self.recorder.called, 1, 'Recorder shows function was called %s times!' % str(
+            self.recorder.called))
+
+    def testSimpleTopPath(self):
+        self._runTest_('<html tal:replace="top">Top</html>', 'Hello from the top', 'Simple top level path failed.'
+                       )
+
+    def testOneLevelMap(self):
+        self._runTest_('<html tal:replace="theMap/top">Map</html>', 'Hello', 'One level deep map access failed.'
+                       )
+
+    def testTwoLevelMap(self):
+        self._runTest_('<html tal:replace="theMap/onelevel/top">Map</html>', 'Bye', 'Two level deep map access failed.'
+                       )
+
+    def testOneLevelFuncMap(self):
+        self._runTest_('<html tal:replace="funcMap/simple">Map</html>', 'Hello World', 'One level deep function access failed.'
+                       )
+
+    def testTwoLevelFuncMap(self):
+        self._runTest_('<html tal:replace="funcMap/nested/nest">Map</html>', 'Hello World', 'Two level deep function access failed.'
+                       )
+
+    def testTopLevelFunc(self):
+        self._runTest_('<html tal:replace="topFunc">Map</html>', 'Hello World', 'Top level function access failed.'
+                       )
+
+    def testFirstORPath(self):
+        self._runTest_('<html tal:replace="top | alt">hmm</html>', 'Hello from the top', 'First valid path was not selected.'
+                       )
+
+    def testSecondORPath(self):
+        self._runTest_('<html tal:replace="thingy | alt">hmm</html>', 'Wobble the way', 'Second valid path was not selected.'
+                       )
+
+    def testPathFunctionNoParams(self):
+        self._runTest_('<html tal:content="pathFunc">hmm</html>', '<html></html>', 'Path Function with no parameters failed.'
+                       )
+
+    def testPathFunctionWithOnePath(self):
+        self._runTest_('<html tal:content="pathFunc/firstPath">hmm</html>', '<html>firstPath</html>', 'Path Function with one parameter failed.'
+                       )
+
+    def testPathFunctionWithTwoPath(self):
+        self._runTest_('<html tal:content="pathFunc/firstPath/second">hmm</html>', '<html>firstPath/second</html>', 'Path Function with two parameters failed.'
+                       )
+
+    def testPathFunctionWithOnePathOneDeep(self):
+        self._runTest_('<html tal:content="funcMap/pathFunc/firstPath">hmm</html>', '<html>firstPath</html>', 'Path Function with one parameter, nested one deep, failed.'
+                       )
+
+    def testAList(self):
+        self._runTest_('<html tal:content="alist/0/a">hmm</html>', '<html>An A</html>', 'Index into list then dictionary failed.'
+                       )
+
+    def testAList2ndItem(self):
+        self._runTest_('<html tal:content="alist/1">hmm</html>', '<html>Hello!</html>', 'Index into list failed.'
+                       )
+
+    def testAListNoSuchItem(self):
+        self._runTest_('<html tal:content="alist/2">hmm</html>', '<html></html>', 'Index past end of list failed.'
+                       )
+
+    def testCachedFuction(self):
+        self._runCacheTest_('<b tal:content="cacheFunc"></b><i tal:replace="cacheFunc"></i>', '<b>Hello</b>Hello', "Cached function didn't return as expected."
+                            )
 
 if __name__ == '__main__':
-	unittest.main()
-
+    unittest.main()

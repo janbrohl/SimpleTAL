@@ -33,7 +33,10 @@ from __future__ import unicode_literals
 from __future__ import print_function
 from simpletal import simpleTAL, simpleTALES, simpleTALUtils
 
-import time, StringIO, cStringIO, sys
+import time
+import StringIO
+import cStringIO
+import sys
 
 performanceTemplate = """<html>
 <head>
@@ -120,41 +123,43 @@ performanceTemplate = """<html>
 """
 
 context = simpleTALES.Context()
-context.addGlobal ("title", "Performance testing!")
-context.addGlobal ("myList", ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight"])
+context.addGlobal("title", "Performance testing!")
+context.addGlobal("myList", ["One", "Two", "Three",
+                             "Four", "Five", "Six", "Seven", "Eight"])
 
-def NGTemplates (count):
-	tempFile = io.StringIO (performanceTemplate)
-	compiler = simpleTAL.XMLTemplateCompiler()
-	compiler.parseTemplate (tempFile)
-	template = compiler.getTemplate()
-	file = simpleTALUtils.FastStringOutput()
-	start = time.clock()
-	for attempt in range (count):
-		template.expand (context, file)
-	end = time.clock()
-	#print "Resuling file: " + file.getvalue()
-	return (end - start)
-	
-def NGTemplateOverhead (count):
-	file = simpleTALUtils.FastStringOutput()
-	start = time.clock()
-	for attempt in range (count):
-		tempFile = io.StringIO (performanceTemplate)
-		compiler = simpleTAL.XMLTemplateCompiler()
-		compiler.parseTemplate (tempFile)
-		template = compiler.getTemplate()
-		template.expand (context, file)
-	end = time.clock()
-	#print "Resuling file: " + file.getvalue()
-	return (end - start)
+
+def NGTemplates(count):
+    tempFile = io.StringIO(performanceTemplate)
+    compiler = simpleTAL.XMLTemplateCompiler()
+    compiler.parseTemplate(tempFile)
+    template = compiler.getTemplate()
+    file = simpleTALUtils.FastStringOutput()
+    start = time.clock()
+    for attempt in range(count):
+        template.expand(context, file)
+    end = time.clock()
+    # print "Resuling file: " + file.getvalue()
+    return (end - start)
+
+
+def NGTemplateOverhead(count):
+    file = simpleTALUtils.FastStringOutput()
+    start = time.clock()
+    for attempt in range(count):
+        tempFile = io.StringIO(performanceTemplate)
+        compiler = simpleTAL.XMLTemplateCompiler()
+        compiler.parseTemplate(tempFile)
+        template = compiler.getTemplate()
+        template.expand(context, file)
+    end = time.clock()
+    # print "Resuling file: " + file.getvalue()
+    return (end - start)
 
 
 print("Timing TAL templates")
-result = NGTemplates (10000)
+result = NGTemplates(10000)
 print("Result: " + str(result) + " for 10000 template expansions")
 
 print("Timing TAL templates (with template parsing)")
-result = NGTemplateOverhead (1000)
+result = NGTemplateOverhead(1000)
 print("Result: " + str(result) + " for 1000 template expansions")
-

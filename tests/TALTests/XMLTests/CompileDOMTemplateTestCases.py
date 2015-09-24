@@ -32,54 +32,58 @@
 """
 
 from __future__ import unicode_literals
-import unittest, os
+import unittest
+import os
 import io
-import logging, logging.config
+import logging
+import logging.config
 import xml.dom
 
 from simpletal import simpleTAL, simpleTALES
 
-if (os.path.exists ("logging.ini")):
-	logging.config.fileConfig ("logging.ini")
+if (os.path.exists("logging.ini")):
+    logging.config.fileConfig("logging.ini")
 else:
-	logging.basicConfig()
-	
+    logging.basicConfig()
+
 try:
-	# Is PyXML's DOM2SAX available?
-	import xml.dom.ext.Dom2Sax
-	use_dom2sax = 1
+    # Is PyXML's DOM2SAX available?
+    import xml.dom.ext.Dom2Sax
+    use_dom2sax = 1
 except ImportError:
-	use_dom2sax = 0
-	
+    use_dom2sax = 0
+
+
 class CompileDOMTemplateTestCases (unittest.TestCase):
-	def setUp (self):
-		self.context = simpleTALES.Context()
-		entry = """<insertedData>Some structure: <b tal:content="weblog/subject"></b></insertedData>"""
-		
-		weblog = {'subject': 'Test subject', 'entry': entry}
-		
-		self.context.addGlobal ('test', 'testing')
-		self.context.addGlobal ('one', [1])
-		self.context.addGlobal ('two', ["one", "two"])
-		self.context.addGlobal ('three', [1,"Two",3])
-		self.context.addGlobal ('weblog', weblog)
-		
-	def _runTest_ (self, dom, result, errMsg="Error", allowTALInStructure=1):
-		if (not use_dom2sax):
-			return
-		template = simpleTAL.compileDOMTemplate (dom)
-		file = io.StringIO ()
-		template.expand (self.context, file, outputEncoding="iso-8859-1")
-		realResult = file.getvalue()
-		self.assertEqual (realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, dom.toxml(), realResult, result, template))
-						
-	def testContentNothing (self):
-		domImpl = xml.dom.getDOMImplementation()
-		doc = domImpl.createDocument ("", "html", None)
-		h1 = doc.createElement ("h1")
-		h1.setAttribute ("tal:content", "test")
-		doc.firstChild.appendChild (h1)
-		
-		self._runTest_ (doc
-						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html><h1>testing</h1></html>'
-						,"DOM Template failed to compile.")
+
+    def setUp(self):
+        self.context = simpleTALES.Context()
+        entry = """<insertedData>Some structure: <b tal:content="weblog/subject"></b></insertedData>"""
+
+        weblog = {'subject': 'Test subject', 'entry': entry}
+
+        self.context.addGlobal('test', 'testing')
+        self.context.addGlobal('one', [1])
+        self.context.addGlobal('two', ["one", "two"])
+        self.context.addGlobal('three', [1, "Two", 3])
+        self.context.addGlobal('weblog', weblog)
+
+    def _runTest_(self, dom, result, errMsg="Error", allowTALInStructure=1):
+        if (not use_dom2sax):
+            return
+        template = simpleTAL.compileDOMTemplate(dom)
+        file = io.StringIO()
+        template.expand(self.context, file, outputEncoding="iso-8859-1")
+        realResult = file.getvalue()
+        self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
+                         (errMsg, dom.toxml(), realResult, result, template))
+
+    def testContentNothing(self):
+        domImpl = xml.dom.getDOMImplementation()
+        doc = domImpl.createDocument("", "html", None)
+        h1 = doc.createElement("h1")
+        h1.setAttribute("tal:content", "test")
+        doc.firstChild.appendChild(h1)
+
+        self._runTest_(doc, '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><h1>testing</h1></html>',
+                       "DOM Template failed to compile.")

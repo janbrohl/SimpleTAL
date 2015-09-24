@@ -32,58 +32,64 @@
 """
 
 from __future__ import unicode_literals
-import unittest, os
+import unittest
+import os
 import io
-import logging, logging.config
+import logging
+import logging.config
 
 from simpletal import simpleTAL, simpleTALES
 
-if (os.path.exists ("logging.ini")):
-	logging.config.fileConfig ("logging.ini")
+if (os.path.exists("logging.ini")):
+    logging.config.fileConfig("logging.ini")
 else:
-	logging.basicConfig()
-	
+    logging.basicConfig()
+
+
 class TALDefineTestCases (unittest.TestCase):
-	def setUp (self):
-		self.context = simpleTALES.Context()
-		self.context.addGlobal ('test', 'testing')
-		self.context.addGlobal ('one', [1])
-		self.context.addGlobal ('two', ["one", "two"])
-		self.context.addGlobal ('three', [1,"Two",3])
-		
-	def _runTest_ (self, txt, result, errMsg="Error"):
-		template = simpleTAL.compileXMLTemplate (txt)
-		file = io.StringIO ()
-		template.expand (self.context, file, outputEncoding="iso-8859-1")
-		realResult = file.getvalue()
-		self.assertEqual (realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
-						
-	def testDefineString (self):
-		self._runTest_ ('<html tal:define="def1 test"><p tal:content="def1"></p></html>', '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p>testing</p></html>', "Simple string define failed.")
-		
-	def testDefineList (self):
-		self._runTest_ ('<html tal:define="def1 two"><p tal:repeat="var def1">Hello <b tal:content="var"></b></p></html>'
-						, '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p>Hello <b>one</b></p><p>Hello <b>two</b></p></html>', 'List define failed.')
-						
-	def testDefineGlobal (self):
-		self._runTest_ ('<html><p tal:define="global def1 test"></p><p tal:content="def1"></p></html>'
-						, '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p></p><p>testing</p></html>', 'Global did not set globally')
 
-	def testDefineLocal (self):
-		self._runTest_ ('<html><p tal:define="local def1 test"></p><p tal:content="def1"></p></html>'
-						, '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p></p><p></p></html>', 'Explicit local available globaly')
-						
-	def testDefineImplicitLocal (self):
-		self._runTest_ ('<html><p tal:define="def1 test"></p><p tal:content="def1"></p></html>'
-						, '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p></p><p></p></html>', 'Implicit local available globaly')
+    def setUp(self):
+        self.context = simpleTALES.Context()
+        self.context.addGlobal('test', 'testing')
+        self.context.addGlobal('one', [1])
+        self.context.addGlobal('two', ["one", "two"])
+        self.context.addGlobal('three', [1, "Two", 3])
 
-	def testDefineMultipleLocal (self):
-		self._runTest_ ('<html><div tal:define="firstVar test;secondVar string:This is a semi;;colon;thirdVar string:Test"><p tal:content="test">Testing</p><p tal:content="secondVar"></p><p tal:content="thirdVar"></p></div></html>'
-						, '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><div><p>testing</p><p>This is a semi;colon</p><p>Test</p></div></html>', 'Multiple defines failed.')
-		
-	def testDefineMultipleMixed (self):
-		self._runTest_ ('<html><div tal:define="firstVar test;global secondVar string:This is a semi;;colon;thirdVar string:Test"><p tal:content="test">Testing</p><p tal:content="secondVar"></p><p tal:content="thirdVar"></p></div><b tal:content="secondVar"></b></html>'
-						, '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><div><p>testing</p><p>This is a semi;colon</p><p>Test</p></div><b>This is a semi;colon</b></html>', 'Multiple defines failed.')
+    def _runTest_(self, txt, result, errMsg="Error"):
+        template = simpleTAL.compileXMLTemplate(txt)
+        file = io.StringIO()
+        template.expand(self.context, file, outputEncoding="iso-8859-1")
+        realResult = file.getvalue()
+        self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
+                         (errMsg, txt, realResult, result, template))
+
+    def testDefineString(self):
+        self._runTest_('<html tal:define="def1 test"><p tal:content="def1"></p></html>',
+                       '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p>testing</p></html>', "Simple string define failed.")
+
+    def testDefineList(self):
+        self._runTest_('<html tal:define="def1 two"><p tal:repeat="var def1">Hello <b tal:content="var"></b></p></html>',
+                       '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p>Hello <b>one</b></p><p>Hello <b>two</b></p></html>', 'List define failed.')
+
+    def testDefineGlobal(self):
+        self._runTest_('<html><p tal:define="global def1 test"></p><p tal:content="def1"></p></html>',
+                       '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p></p><p>testing</p></html>', 'Global did not set globally')
+
+    def testDefineLocal(self):
+        self._runTest_('<html><p tal:define="local def1 test"></p><p tal:content="def1"></p></html>',
+                       '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p></p><p></p></html>', 'Explicit local available globaly')
+
+    def testDefineImplicitLocal(self):
+        self._runTest_('<html><p tal:define="def1 test"></p><p tal:content="def1"></p></html>',
+                       '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p></p><p></p></html>', 'Implicit local available globaly')
+
+    def testDefineMultipleLocal(self):
+        self._runTest_('<html><div tal:define="firstVar test;secondVar string:This is a semi;;colon;thirdVar string:Test"><p tal:content="test">Testing</p><p tal:content="secondVar"></p><p tal:content="thirdVar"></p></div></html>',
+                       '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><div><p>testing</p><p>This is a semi;colon</p><p>Test</p></div></html>', 'Multiple defines failed.')
+
+    def testDefineMultipleMixed(self):
+        self._runTest_('<html><div tal:define="firstVar test;global secondVar string:This is a semi;;colon;thirdVar string:Test"><p tal:content="test">Testing</p><p tal:content="secondVar"></p><p tal:content="thirdVar"></p></div><b tal:content="secondVar"></b></html>',
+                       '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><div><p>testing</p><p>This is a semi;colon</p><p>Test</p></div><b>This is a semi;colon</b></html>', 'Multiple defines failed.')
 
 if __name__ == '__main__':
-	unittest.main()
+    unittest.main()

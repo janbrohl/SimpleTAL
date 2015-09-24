@@ -32,49 +32,51 @@
 """
 
 from __future__ import unicode_literals
-import unittest, os
+import unittest
+import os
 import io
-import logging, logging.config
+import logging
+import logging.config
 
 from simpletal import simpleTAL, simpleTALES
 
-if (os.path.exists ("logging.ini")):
-	logging.config.fileConfig ("logging.ini")
+if (os.path.exists("logging.ini")):
+    logging.config.fileConfig("logging.ini")
 else:
-	logging.basicConfig()
-	
-class TALSpecialCharsTestCases (unittest.TestCase):
-	def setUp (self):
-		self.context = simpleTALES.Context(allowPythonPath=1)
-		self.context.addGlobal ('test', '< testing > experimenting & twice as useful')
-		self.context.addGlobal ('one', [1])
-		self.context.addGlobal ('two', ["one", "two"])
-		self.context.addGlobal ('three', [1,"Two",3])
-		
-	def _runTest_ (self, txt, result, errMsg="Error"):
-		template = simpleTAL.compileHTMLTemplate (txt)
-		file = io.StringIO ()
-		template.expand (self.context, file)
-		realResult = file.getvalue()
-		self.assertEqual (realResult, result, "%s - \npassed in: %r \ngot back %r \nexpected %r\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
-						
-	def testLessThanGreaterThanAmpersand (self):
-		self._runTest_ ('<html tal:content="test">Hello</html>'
-						,"<html>&lt; testing &gt; experimenting &amp; twice as useful</html>"
-						,"Less than, greater than or amperand were not encoded correctly")
-						
-	def testEscapedPythonPaths (self):
-		self._runTest_ ('<html tal:content="python: str (2000 &lt;&lt; 1)">Hello</html>'
-						,"<html>4000</html>"
-						,"Python bit shift failed.")
-						
-	def testAmpInTemplate (self):
-		#logging.getLogger().setLevel(logging.DEBUG)
-		NBSP = b"\xa0".decode("iso-8859-1")
-		self._runTest_ (b'<html test="&amp;nbsp;&nbsp;" tal:attributes="test2 string: Boo &nbsp; There ${test}">Hello Bye Bye</html>'
-							,"""<html test2="Boo """ + NBSP + """ There &lt; testing &gt; experimenting &amp; twice as useful" test="&amp;nbsp;""" + NBSP + """">Hello Bye Bye</html>"""
-							,"&amp; in template failed.")
-						
-if __name__ == '__main__':
-	unittest.main()
+    logging.basicConfig()
 
+
+class TALSpecialCharsTestCases (unittest.TestCase):
+
+    def setUp(self):
+        self.context = simpleTALES.Context(allowPythonPath=1)
+        self.context.addGlobal(
+            'test', '< testing > experimenting & twice as useful')
+        self.context.addGlobal('one', [1])
+        self.context.addGlobal('two', ["one", "two"])
+        self.context.addGlobal('three', [1, "Two", 3])
+
+    def _runTest_(self, txt, result, errMsg="Error"):
+        template = simpleTAL.compileHTMLTemplate(txt)
+        file = io.StringIO()
+        template.expand(self.context, file)
+        realResult = file.getvalue()
+        self.assertEqual(realResult, result, "%s - \npassed in: %r \ngot back %r \nexpected %r\n\nTemplate: %s" %
+                         (errMsg, txt, realResult, result, template))
+
+    def testLessThanGreaterThanAmpersand(self):
+        self._runTest_('<html tal:content="test">Hello</html>', "<html>&lt; testing &gt; experimenting &amp; twice as useful</html>",
+                       "Less than, greater than or amperand were not encoded correctly")
+
+    def testEscapedPythonPaths(self):
+        self._runTest_('<html tal:content="python: str (2000 &lt;&lt; 1)">Hello</html>',
+                       "<html>4000</html>", "Python bit shift failed.")
+
+    def testAmpInTemplate(self):
+        # logging.getLogger().setLevel(logging.DEBUG)
+        NBSP = b"\xa0".decode("iso-8859-1")
+        self._runTest_ (b'<html test="&amp;nbsp;&nbsp;" tal:attributes="test2 string: Boo &nbsp; There ${test}">Hello Bye Bye</html>'                                                , """<html test2="Boo """ + NBSP + """ There &lt; testing &gt; experimenting &amp; twice as useful" test="&amp;nbsp;""" + NBSP + """">Hello Bye Bye</html>"""
+                        , "&amp; in template failed.")
+
+if __name__ == '__main__':
+    unittest.main()

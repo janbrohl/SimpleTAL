@@ -38,23 +38,23 @@ import sys
 
 # Create the context that is used by the template
 context = simpleTALES.Context()
-context.addGlobal ("title", "Hello World")
-context.addGlobal ("author", "Colin Stewart")
+context.addGlobal("title", "Hello World")
+context.addGlobal("author", "Colin Stewart")
 
 # A list that contains a dictionary
-chapters = [{"heading": "Introduction", "text": "Some <b>text</b> here"}
-					 ,{"heading": "Details", "text": "Notice tags are preserved."}
-					 ]
+chapters = [{"heading": "Introduction", "text": "Some <b>text</b> here"}, {"heading": "Details", "text": "Notice tags are preserved."}
+            ]
 
 advancedText = 'Structured text can contain other templates like this - written by <b tal:replace="author">Me</b>'
 
-chapters.append ({"heading": "Advanced", "text": simpleTAL.compileHTMLTemplate (advancedText)})
+chapters.append(
+    {"heading": "Advanced", "text": simpleTAL.compileHTMLTemplate(advancedText)})
 
-context.addGlobal ("doc", chapters)
+context.addGlobal("doc", chapters)
 
-templateFile = open ("structure.html", 'r')
-template = simpleTAL.compileHTMLTemplate (templateFile)
+templateFile = open("structure.html", 'r')
+template = simpleTAL.compileHTMLTemplate(templateFile)
 
 templateFile.close()
 
-template.expand (context, sys.stdout)
+template.expand(context, sys.stdout)

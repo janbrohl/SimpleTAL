@@ -46,64 +46,68 @@ from __future__ import absolute_import
 import xml.etree.ElementTree
 import simpletal.simpleTALES
 
-class SimpleElementTreeVar (xml.etree.ElementTree.Element,simpletal.simpleTALES.ContextVariable):
-	def __init__(self, tag, attrib):
-		xml.etree.ElementTree.Element.__init__(self, tag, attrib)
-		simpletal.simpleTALES.ContextVariable.__init__(self)
-		
-	def value (self, pathInfo = None):
-		if (pathInfo is not None):
-			pathIndex, paths = pathInfo
-			ourParams = paths[pathIndex:]
-			attributeName = None
-			if (len (ourParams) > 0):
-				# Look for attribute index
-				if (ourParams[-1].startswith ('@')):
-					# Attribute lookup
-					attributeName = ourParams [-1][1:]
-					ourParams = ourParams [:-1]
-			# Do we do a find?
-			activeElement = self
-			if len (ourParams) > 0:
-				# Look for a find or findall first
-				if (ourParams [0] == 'find'):
-					# Find the element if possible
-					activeElement = self.find ("/".join (ourParams [1:]))
-				elif (ourParams [0] == 'findall'):
-					# Short cut this
-					raise simpletal.simpleTALES.ContextVariable (self.findall ("/".join (ourParams[1:])))
-				else:
-					# Assume that we wanted to use find
-					activeElement = self.find ("/".join (ourParams))
-			# Did we find an element and are we looking for an attribute?
-			if (attributeName is not None and activeElement is not None):
-				attrValue = activeElement.attrib.get (attributeName, None)
-				raise simpletal.simpleTALES.ContextVariable (attrValue)
-			
-			# Just return the element
-			if (activeElement is None):
-				# Wrap it
-				raise simpletal.simpleTALES.ContextVariable (None)
-			raise activeElement
-		else:
-			return self
-			
-	def __unicode__ (self):
-		return self.text
-		
-	def __str__ (self):
-		return str (self.text)
 
-def parseFile (file):
-	treeBuilder = xml.etree.ElementTree.TreeBuilder (element_factory = SimpleElementTreeVar)
-	xmlTreeBuilder = xml.etree.ElementTree.XMLTreeBuilder (target=treeBuilder)
-	
-	if (not hasattr (file, 'read')):
-		ourFile = open (file)
-		xmlTreeBuilder.feed (ourFile.read())
-		ourFile.close()
-	else:
-		xmlTreeBuilder.feed (file.read())
-	
-	return xmlTreeBuilder.close()
-	
+class SimpleElementTreeVar (xml.etree.ElementTree.Element, simpletal.simpleTALES.ContextVariable):
+
+    def __init__(self, tag, attrib):
+        xml.etree.ElementTree.Element.__init__(self, tag, attrib)
+        simpletal.simpleTALES.ContextVariable.__init__(self)
+
+    def value(self, pathInfo=None):
+        if (pathInfo is not None):
+            pathIndex, paths = pathInfo
+            ourParams = paths[pathIndex:]
+            attributeName = None
+            if (len(ourParams) > 0):
+                # Look for attribute index
+                if (ourParams[-1].startswith('@')):
+                    # Attribute lookup
+                    attributeName = ourParams[-1][1:]
+                    ourParams = ourParams[:-1]
+            # Do we do a find?
+            activeElement = self
+            if len(ourParams) > 0:
+                # Look for a find or findall first
+                if (ourParams[0] == 'find'):
+                    # Find the element if possible
+                    activeElement = self.find("/".join(ourParams[1:]))
+                elif (ourParams[0] == 'findall'):
+                    # Short cut this
+                    raise simpletal.simpleTALES.ContextVariable(
+                        self.findall("/".join(ourParams[1:])))
+                else:
+                    # Assume that we wanted to use find
+                    activeElement = self.find("/".join(ourParams))
+            # Did we find an element and are we looking for an attribute?
+            if (attributeName is not None and activeElement is not None):
+                attrValue = activeElement.attrib.get(attributeName, None)
+                raise simpletal.simpleTALES.ContextVariable(attrValue)
+
+            # Just return the element
+            if (activeElement is None):
+                # Wrap it
+                raise simpletal.simpleTALES.ContextVariable(None)
+            raise activeElement
+        else:
+            return self
+
+    def __unicode__(self):
+        return self.text
+
+    def __str__(self):
+        return str(self.text)
+
+
+def parseFile(file):
+    treeBuilder = xml.etree.ElementTree.TreeBuilder(
+        element_factory=SimpleElementTreeVar)
+    xmlTreeBuilder = xml.etree.ElementTree.XMLTreeBuilder(target=treeBuilder)
+
+    if (not hasattr(file, 'read')):
+        ourFile = open(file)
+        xmlTreeBuilder.feed(ourFile.read())
+        ourFile.close()
+    else:
+        xmlTreeBuilder.feed(file.read())
+
+    return xmlTreeBuilder.close()

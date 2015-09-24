@@ -40,22 +40,21 @@
 from simpletal import simpleTAL, simpleTALES, simpleElementTree
 import sys
 
-xmlTree = simpleElementTree.parseFile (file="input.xml")
+xmlTree = simpleElementTree.parseFile(file="input.xml")
 # Create the context that is used by the template
 context = simpleTALES.Context(allowPythonPath=1)
 
 # Add the XML element tree to the context
-context.addGlobal ("input", xmlTree)
+context.addGlobal("input", xmlTree)
 
 # Open the template file
-templateFile = open ("basic.xml", 'r')
+templateFile = open("basic.xml", 'r')
 
 # Compile a template
-template = simpleTAL.compileXMLTemplate (templateFile)
+template = simpleTAL.compileXMLTemplate(templateFile)
 
 # Close the template file
 templateFile.close()
 
 # Expand the template as HTML using this context
-template.expand (context, sys.stdout, "utf-8")
-
+template.expand(context, sys.stdout, "utf-8")

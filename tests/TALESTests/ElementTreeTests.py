@@ -32,64 +32,68 @@
 """
 
 from __future__ import unicode_literals
-import unittest, os
-import io,sys
-import logging, logging.config
+import unittest
+import os
+import io
+import sys
+import logging
+import logging.config
 
-if sys.version_info.major==2:
-        from simpletal import simpleElementTree
+if sys.version_info.major == 2:
+    from simpletal import simpleElementTree
 
-	
 
 from simpletal import simpleTAL, simpleTALES
 
-if (os.path.exists ("logging.ini")):
-	logging.config.fileConfig ("logging.ini")
+if (os.path.exists("logging.ini")):
+    logging.config.fileConfig("logging.ini")
 else:
-	logging.basicConfig()
+    logging.basicConfig()
 
-def simpleFunction (param):
-	return "Hello %s" % param
-	
-def helloFunction ():
-	return "Hello"
 
-@unittest.skipIf(sys.version_info.major!=2,"SimpleElementTree only supported for Python 2.")				
+def simpleFunction(param):
+    return "Hello %s" % param
+
+
+def helloFunction():
+    return "Hello"
+
+
+@unittest.skipIf(sys.version_info.major != 2, "SimpleElementTree only supported for Python 2.")
 class ElementTreeTestCases (unittest.TestCase):
-	def setUp (self):
-		pass
-			
-	def _runTest_ (self, txt, result, errMsg="Error", allowPythonPath=0):			
-		self.context = simpleTALES.Context(allowPythonPath=allowPythonPath)
-		self.context.addGlobal ('top', 'Hello from the top')
-		self.context.addGlobal ('helloFunc', simpleFunction)
-		self.context.addGlobal ('helloPath', simpleTALES.PathFunctionVariable(simpleFunction))
-		self.context.addGlobal ('helloFunction', helloFunction)
-		self.context.addGlobal ('myList', [1,2,3,4,5,6])
-		self.context.addGlobal ('testing', 'testing')
-		self.context.addGlobal ('map', {'test': 'maptest'})
-		self.context.addGlobal ('data', {'one': 1, 'zero': 0})
-		
-		testXML = '<?xml version="1.0" encoding="utf-8"?><root><title type="Example">This is a test</title></root>'
-		xmlTree = simpleElementTree.parseFile (io.StringIO (testXML))
-		self.context.addGlobal ("xml", xmlTree)
-		
-		template = simpleTAL.compileHTMLTemplate (txt)
-		file = io.StringIO ()
-		template.expand (self.context, file)
-		realResult = file.getvalue()
-		self.assertEqual (realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
 
-	def testNormalTree (self):
-		self._runTest_ ("""<html tal:content="xml/title">Exists</html>"""
-					   ,'<html>This is a test</html>'
-					   ,'Simple Element Tree test failed.'
-					   ,allowPythonPath=1
-					   )
-		
-	def testPythonPathTree (self):
-		self._runTest_ ("""<html tal:content="python:path ('xml/title')">Exists</html>"""
-					   ,'<html>This is a test</html>'
-					   ,'Python path use of Element Tree failed.'
-					   ,allowPythonPath=1
-					   )
+    def setUp(self):
+        pass
+
+    def _runTest_(self, txt, result, errMsg="Error", allowPythonPath=0):
+        self.context = simpleTALES.Context(allowPythonPath=allowPythonPath)
+        self.context.addGlobal('top', 'Hello from the top')
+        self.context.addGlobal('helloFunc', simpleFunction)
+        self.context.addGlobal(
+            'helloPath', simpleTALES.PathFunctionVariable(simpleFunction))
+        self.context.addGlobal('helloFunction', helloFunction)
+        self.context.addGlobal('myList', [1, 2, 3, 4, 5, 6])
+        self.context.addGlobal('testing', 'testing')
+        self.context.addGlobal('map', {'test': 'maptest'})
+        self.context.addGlobal('data', {'one': 1, 'zero': 0})
+
+        testXML = '<?xml version="1.0" encoding="utf-8"?><root><title type="Example">This is a test</title></root>'
+        xmlTree = simpleElementTree.parseFile(io.StringIO(testXML))
+        self.context.addGlobal("xml", xmlTree)
+
+        template = simpleTAL.compileHTMLTemplate(txt)
+        file = io.StringIO()
+        template.expand(self.context, file)
+        realResult = file.getvalue()
+        self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
+                         (errMsg, txt, realResult, result, template))
+
+    def testNormalTree(self):
+        self._runTest_ ("""<html tal:content="xml/title">Exists</html>"""
+                        , '<html>This is a test</html>', 'Simple Element Tree test failed.', allowPythonPath=1
+                        )
+
+    def testPythonPathTree(self):
+        self._runTest_ ("""<html tal:content="python:path ('xml/title')">Exists</html>"""
+                        , '<html>This is a test</html>', 'Python path use of Element Tree failed.', allowPythonPath=1
+                        )

@@ -41,21 +41,20 @@ import sys
 context = simpleTALES.Context()
 
 # Add a string to the context under the variable title
-context.addGlobal ("title", "Simple METAL Example")
+context.addGlobal("title", "Simple METAL Example")
 
 # Compile the macro pages
-templateFile = open ("macro.html", 'r')
-macros = simpleTAL.compileHTMLTemplate (templateFile)
+templateFile = open("macro.html", 'r')
+macros = simpleTAL.compileHTMLTemplate(templateFile)
 templateFile.close()
 
 # Add the macros page to the Context
-context.addGlobal ("sitemacros", macros)
+context.addGlobal("sitemacros", macros)
 
 # Now compile the page which will use the macros
-templateFile = open ("page.html", 'r')
-page = simpleTAL.compileHTMLTemplate (templateFile)
+templateFile = open("page.html", 'r')
+page = simpleTAL.compileHTMLTemplate(templateFile)
 templateFile.close()
 
 # Expand the page using this context
-page.expand (context, sys.stdout)
-
+page.expand(context, sys.stdout)

@@ -2,3 +2,4 @@
 *.pyproj
 *__pycache__*
 autoedit.py
+autopep_all.cmd

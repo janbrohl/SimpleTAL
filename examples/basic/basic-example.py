@@ -44,22 +44,21 @@ import sys
 context = simpleTALES.Context(allowPythonPath=1)
 
 # Add a string to the context under the variable title
-context.addGlobal ("title", "Colours of the rainbow")
+context.addGlobal("title", "Colours of the rainbow")
 
 # A list of strings
 colours = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"]
 # Add the list to the context under the variable rainbow
-context.addGlobal ("rainbow", colours)
+context.addGlobal("rainbow", colours)
 
 # Open the template file
-templateFile = open ("basic.html", 'r')
+templateFile = open("basic.html", 'r')
 
 # Compile a template
-template = simpleTAL.compileHTMLTemplate (templateFile)
+template = simpleTAL.compileHTMLTemplate(templateFile)
 
 # Close the template file
 templateFile.close()
 
 # Expand the template as HTML using this context
-template.expand (context, sys.stdout, outputEncoding="utf-8")
-
+template.expand(context, sys.stdout, outputEncoding="utf-8")

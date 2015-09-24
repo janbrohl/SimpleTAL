@@ -33,96 +33,91 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 
-import unittest, os
+import unittest
+import os
 import io
-import logging, logging.config
+import logging
+import logging.config
 
 from simpletal import simpleTAL, simpleTALES
 from simpletal.simpleTALUtils import getXMLChecksum
 
 
-if (os.path.exists ("logging.ini")):
-	logging.config.fileConfig ("logging.ini")
+if (os.path.exists("logging.ini")):
+    logging.config.fileConfig("logging.ini")
 else:
-	logging.basicConfig()
-	
+    logging.basicConfig()
 
-	
+
 class TALAttributesTestCases (unittest.TestCase):
-	def setUp (self):
-		self.context = simpleTALES.Context()
-		self.context.addGlobal ('test', 'testing')
-		self.context.addGlobal ('link', 'www.owlfish.com')
-		self.context.addGlobal ('needsQuoting', """Does "this" work?""")
-		self.context.addGlobal ('number', '5')
-		self.context.addGlobal ('uniQuote', 'Does "this" work?')
-		
-	def _runTest_ (self, txt, result, errMsg="Error"):
-		template = simpleTAL.compileXMLTemplate (txt)
-		file = io.StringIO ()
-		template.expand (self.context, file, outputEncoding="iso-8859-1")
-		realResult = file.getvalue()
-		try:
-			expectedChecksum = getXMLChecksum (result)
-		except Exception as e:
-			self.fail ("Exception (%s) thrown parsing XML expected result: %s" % (str (e), result))
-		
-		try:
-			realChecksum = getXMLChecksum (realResult)
-		except Exception as e:
-			self.fail ("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s" % (str (e), realResult, str (template)))
-		
-		self.assertEqual (expectedChecksum, realChecksum, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
-						
-	def testAddingAnAttribute (self):
-		self._runTest_ ('<html tal:attributes="link link" href="owlfish.com">Hello</html>'
-						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html link="www.owlfish.com" href="owlfish.com">Hello</html>'
-						,"Addition of attribute 'link' failed.")
-		
-	def testRemovingAnAttribute (self):
-		self._runTest_ ('<html class="test" tal:attributes="href nothing" href="owlfish.com">Hello</html>'
-						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html class="test">Hello</html>'
-						,"Removal of attribute 'href' failed.")
-						
-	def testDefaultAttribute (self):
-		self._runTest_ ('<html class="test" tal:attributes="href default" href="owlfish.com">Hello</html>'
-						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html class="test" href="owlfish.com">Hello</html>'
-						,"Defaulting of attribute 'href' failed.")
 
-	def testMultipleAttributes (self):
-		self._runTest_ ('<html old="still &quot; here" class="test" tal:attributes="href default;class nothing;new test" href="owlfish.com">Hello</html>'
-						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html new="testing" old="still &quot; here" href="owlfish.com">Hello</html>'
-						,"Setting multiple attributes at once failed.")
+    def setUp(self):
+        self.context = simpleTALES.Context()
+        self.context.addGlobal('test', 'testing')
+        self.context.addGlobal('link', 'www.owlfish.com')
+        self.context.addGlobal ('needsQuoting', """Does "this" work?""")
+        self.context.addGlobal('number', '5')
+        self.context.addGlobal('uniQuote', 'Does "this" work?')
 
-	def testMultipleAttributesSpace (self):
-		self._runTest_ ('<html old="still here" class="test" tal:attributes="href default ; class string:Hello there; new test" href="owlfish.com">Hello</html>'
-						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html class="Hello there" new="testing" old="still here" href="owlfish.com">Hello</html>'
-						,"Setting multiple attributes at once, with spaces between semi-colons, failed.")
+    def _runTest_(self, txt, result, errMsg="Error"):
+        template = simpleTAL.compileXMLTemplate(txt)
+        file = io.StringIO()
+        template.expand(self.context, file, outputEncoding="iso-8859-1")
+        realResult = file.getvalue()
+        try:
+            expectedChecksum = getXMLChecksum(result)
+        except Exception as e:
+            self.fail(
+                "Exception (%s) thrown parsing XML expected result: %s" % (str(e), result))
 
-	def testMultipleAttributesEscaped (self):
-		self._runTest_ ('<html old="still here" class="test" tal:attributes="href default ; class string: Semi-colon;;test;new test " href="owlfish.com">Hello</html>'
-						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html class="Semi-colon;test" new="testing" old="still here" href="owlfish.com">Hello</html>'
-						,"Setting multiple attributes at once, with spaces between semi-colons, failed.")
+        try:
+            realChecksum = getXMLChecksum(realResult)
+        except Exception as e:
+            self.fail("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s" % (
+                str(e), realResult, str(template)))
 
-	def testAttributeEscaping (self):
-		self._runTest_ ('<html existingAtt="&quot;Testing&quot;" tal:attributes="href needsQuoting">Hello</html>'
-						,"""<?xml version="1.0" encoding="iso-8859-1"?>\n<html href="Does &quot;this&quot; work?" existingAtt="&quot;Testing&quot;">Hello</html>"""
-						,"Escaping of new attributes failed.")
-										
-	def testNumberAttributeEscaping (self):
-		self._runTest_ ('<html existingAtt="&quot;Testing&quot;" tal:attributes="href number">Hello</html>'
-						,"""<?xml version="1.0" encoding="iso-8859-1"?>\n<html href="5" existingAtt="&quot;Testing&quot;">Hello</html>"""
-						,"Escaping of new attributes failed.")
-		
-	def testNumberAttributeEscaping2 (self):
-		self._runTest_ ('<html existingAtt="&quot;Testing&quot;" tal:attributes="href uniQuote">Hello</html>'
-						,"""<?xml version="1.0" encoding="iso-8859-1"?>\n<html href="Does &quot;this&quot; work?" existingAtt="&quot;Testing&quot;">Hello</html>"""
-						,"Escaping of new attributes failed.")
-						
-	def testAttributeCase (self):
-		self._runTest_ ('<html HREF2="Testing" tal:attributes="href test">Hello</html>'
-						,"""<?xml version="1.0" encoding="iso-8859-1"?>\n<html href="testing" HREF2="Testing">Hello</html>"""
-						,"Capitalised attributes not carried through template.")
+        self.assertEqual(expectedChecksum, realChecksum, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
+                         (errMsg, txt, realResult, result, template))
+
+    def testAddingAnAttribute(self):
+        self._runTest_('<html tal:attributes="link link" href="owlfish.com">Hello</html>',
+                       '<?xml version="1.0" encoding="iso-8859-1"?>\n<html link="www.owlfish.com" href="owlfish.com">Hello</html>', "Addition of attribute 'link' failed.")
+
+    def testRemovingAnAttribute(self):
+        self._runTest_('<html class="test" tal:attributes="href nothing" href="owlfish.com">Hello</html>',
+                       '<?xml version="1.0" encoding="iso-8859-1"?>\n<html class="test">Hello</html>', "Removal of attribute 'href' failed.")
+
+    def testDefaultAttribute(self):
+        self._runTest_('<html class="test" tal:attributes="href default" href="owlfish.com">Hello</html>',
+                       '<?xml version="1.0" encoding="iso-8859-1"?>\n<html class="test" href="owlfish.com">Hello</html>', "Defaulting of attribute 'href' failed.")
+
+    def testMultipleAttributes(self):
+        self._runTest_('<html old="still &quot; here" class="test" tal:attributes="href default;class nothing;new test" href="owlfish.com">Hello</html>',
+                       '<?xml version="1.0" encoding="iso-8859-1"?>\n<html new="testing" old="still &quot; here" href="owlfish.com">Hello</html>', "Setting multiple attributes at once failed.")
+
+    def testMultipleAttributesSpace(self):
+        self._runTest_('<html old="still here" class="test" tal:attributes="href default ; class string:Hello there; new test" href="owlfish.com">Hello</html>',
+                       '<?xml version="1.0" encoding="iso-8859-1"?>\n<html class="Hello there" new="testing" old="still here" href="owlfish.com">Hello</html>', "Setting multiple attributes at once, with spaces between semi-colons, failed.")
+
+    def testMultipleAttributesEscaped(self):
+        self._runTest_('<html old="still here" class="test" tal:attributes="href default ; class string: Semi-colon;;test;new test " href="owlfish.com">Hello</html>',
+                       '<?xml version="1.0" encoding="iso-8859-1"?>\n<html class="Semi-colon;test" new="testing" old="still here" href="owlfish.com">Hello</html>', "Setting multiple attributes at once, with spaces between semi-colons, failed.")
+
+    def testAttributeEscaping(self):
+        self._runTest_ ('<html existingAtt="&quot;Testing&quot;" tal:attributes="href needsQuoting">Hello</html>'                                        , """<?xml version="1.0" encoding="iso-8859-1"?>\n<html href="Does &quot;this&quot; work?" existingAtt="&quot;Testing&quot;">Hello</html>"""
+                        , "Escaping of new attributes failed.")
+
+    def testNumberAttributeEscaping(self):
+        self._runTest_ ('<html existingAtt="&quot;Testing&quot;" tal:attributes="href number">Hello</html>'                                        , """<?xml version="1.0" encoding="iso-8859-1"?>\n<html href="5" existingAtt="&quot;Testing&quot;">Hello</html>"""
+                        , "Escaping of new attributes failed.")
+
+    def testNumberAttributeEscaping2(self):
+        self._runTest_ ('<html existingAtt="&quot;Testing&quot;" tal:attributes="href uniQuote">Hello</html>'                                        , """<?xml version="1.0" encoding="iso-8859-1"?>\n<html href="Does &quot;this&quot; work?" existingAtt="&quot;Testing&quot;">Hello</html>"""
+                        , "Escaping of new attributes failed.")
+
+    def testAttributeCase(self):
+        self._runTest_ ('<html HREF2="Testing" tal:attributes="href test">Hello</html>'                                        , """<?xml version="1.0" encoding="iso-8859-1"?>\n<html href="testing" HREF2="Testing">Hello</html>"""
+                        , "Capitalised attributes not carried through template.")
 
 if __name__ == '__main__':
-	unittest.main()
+    unittest.main()

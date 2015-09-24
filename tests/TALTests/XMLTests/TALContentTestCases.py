@@ -32,67 +32,68 @@
 """
 
 from __future__ import unicode_literals
-import unittest, os
+import unittest
+import os
 import io
-import logging, logging.config
+import logging
+import logging.config
 
 from simpletal import simpleTAL, simpleTALES
 
-if (os.path.exists ("logging.ini")):
-	logging.config.fileConfig ("logging.ini")
+if (os.path.exists("logging.ini")):
+    logging.config.fileConfig("logging.ini")
 else:
-	logging.basicConfig()
-	
-class TALContentTestCases (unittest.TestCase):
-	def setUp (self):
-		self.context = simpleTALES.Context()
-		entry = """<insertedData>Some structure: <b tal:content="weblog/subject"></b></insertedData>"""
-		
-		weblog = {'subject': 'Test subject', 'entry': entry}
-		
-		self.context.addGlobal ('test', 'testing')
-		self.context.addGlobal ('one', [1])
-		self.context.addGlobal ('two', ["one", "two"])
-		self.context.addGlobal ('three', [1,"Two",3])
-		self.context.addGlobal ('weblog', weblog)
-		
-	def _runTest_ (self, txt, result, errMsg="Error", allowTALInStructure=1):
-		template = simpleTAL.compileXMLTemplate (txt)
-		file = io.StringIO ()
-		template.expand (self.context, file, outputEncoding="iso-8859-1")
-		realResult = file.getvalue()
-		self.assertEqual (realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
-						
-	def testContentNothing (self):
-		self._runTest_ ('<html><p tal:content="nothing"></p></html>'
-						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p></p></html>'
-						,'Content of nothing did not evaluate to empty tag.')
-						
-	def testContentDefault (self):
-		self._runTest_ ('<html><p tal:content="default">Original</p></html>'
-						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p>Original</p></html>'
-						,'Content of default did not evaluate to existing content')
-	
-	def testContentString (self):
-		self._runTest_ ('<html><p tal:content="test">Original</p></html>'
-						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p>testing</p></html>'
-						,'Content of string did not evaluate to contain string')
-						
-	def testContentStructure (self):
-		# This test has specific needs - i.e. wrap the weblog/entry in a template...		
-		entry = """<insertedData>Some structure: <b tal:content="weblog/subject"></b></insertedData>"""
-		weblog = {'subject': 'Test subject', 'entry': simpleTAL.compileXMLTemplate(entry)}
-		self.context.addGlobal ('weblog', weblog)
-		
-		self._runTest_ ('<html><p tal:content="structure weblog/entry">Original</p></html>'
-						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p><insertedData>Some structure: <b>Test subject</b></insertedData></p></html>'
-						,'Content of Structure did not evaluate to expected result')   
+    logging.basicConfig()
 
-	def testTALDisabledContentStructure (self):
-		self._runTest_ ('<html><p tal:content="structure weblog/entry">Original</p></html>'
-						,'<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p><insertedData>Some structure: <b tal:content="weblog/subject"></b></insertedData></p></html>'
-						,'Content of Structure did not evaluate to expected result'
-						,allowTALInStructure=0)  
-						
+
+class TALContentTestCases (unittest.TestCase):
+
+    def setUp(self):
+        self.context = simpleTALES.Context()
+        entry = """<insertedData>Some structure: <b tal:content="weblog/subject"></b></insertedData>"""
+
+        weblog = {'subject': 'Test subject', 'entry': entry}
+
+        self.context.addGlobal('test', 'testing')
+        self.context.addGlobal('one', [1])
+        self.context.addGlobal('two', ["one", "two"])
+        self.context.addGlobal('three', [1, "Two", 3])
+        self.context.addGlobal('weblog', weblog)
+
+    def _runTest_(self, txt, result, errMsg="Error", allowTALInStructure=1):
+        template = simpleTAL.compileXMLTemplate(txt)
+        file = io.StringIO()
+        template.expand(self.context, file, outputEncoding="iso-8859-1")
+        realResult = file.getvalue()
+        self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
+                         (errMsg, txt, realResult, result, template))
+
+    def testContentNothing(self):
+        self._runTest_('<html><p tal:content="nothing"></p></html>',
+                       '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p></p></html>', 'Content of nothing did not evaluate to empty tag.')
+
+    def testContentDefault(self):
+        self._runTest_('<html><p tal:content="default">Original</p></html>',
+                       '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p>Original</p></html>', 'Content of default did not evaluate to existing content')
+
+    def testContentString(self):
+        self._runTest_('<html><p tal:content="test">Original</p></html>',
+                       '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p>testing</p></html>', 'Content of string did not evaluate to contain string')
+
+    def testContentStructure(self):
+        # This test has specific needs - i.e. wrap the weblog/entry in a
+        # template...
+        entry = """<insertedData>Some structure: <b tal:content="weblog/subject"></b></insertedData>"""
+        weblog = {'subject': 'Test subject',
+                  'entry': simpleTAL.compileXMLTemplate(entry)}
+        self.context.addGlobal('weblog', weblog)
+
+        self._runTest_('<html><p tal:content="structure weblog/entry">Original</p></html>',
+                       '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p><insertedData>Some structure: <b>Test subject</b></insertedData></p></html>', 'Content of Structure did not evaluate to expected result')
+
+    def testTALDisabledContentStructure(self):
+        self._runTest_('<html><p tal:content="structure weblog/entry">Original</p></html>', '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><p><insertedData>Some structure: <b tal:content="weblog/subject"></b></insertedData></p></html>',
+                       'Content of Structure did not evaluate to expected result', allowTALInStructure=0)
+
 if __name__ == '__main__':
-	unittest.main()
+    unittest.main()

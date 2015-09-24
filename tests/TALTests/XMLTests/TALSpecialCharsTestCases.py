@@ -32,50 +32,55 @@
 """
 
 from __future__ import unicode_literals
-import unittest, os, sys
+import unittest
+import os
+import sys
 import io
-import logging, logging.config
+import logging
+import logging.config
 
-if sys.version_info.major>=3:
-	unicode=str
+if sys.version_info.major >= 3:
+    unicode = str
 
 from simpletal import simpleTAL, simpleTALES
 
-if (os.path.exists ("logging.ini")):
-	logging.config.fileConfig ("logging.ini")
+if (os.path.exists("logging.ini")):
+    logging.config.fileConfig("logging.ini")
 else:
-	logging.basicConfig()
-	
+    logging.basicConfig()
+
+
 class TALSpecialCharsTestCases (unittest.TestCase):
-	def setUp (self):
-		self.context = simpleTALES.Context(allowPythonPath=1)
-		self.context.addGlobal ('test', '< testing > experimenting & twice as useful')
-		self.context.addGlobal ('one', [1])
-		self.context.addGlobal ('two', ["one", "two"])
-		self.context.addGlobal ('three', [1,"Two",3])
-		
-	def _runTest_ (self, txt, result, errMsg="Error", allowTALInStructure=1):
-		template = simpleTAL.compileXMLTemplate (txt)
-		file = io.StringIO ()
-		template.expand (self.context, file, outputEncoding="iso-8859-1")
-		realResult = file.getvalue()
-		self.assertEqual (realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" % (errMsg, txt, realResult, result, template))
-		
-	def testLessThanGreaterThanAmpersand (self):
-		self._runTest_ ('<html tal:content="test">Hello</html>'
-						,"""<?xml version="1.0" encoding="iso-8859-1"?>\n<html>&lt; testing &gt; experimenting &amp; twice as useful</html>"""
-						,"Less than, greater than or amperand were not encoded correctly")
-						
-	def testEscapedPythonPaths (self):
-		self._runTest_ ('<html tal:content="python: str (2000 &lt;&lt; 1)">Hello</html>'
-						,"""<?xml version="1.0" encoding="iso-8859-1"?>\n<html>4000</html>"""
-						,"Python bit shift failed.")
-						
-	def testAmpInTemplate (self):
-		self._runTest_ ("""<html tal:attributes="test2 string: Boo There ${test}"><body test="&amp;">Hello Bye Bye</body></html>"""
-							,"""<?xml version="1.0" encoding="iso-8859-1"?>
+
+    def setUp(self):
+        self.context = simpleTALES.Context(allowPythonPath=1)
+        self.context.addGlobal(
+            'test', '< testing > experimenting & twice as useful')
+        self.context.addGlobal('one', [1])
+        self.context.addGlobal('two', ["one", "two"])
+        self.context.addGlobal('three', [1, "Two", 3])
+
+    def _runTest_(self, txt, result, errMsg="Error", allowTALInStructure=1):
+        template = simpleTAL.compileXMLTemplate(txt)
+        file = io.StringIO()
+        template.expand(self.context, file, outputEncoding="iso-8859-1")
+        realResult = file.getvalue()
+        self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
+                         (errMsg, txt, realResult, result, template))
+
+    def testLessThanGreaterThanAmpersand(self):
+        self._runTest_ ('<html tal:content="test">Hello</html>'                                        , """<?xml version="1.0" encoding="iso-8859-1"?>\n<html>&lt; testing &gt; experimenting &amp; twice as useful</html>"""
+                        , "Less than, greater than or amperand were not encoded correctly")
+
+    def testEscapedPythonPaths(self):
+        self._runTest_ ('<html tal:content="python: str (2000 &lt;&lt; 1)">Hello</html>'                                        , """<?xml version="1.0" encoding="iso-8859-1"?>\n<html>4000</html>"""
+                        , "Python bit shift failed.")
+
+    def testAmpInTemplate(self):
+        self._runTest_ ("""<html tal:attributes="test2 string: Boo There ${test}"><body test="&amp;">Hello Bye Bye</body></html>"""
+                        , """<?xml version="1.0" encoding="iso-8859-1"?>
 <html test2="Boo There &lt; testing &gt; experimenting &amp; twice as useful"><body test="&amp;">Hello Bye Bye</body></html>"""
-							,"&amp; in template failed.")
-						
+                        , "&amp; in template failed.")
+
 if __name__ == '__main__':
-	unittest.main()
+    unittest.main()
