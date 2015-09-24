@@ -132,8 +132,8 @@ ENTITY_REF_REGEX = re.compile(
 
 # The list of elements in HTML that can not have end tags - done as a dictionary for fast
 # lookup.
-HTML_FORBIDDEN_ENDTAG = frozenset(['AREA', 'BASE', 'BASEFONT', 'BR', 'COL', 'FRAME', 'HR',
-                                   'IMG', 'INPUT', 'ISINDEX', 'LINK', 'META', 'PARAM'])
+HTML_FORBIDDEN_ENDTAG = frozenset(['AREA', 'BASE', 'BASEFONT', 'BR', 'COL', 'COMMAND', 'EMBED', 'FRAME', 'HR',
+                                   'IMG', 'INPUT', 'ISINDEX', 'KEYGEN', 'LINK', 'META', 'PARAM', 'SOURCE', 'TRACK', 'WBR'])
 
 # List of element:attribute pairs that can use minimized form in HTML
 HTML_BOOLEAN_ATTS = frozenset(['AREA:NOHREF', 'IMG:ISMAP', 'OBJECT:DECLARE', 'INPUT:CHECKED',
@@ -1399,9 +1399,20 @@ class HTMLTemplateCompiler (TemplateCompiler, HTMLParser.HTMLParser):
         return "".join(result)
 
     def handle_startendtag(self, tag, attributes):
-        self.handle_starttag(tag, attributes)
-        if (tag.upper() not in HTML_FORBIDDEN_ENDTAG):
-            self.handle_endtag(tag)
+        self.log.debug("Recieved StartEnd Tag: " + tag +
+                       " Attributes: " + unicode(attributes))
+        atts = []
+        for att, attValue in attributes:
+            # We need to spot empty tal:omit-tags
+            if (attValue is None):
+                if (att == self.tal_namespace_omittag):
+                    atts.append((att, ""))
+                else:
+                    atts.append((att, att))
+            else:
+                atts.append((att, attValue))
+        self.parseStartTag(tag, atts)
+        self.popTag((tag, None), omitTagFlag=1)
 
     def handle_starttag(self, tag, attributes):
         self.log.debug("Recieved Start Tag: " + tag +
@@ -1431,7 +1442,7 @@ class HTMLTemplateCompiler (TemplateCompiler, HTMLParser.HTMLParser):
         self.log.debug("Recieved End Tag: " + tag)
         if (tag.upper() in HTML_FORBIDDEN_ENDTAG):
             self.log.warning(
-                "HTML 4.01 forbids end tags for the %s element" % tag)
+                "HTML forbids end tags for the %s element" % tag)
         else:
             # Normal end tag
             self.popTag((tag, None))
