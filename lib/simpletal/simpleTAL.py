@@ -1402,7 +1402,7 @@ class HTMLTemplateCompiler (TemplateCompiler, HTMLParser.HTMLParser):
         HTMLParser.HTMLParser.__init__(self)
         self.log = logging.getLogger("simpleTAL.HTMLTemplateCompiler")
 
-    def parseTemplate(self, file, encoding="iso-8859-1", minimizeBooleanAtts=0):
+    def parseTemplate(self, file, encoding="UTF-8", minimizeBooleanAtts=0):
         if isinstance(file, io.TextIOBase):
             s = file.read()
         else:
@@ -1618,7 +1618,7 @@ class XMLTemplateCompiler (TemplateCompiler, xml.sax.handler.ContentHandler, xml
         return template
 
 
-def compileHTMLTemplate(template, inputEncoding="ISO-8859-1", minimizeBooleanAtts=0):
+def compileHTMLTemplate(template, inputEncoding="UTF-8", minimizeBooleanAtts=0):
     """ Reads the templateFile and produces a compiled template.
                     To use the resulting template object call:
                             template.expand (context, outputFile)

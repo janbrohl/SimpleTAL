@@ -62,6 +62,7 @@ class TemplateCache:
                     This cache only works with file based templates, the ctime of the file is 
                     checked on each hit, if the file has changed the template is re-compiled.
     """
+    html_regex = re.compile(".*[.]html?", re.IGNORECASE)
 
     def __init__(self):
         self.templateCache = {}
@@ -69,59 +70,48 @@ class TemplateCache:
         self.hits = 0
         self.misses = 0
 
-    def getTemplate(self, name, inputEncoding='ISO-8859-1'):
-        """ Name should be the path of a template file.  If the path ends in 'xml' it is treated
-                as an XML Template, otherwise it's treated as an HTML Template.  If the template file
+    def getTemplate(self, name, inputEncoding='UTF-8'):
+        """ Name should be the path of a template file.  If the path matches self.html_regex it is treated
+                as an HTML Template, otherwise it's treated as an XML Template.  If the template file
                 has changed since the last cache it will be re-compiled.
 
                 inputEncoding is only used for HTML templates, and should be the encoding that the template
                 is stored in.
         """
-        template, oldctime = self.templateCache.get(name, (None, None))
-        if template is not None:
-            ctime = os.stat(name)[stat.ST_MTIME]
-            if (oldctime == ctime):
-                # Cache hit!
-                self.hits += 1
-                return template
-        # Cache miss, let's cache this template
         return self._cacheTemplate_(name, inputEncoding)
 
     def getXMLTemplate(self, name):
         """ Name should be the path of an XML template file.  
         """
-        template, oldctime = self.templateCache.get(name, (None, None))
-        if template is not None:
-            ctime = os.stat(name)[stat.ST_MTIME]
-            if (oldctime == ctime):
-                # Cache hit!
-                self.hits += 1
-                return template
-        # Cache miss, let's cache this template
         return self._cacheTemplate_(name, None, xmlTemplate=1)
 
     def _cacheTemplate_(self, name, inputEncoding, xmlTemplate=0):
         with self.cacheLock:
+            template, oldctime = self.templateCache.get(name, (None, None))
+            if template is not None:
+                ctime = os.stat(name)[stat.ST_MTIME]
+                if (oldctime == ctime):
+                    # Cache hit!
+                    self.hits += 1
+                    return template
+
+            # Cache miss, let's cache this template
             with open(name, 'r') as tempFile:
                 if (xmlTemplate):
                     # We know it is XML
                     template = simpletal.simpleTAL.compileXMLTemplate(tempFile)
                 else:
                     # We have to guess...
-                    firstline = tempFile.readline()
-                    tempFile.seek(0)
-                    if ((name[-3:] == "xml") or (firstline.strip()[:5] == '<?xml')
-                            or (firstline[:9] == '<!DOCTYPE' and firstline.find('XHTML') != -1)):
+                    if self.html_regex.match(name) is None:
                         template = simpletal.simpleTAL.compileXMLTemplate(
                             tempFile)
                     else:
                         template = simpletal.simpleTAL.compileHTMLTemplate(
                             tempFile, inputEncoding)
-                tempFile.close()
                 self.templateCache[name] = (
                     template, os.stat(name)[stat.ST_MTIME])
                 self.misses += 1
-        return template
+            return template
 
 
 class MacroExpansionInterpreter (simpletal.simpleTAL.TemplateInterpreter):
