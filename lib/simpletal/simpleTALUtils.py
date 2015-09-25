@@ -57,21 +57,6 @@ import simpletal.simpleTAL
 ESCAPED_TEXT_REGEX = re.compile(r"\&\S+?;")
 
 
-class FastStringOutput:
-    """ A very simple StringIO replacement that only provides write() and getvalue()
-            and is around 6% faster than StringIO.
-    """
-
-    def __init__(self):
-        self.data = []
-
-    def write(self, data):
-        self.data.append(data)
-
-    def getvalue(self):
-        return "".join(self.data)
-
-
 class TemplateCache:
     """ A TemplateCache is a multi-thread safe object that caches compiled templates.
                     This cache only works with file based templates, the ctime of the file is 
@@ -125,7 +110,8 @@ class TemplateCache:
                     # We have to guess...
                     firstline = tempFile.readline()
                     tempFile.seek(0)
-                    if (name[-3:] == "xml") or (firstline.strip()[:5] == '<?xml') or (firstline[:9] == '<!DOCTYPE' and firstline.find('XHTML') != -1):
+                    if ((name[-3:] == "xml") or (firstline.strip()[:5] == '<?xml')
+                            or (firstline[:9] == '<!DOCTYPE' and firstline.find('XHTML') != -1)):
                         template = simpletal.simpleTAL.compileXMLTemplate(
                             tempFile)
                     else:
@@ -136,19 +122,6 @@ class TemplateCache:
                     template, os.stat(name)[stat.ST_MTIME])
                 self.misses += 1
         return template
-
-
-def tagAsText(tag, atts):
-    result = "<" + tag
-    for name, value in atts:
-        if (ESCAPED_TEXT_REGEX.search(value) is not None):
-            # We already have some escaped characters in here, so assume it's
-            # all valid
-            result += ' %s="%s"' % (name, value)
-        else:
-            result += ' %s="%s"' % (name, cgi.escape(value))
-    result += ">"
-    return result
 
 
 class MacroExpansionInterpreter (simpletal.simpleTAL.TemplateInterpreter):
@@ -254,7 +227,9 @@ class MacroExpansionInterpreter (simpletal.simpleTAL.TemplateInterpreter):
         if (self.localVarsDefined):
             self.context.popLocals()
 
-        self.movePCForward, self.movePCBack, self.outputTag, self.originalAttributes, self.currentAttributes, self.repeatVariable, self.tagContent, self.localVarsDefined = self.scopeStack.pop()
+        (self.movePCForward, self.movePCBack, self.outputTag,
+         self.originalAttributes, self.currentAttributes, self.repeatVariable,
+         self.tagContent, self.localVarsDefined) = self.scopeStack.pop()
         self.programCounter += 1
 
 
@@ -268,6 +243,7 @@ def ExpandMacros(context, template, outputEncoding="utf-8"):
 
 
 class XMLListHandler (xml.sax.handler.ContentHandler, xml.sax.handler.DTDHandler, xml.sax.handler.ErrorHandler):
+    """XMLListHandler gebnerates a normalized representation of xml-documents for testing"""
 
     def __init__(self, parser):
         xml.sax.handler.ContentHandler.__init__(self)
@@ -323,13 +299,15 @@ class XMLListHandler (xml.sax.handler.ContentHandler, xml.sax.handler.DTDHandler
         print("Warning: %s" % str(excpt))
 
 
-LISTPARSER = xml.sax.make_parser()
-LISTHANDLER = XMLListHandler(LISTPARSER)
-LISTPARSER.setContentHandler(LISTHANDLER)
-LISTPARSER.setDTDHandler(LISTHANDLER)
-LISTPARSER.setErrorHandler(LISTHANDLER)
+def getXMLList(doc):
+    listparser = xml.sax.make_parser()
+    listhandler = XMLListHandler(listparser)
+    listparser.setContentHandler(listhandler)
+    listparser.setDTDHandler(listhandler)
+    listparser.setErrorHandler(listhandler)
+    listparser.parse(io.StringIO(doc))
+    return listhandler.list
 
 
 def getXMLChecksum(doc):
-    LISTPARSER.parse(io.StringIO(doc))
-    return hashlib.md5("".join(LISTHANDLER.list).encode("utf-8")).hexdigest()
+    return hashlib.md5("".join(getXMLList(doc)).encode("utf-8")).hexdigest()
