@@ -41,7 +41,7 @@ import logging.config
 
 from simpletal import simpleTAL, simpleTALES
 
-from simpletal.simpleTALUtils import getXMLChecksum
+import simpletal.simpleTALUtils
 
 if (os.path.exists("logging.ini")):
     logging.config.fileConfig("logging.ini")
@@ -64,18 +64,18 @@ class TALSingletonTests (unittest.TestCase):
         template.expand(self.context, file, outputEncoding="iso-8859-1")
         realResult = file.getvalue()
         try:
-            expectedChecksum = getXMLChecksum(result)
+            expectedList = simpletal.simpleTALUtils.getXMLList(result)
         except Exception as e:
             self.fail(
                 "Exception (%s) thrown parsing XML expected result: %s" % (str(e), result))
 
         try:
-            realChecksum = getXMLChecksum(realResult)
+            realList = simpletal.simpleTALUtils.getXMLList(realResult)
         except Exception as e:
             self.fail("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s" % (
                 str(e), realResult, str(template)))
 
-        self.assertEqual(expectedChecksum, realChecksum, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
+        self.assertEqual(expectedList, realList, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
                          (errMsg, txt, realResult, result, template))
 
     def _runMacroTest_(self, macros, page, result, errMsg="Error"):
@@ -87,18 +87,18 @@ class TALSingletonTests (unittest.TestCase):
         pageTemplate.expand(self.context, file)
         realResult = file.getvalue()
         try:
-            expectedChecksum = getXMLChecksum(result)
+            expectedList = simpletal.simpleTALUtils.getXMLList(result)
         except Exception as e:
             self.fail(
                 "Exception (%s) thrown parsing XML expected result: %s" % (str(e), result))
 
         try:
-            realChecksum = getXMLChecksum(realResult)
+            realList = simpletal.simpleTALUtils.getXMLList(realResult)
         except Exception as e:
             self.fail("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s\nMacro Template: %s" % (
                 str(e), realResult, str(pageTemplate), str(macroTemplate)))
 
-        self.assertEqual(expectedChecksum, realChecksum, "%s - \npassed in macro: %s \n and page: %s\ngot back %s \nexpected %s\n\nPage Template: %s" %
+        self.assertEqual(expectedList, realList, "%s - \npassed in macro: %s \n and page: %s\ngot back %s \nexpected %s\n\nPage Template: %s" %
                          (errMsg, macros, page, realResult, result, pageTemplate))
 
     def testDefineAttributes(self):

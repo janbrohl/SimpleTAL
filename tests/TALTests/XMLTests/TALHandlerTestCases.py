@@ -51,7 +51,7 @@ except ImportError:
         pass
 
 from simpletal import simpleTAL, simpleTALES
-from simpletal.simpleTALUtils import getXMLChecksum
+import simpletal.simpleTALUtils
 
 if (os.path.exists("logging.ini")):
     logging.config.fileConfig("logging.ini")
@@ -73,14 +73,14 @@ class TALHandlerTestCases (unittest.TestCase):
         fh = io.StringIO()
         template.expand(self.context, fh, outputEncoding="iso-8859-1")
         realResult = fh.getvalue()
-        expectedChecksum = getXMLChecksum(result)
+        expectedList = simpletal.simpleTALUtils.getXMLList(result)
         try:
-            realChecksum = getXMLChecksum(realResult)
+            realList = simpletal.simpleTALUtils.getXMLList(realResult)
         except Exception as e:
             self.fail("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s" % (
                 str(e), realResult, str(template)))
 
-        self.assertEqual(expectedChecksum, realChecksum, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
+        self.assertEqual(expectedList, realList, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
                          (errMsg, txt, realResult, result, template))
 
     def testSingleEmptyElement(self):

@@ -46,7 +46,6 @@ import cgi
 import re
 import xml.sax
 import xml.sax.handler
-import hashlib
 
 
 import io
@@ -297,7 +296,3 @@ def getXMLList(doc):
     listparser.setErrorHandler(listhandler)
     listparser.parse(io.StringIO(doc))
     return listhandler.list
-
-
-def getXMLChecksum(doc):
-    return hashlib.md5("".join(getXMLList(doc)).encode("utf-8")).hexdigest()
