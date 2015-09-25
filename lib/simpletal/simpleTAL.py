@@ -127,19 +127,24 @@ METAL_DEFINE_MACRO = 17
 
 METAL_NAME_REGEX = re.compile("[a-zA-Z_][a-zA-Z0-9_]*")
 SINGLETON_XML_REGEX = re.compile(b'^<[^\s/>]+(?:\s*[^=>]+="[^">]+")*\s*/>')
-ENTITY_REF_REGEX = re.compile(
-    r'(?:&[a-zA-Z][\-\.a-zA-Z0-9]*[^\-\.a-zA-Z0-9])|(?:&#[xX]?[a-eA-E0-9]*[^0-9a-eA-E])')
 
 # The list of elements in HTML that can not have end tags - done as a dictionary for fast
 # lookup.
-HTML_FORBIDDEN_ENDTAG = frozenset(['AREA', 'BASE', 'BASEFONT', 'BR', 'COL', 'COMMAND', 'EMBED', 'FRAME', 'HR',
-                                   'IMG', 'INPUT', 'ISINDEX', 'KEYGEN', 'LINK', 'META', 'PARAM', 'SOURCE', 'TRACK', 'WBR'])
+HTML_FORBIDDEN_ENDTAG = frozenset(['AREA', 'BASE', 'BASEFONT', 'BR',
+                                   'COL', 'COMMAND', 'EMBED', 'FRAME',
+                                   'HR', 'IMG', 'INPUT', 'ISINDEX',
+                                   'KEYGEN', 'LINK', 'META', 'PARAM',
+                                   'SOURCE', 'TRACK', 'WBR'])
 
 # List of element:attribute pairs that can use minimized form in HTML
-HTML_BOOLEAN_ATTS = frozenset(['AREA:NOHREF', 'IMG:ISMAP', 'OBJECT:DECLARE', 'INPUT:CHECKED',
-                               'INPUT:DISABLED', 'INPUT:READONLY', 'INPUT:ISMAP', 'SELECT:MULTIPLE',
-                               'SELECT:DISABLED', 'OPTGROUP:DISABLED', 'OPTION:SELECTED', 'OPTION:DISABLED',
-                               'TEXTAREA:DISABLED', 'TEXTAREA:READONLY', 'BUTTON:DISABLED', 'SCRIPT:DEFER'])
+HTML_BOOLEAN_ATTS = frozenset([('AREA', 'NOHREF'), ('IMG', 'ISMAP'), ('OBJECT', 'DECLARE'),
+                               ('INPUT', 'CHECKED'), ('INPUT', 'DISABLED'),
+                               ('INPUT', 'READONLY'), ('INPUT', 'ISMAP'),
+                               ('SELECT', 'MULTIPLE'), ('SELECT', 'DISABLED'),
+                               ('OPTGROUP', 'DISABLED'), ('OPTION', 'SELECTED'),
+                               ('OPTION', 'DISABLED'), ('TEXTAREA', 'DISABLED'),
+                               ('TEXTAREA', 'READONLY'), ('BUTTON', 'DISABLED'),
+                               ('SCRIPT', 'DEFER')])
 
 
 class TemplateInterpreter:
@@ -149,12 +154,19 @@ class TemplateInterpreter:
         self.commandList = None
         self.symbolTable = None
         self.slotParameters = {}
-        self.commandHandler = {TAL_DEFINE: self.cmdDefine, TAL_CONDITION: self.cmdCondition,
-                               TAL_REPEAT: self.cmdRepeat, TAL_CONTENT: self.cmdContent,
-                               TAL_ATTRIBUTES: self.cmdAttributes, TAL_OMITTAG: self.cmdOmitTag,
-                               TAL_START_SCOPE: self.cmdStartScope, TAL_OUTPUT: self.cmdOutput,
-                               TAL_STARTTAG: self.cmdOutputStartTag, TAL_ENDTAG_ENDSCOPE: self.cmdEndTagEndScope,
-                               METAL_USE_MACRO: self.cmdUseMacro, METAL_DEFINE_SLOT: self.cmdDefineSlot,
+        self.commandHandler = {TAL_DEFINE: self.cmdDefine,
+                               TAL_CONDITION: self.cmdCondition,
+                               TAL_REPEAT: self.cmdRepeat,
+                               TAL_CONTENT: self.cmdContent,
+                               TAL_ATTRIBUTES: self.cmdAttributes,
+                               TAL_OMITTAG: self.cmdOmitTag,
+                               TAL_START_SCOPE: self.cmdStartScope,
+                               TAL_OUTPUT: self.cmdOutput,
+                               TAL_STARTTAG: self.cmdOutputStartTag,
+                               TAL_ENDTAG_ENDSCOPE:
+                               self.cmdEndTagEndScope,
+                               METAL_USE_MACRO: self.cmdUseMacro,
+                               METAL_DEFINE_SLOT: self.cmdDefineSlot,
                                TAL_NOOP: self.cmdNoOp}
 
     def tagAsText(self, tag_atts, singletonFlag=0):
@@ -198,18 +210,26 @@ class TemplateInterpreter:
 
     def popProgram(self):
         v, self.commandList, self.symbolTable = self.programStack.pop()
-        self.programCounter, self.scopeStack, self.slotParameters, self.currentSlots, self.movePCForward, self.movePCBack, self.outputTag, self.originalAttributes, self.currentAttributes, self.repeatVariable, self.repeatAttributesCopy, self.tagContent, self.localVarsDefined = v
+        (self.programCounter, self.scopeStack, self.slotParameters,
+         self.currentSlots, self.movePCForward, self.movePCBack,
+         self.outputTag, self.originalAttributes,
+         self.currentAttributes, self.repeatVariable,
+         self.repeatAttributesCopy, self.tagContent,
+         self.localVarsDefined) = v
 
     def pushProgram(self):
-        v = (self.programCounter, self.scopeStack, self.slotParameters, self.currentSlots,
-             self.movePCForward, self.movePCBack, self.outputTag, self.originalAttributes,
-             self.currentAttributes, self.repeatVariable, self.repeatAttributesCopy,
+        v = (self.programCounter, self.scopeStack,
+             self.slotParameters, self.currentSlots,
+             self.movePCForward, self.movePCBack, self.outputTag,
+             self.originalAttributes, self.currentAttributes,
+             self.repeatVariable, self.repeatAttributesCopy,
              self.tagContent, self.localVarsDefined)
         self.programStack.append((v, self.commandList, self.symbolTable))
 
     def execute(self, template):
         self.cleanState()
-        self.commandList, self.programCounter, programLength, self.symbolTable = template.getProgram()
+        (self.commandList, self.programCounter, programLength,
+         self.symbolTable) = template.getProgram()
         cmndList = self.commandList
         while (self.programCounter < programLength):
             cmnd = cmndList[self.programCounter]
@@ -506,8 +526,12 @@ class TemplateInterpreter:
         """ args: (originalAttributes, currentAttributes)
                         Pushes the current state onto the stack, and sets up the new state
         """
-        self.scopeStack.append((self.movePCForward, self.movePCBack, self.outputTag, self.originalAttributes,
-                                self.currentAttributes, self.repeatVariable, self.tagContent, self.localVarsDefined))
+        self.scopeStack.append((self.movePCForward, self.movePCBack,
+                                self.outputTag,
+                                self.originalAttributes,
+                                self.currentAttributes,
+                                self.repeatVariable, self.tagContent,
+                                self.localVarsDefined))
 
         self.movePCForward = None
         self.movePCBack = None
@@ -585,7 +609,7 @@ class HTMLTemplateInterpreter (TemplateInterpreter):
         result.append(tag)
         upperTag = tag.upper()
         for attName, attValue in atts:
-            if ('%s:%s' % (upperTag, attName.upper()) in HTML_BOOLEAN_ATTS):
+            if ((upperTag, attName.upper()) in HTML_BOOLEAN_ATTS):
                 # We should output a minimised boolean value
                 result.append(' ')
                 result.append(attName)
@@ -666,8 +690,11 @@ class Template:
             index += 1
         result = result + "\n\nSymbols:\n"
         for symbol in self.symbolTable.keys():
-            result = result + "Symbol: " + unicode(symbol) + " points to: " + unicode(self.symbolTable[
-                symbol]) + ", which is command: " + unicode(self.commandList[self.symbolTable[symbol]]) + "\n"
+            result = (result + "Symbol: " + unicode(symbol)
+                      + " points to: " + unicode(self.symbolTable[symbol])
+                      + ", which is command: "
+                      + unicode(self.commandList[self.symbolTable[symbol]])
+                      + "\n")
 
         result = result + "\n\nMacros:\n"
         for macro in self.macros.keys():
@@ -699,7 +726,8 @@ class SubTemplate (Template):
 
     def getProgram(self):
         """ Returns a tuple of (commandList, startPoint, endPoint, symbolTable) """
-        return (self.commandList, self.startRange, self.symbolTable[self.endRangeSymbol] + 1, self.symbolTable)
+        return (self.commandList, self.startRange,
+                self.symbolTable[self.endRangeSymbol] + 1, self.symbolTable)
 
     def __str__(self):
         endRange = self.symbolTable[self.endRangeSymbol]
@@ -749,7 +777,8 @@ class XMLTemplate (Template):
         Template.__init__(self, commands, macros, symbols)
         self.doctype = doctype
 
-    def expand(self, context, outputFile, outputEncoding="utf-8", docType=None, suppressXMLDeclaration=0, interpreter=None):
+    def expand(self, context, outputFile, outputEncoding="utf-8",
+               docType=None, suppressXMLDeclaration=0, interpreter=None):
         """ This method will write to the outputFile, using the encoding specified,
                 the expanded version of this template.  The context passed in is used to resolve
                 all expressions with the template.
@@ -789,13 +818,18 @@ class TemplateCompiler:
         self.macroMap = {}
         self.endTagSymbol = 1
 
-        self.commandHandler = {TAL_DEFINE: self.compileCmdDefine, TAL_CONDITION: self.compileCmdCondition,
-                               TAL_REPEAT: self.compileCmdRepeat, TAL_CONTENT: self.compileCmdContent,
-                               TAL_REPLACE: self.compileCmdReplace, TAL_ATTRIBUTES: self.compileCmdAttributes,
+        self.commandHandler = {TAL_DEFINE: self.compileCmdDefine,
+                               TAL_CONDITION: self.compileCmdCondition,
+                               TAL_REPEAT: self.compileCmdRepeat,
+                               TAL_CONTENT: self.compileCmdContent,
+                               TAL_REPLACE: self.compileCmdReplace,
+                               TAL_ATTRIBUTES: self.compileCmdAttributes,
                                TAL_OMITTAG: self.compileCmdOmitTag,
                                # Metal commands
-                               METAL_USE_MACRO: self.compileMetalUseMacro, METAL_DEFINE_SLOT: self.compileMetalDefineSlot,
-                               METAL_FILL_SLOT: self.compileMetalFillSlot, METAL_DEFINE_MACRO: self.compileMetalDefineMacro}
+                               METAL_USE_MACRO: self.compileMetalUseMacro,
+                               METAL_DEFINE_SLOT: self.compileMetalDefineSlot,
+                               METAL_FILL_SLOT: self.compileMetalFillSlot,
+                               METAL_DEFINE_MACRO: self.compileMetalDefineMacro}
 
         # Default namespaces
         self.setTALPrefix('tal')
@@ -945,8 +979,8 @@ class TemplateCompiler:
                 # un-balanced TAL tags!
                 if (endTagSymbol is not None):
                     # ERROR
-                    msg = "TAL/METAL Elements must be balanced - found close tag %s expecting %s" % (tag[
-                                                                                                     0], oldTag[0])
+                    msg = ("TAL/METAL Elements must be balanced - found close tag %s expecting %s"
+                           % (tag[0], oldTag[0]))
                     self.log.error(msg)
                     raise TemplateParseException(self.tagAsText(oldTag), msg)
         self.log.error(
@@ -1115,7 +1149,8 @@ class TemplateCompiler:
             isLocal = 1
             if (len(stmtBits) < 2):
                 # Error, badly formed define command
-                msg = "Badly formed define command '%s'.  Define commands must be of the form: '[local|global] varName expression[;[local|global] varName expression]'" % argument
+                msg = ("Badly formed define command '%s'.  Define commands must be of the form: '[local|global] varName expression[;[local|global] varName expression]'"
+                       % argument)
                 self.log.error(msg)
                 raise TemplateParseException(
                     self.tagAsText(self.currentStartTag), msg)
@@ -1160,7 +1195,8 @@ class TemplateCompiler:
         attProps = argument.split(' ')
         if (len(attProps) < 2):
             # Error, badly formed repeat command
-            msg = "Badly formed repeat command '%s'.  Repeat commands must be of the form: 'localVariable path'" % argument
+            msg = ("Badly formed repeat command '%s'.  Repeat commands must be of the form: 'localVariable path'"
+                   % argument)
             self.log.error(msg)
             raise TemplateParseException(
                 self.tagAsText(self.currentStartTag), msg)
@@ -1216,7 +1252,8 @@ class TemplateCompiler:
             stmtBits = attributeStmt.split(' ')
             if (len(stmtBits) < 2):
                 # Error, badly formed attributes command
-                msg = "Badly formed attributes command '%s'.  Attributes commands must be of the form: 'name expression[;name expression]'" % argument
+                msg = ("Badly formed attributes command '%s'.  Attributes commands must be of the form: 'name expression[;name expression]'"
+                       % argument)
                 self.log.error(msg)
                 raise TemplateParseException(
                     self.tagAsText(self.currentStartTag), msg)
@@ -1383,7 +1420,7 @@ class HTMLTemplateCompiler (TemplateCompiler, HTMLParser.HTMLParser):
         result.append(tag)
         upperTag = tag.upper()
         for attName, attValue in atts:
-            if (self.minimizeBooleanAtts and ('%s:%s' % (upperTag, attName.upper())) in HTML_BOOLEAN_ATTS):
+            if (self.minimizeBooleanAtts and ((upperTag, attName.upper())) in HTML_BOOLEAN_ATTS):
                 # We should output a minimised boolean value
                 result.append(' ')
                 result.append(attName)
@@ -1537,7 +1574,8 @@ class XMLTemplateCompiler (TemplateCompiler, xml.sax.handler.ContentHandler, xml
         try:
             xmlText = self.ourParser.getProperty(
                 xml.sax.handler.property_xml_string)
-            if (isinstance(xmlText, unicode) and SINGLETON_XML_REGEX.match(xmlText.encode("utf-8"))) or SINGLETON_XML_REGEX.match(xmlText):
+            if ((isinstance(xmlText, unicode) and SINGLETON_XML_REGEX.match(xmlText.encode("utf-8")))
+                    or SINGLETON_XML_REGEX.match(xmlText)):
                 # This is a singleton!
                 self.singletonElement = 1
         except xml.sax.SAXException as e:
