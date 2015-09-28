@@ -130,11 +130,18 @@ SINGLETON_XML_REGEX = re.compile(b'^<[^\s/>]+(?:\s*[^=>]+="[^">]+")*\s*/>')
 
 # The list of elements in HTML that can not have end tags - done as a dictionary for fast
 # lookup.
-HTML_FORBIDDEN_ENDTAG = frozenset(['AREA', 'BASE', 'BASEFONT', 'BR',
-                                   'COL', 'COMMAND', 'EMBED', 'FRAME',
-                                   'HR', 'IMG', 'INPUT', 'ISINDEX',
-                                   'KEYGEN', 'LINK', 'META', 'PARAM',
-                                   'SOURCE', 'TRACK', 'WBR'])
+# looked up at http://www.w3.org/TR/html401/index/elements.html
+HTML4_VOID_ELEMENTS = frozenset(['AREA', 'BASE', 'BASEFONT', 'BR',
+                                 'COL', 'FRAME', 'HR', 'IMG',
+                                 'INPUT', 'ISINDEX', 'LINK', 'META',
+                                 'PARAM'])
+# looked up at http://www.w3.org/TR/html-markup/syntax.html#void-element
+HTML5_VOID_ELEMENTS = frozenset(['AREA', 'BASE', 'BR', 'COL',
+                                 'COMMAND', 'EMBED', 'HR', 'IMG',
+                                 'INPUT', 'KEYGEN', 'LINK', 'META',
+                                 'PARAM', 'SOURCE', 'TRACK', 'WBR'])
+
+HTML_FORBIDDEN_ENDTAG = HTML4_VOID_ELEMENTS | HTML5_VOID_ELEMENTS
 
 # List of element:attribute pairs that can use minimized form in HTML
 HTML_BOOLEAN_ATTS = frozenset([('AREA', 'NOHREF'), ('IMG', 'ISMAP'), ('OBJECT', 'DECLARE'),
