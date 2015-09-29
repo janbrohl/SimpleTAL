@@ -131,6 +131,8 @@ class TemplateFolder(object):  # TODO: write tests
     def __getattr__(self, name):
         if SAFE_NAME_REGEX.match(name) is None:
             raise AttributeError("%r is not allowed" % name)
+        if name == "container":
+            return self.__class__(self._root, self._getfunc, self._ext, self._path[:-1])
         newPath = self._path + (name,)
         fullPath = os.path.join(self._root, *npath)
         if os.path.isdir(fullPath):
@@ -141,8 +143,8 @@ class TemplateFolder(object):  # TODO: write tests
             raise AttributeError(name)
 
     def folders(self):
-        return [name for name in os.listdir(os.path.join(self._root, *self._path))
-                if SAFE_NAME_REGEX.match(name) is not None]
+        return sorted(name for name in os.listdir(os.path.join(self._root, *self._path))
+                      if SAFE_NAME_REGEX.match(name) is not None)
 
     def templates(self):
         e = self._ext
@@ -153,6 +155,7 @@ class TemplateFolder(object):  # TODO: write tests
                 n = name[:-le]
                 if SAFE_NAME_REGEX.match(n):
                     out.append(n)
+        out.sort()
         return out
 
 
@@ -162,24 +165,19 @@ class MacroExpansionInterpreter (simpletal.simpleTAL.TemplateInterpreter):
         simpletal.simpleTAL.TemplateInterpreter.__init__(self)
         # Override the standard interpreter way of doing things.
         self.macroStateStack = []
-        self.commandHandler[simpletal.simpleTAL.TAL_DEFINE] = self.cmdNoOp
-        self.commandHandler[simpletal.simpleTAL.TAL_CONDITION] = self.cmdNoOp
-        self.commandHandler[simpletal.simpleTAL.TAL_REPEAT] = self.cmdNoOp
-        self.commandHandler[simpletal.simpleTAL.TAL_CONTENT] = self.cmdNoOp
-        self.commandHandler[simpletal.simpleTAL.TAL_ATTRIBUTES] = self.cmdNoOp
-        self.commandHandler[simpletal.simpleTAL.TAL_OMITTAG] = self.cmdNoOp
-        self.commandHandler[
-            simpletal.simpleTAL.TAL_START_SCOPE] = self.cmdStartScope
-        self.commandHandler[simpletal.simpleTAL.TAL_OUTPUT] = self.cmdOutput
-        self.commandHandler[
-            simpletal.simpleTAL.TAL_STARTTAG] = self.cmdOutputStartTag
-        self.commandHandler[
-            simpletal.simpleTAL.TAL_ENDTAG_ENDSCOPE] = self.cmdEndTagEndScope
-        self.commandHandler[
-            simpletal.simpleTAL.METAL_USE_MACRO] = self.cmdUseMacro
-        self.commandHandler[
-            simpletal.simpleTAL.METAL_DEFINE_SLOT] = self.cmdDefineSlot
-        self.commandHandler[simpletal.simpleTAL.TAL_NOOP] = self.cmdNoOp
+        self.commandHandler.update({simpletal.simpleTAL.TAL_DEFINE: self.cmdNoOp,
+                                    simpletal.simpleTAL.TAL_CONDITION: self.cmdNoOp,
+                                    simpletal.simpleTAL.TAL_REPEAT: self.cmdNoOp,
+                                    simpletal.simpleTAL.TAL_CONTENT: self.cmdNoOp,
+                                    simpletal.simpleTAL.TAL_ATTRIBUTES: self.cmdNoOp,
+                                    simpletal.simpleTAL.TAL_OMITTAG: self.cmdNoOp,
+                                    simpletal.simpleTAL.TAL_START_SCOPE: self.cmdStartScope,
+                                    simpletal.simpleTAL.TAL_OUTPUT: self.cmdOutput,
+                                    simpletal.simpleTAL.TAL_STARTTAG: self.cmdOutputStartTag,
+                                    simpletal.simpleTAL.TAL_ENDTAG_ENDSCOPE: self.cmdEndTagEndScope,
+                                    simpletal.simpleTAL.METAL_USE_MACRO: self.cmdUseMacro,
+                                    simpletal.simpleTAL.METAL_DEFINE_SLOT: self.cmdDefineSlot,
+                                    simpletal.simpleTAL.TAL_NOOP: self.cmdNoOp})
 
         self.inMacro = None
         self.macroArg = None
