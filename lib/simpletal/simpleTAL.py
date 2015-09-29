@@ -154,7 +154,7 @@ HTML_BOOLEAN_ATTS = frozenset([('AREA', 'NOHREF'), ('IMG', 'ISMAP'), ('OBJECT', 
                                ('SCRIPT', 'DEFER')])
 
 
-class TemplateInterpreter:
+class TemplateInterpreter(object):
 
     def __init__(self):
         self.programStack = []
@@ -632,7 +632,7 @@ class HTMLTemplateInterpreter (TemplateInterpreter):
         return "".join(result)
 
 
-class Template:
+class Template(object):
 
     def __init__(self, commands, macros, symbols, doctype=None):
         self.commandList = commands
@@ -814,7 +814,7 @@ class XMLTemplate (Template):
         self.expandInline(context, encodingFile, interpreter)
 
 
-class TemplateCompiler:
+class TemplateCompiler(object):
 
     def __init__(self):
         """ Initialise a template compiler.
