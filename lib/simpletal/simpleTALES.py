@@ -255,7 +255,7 @@ class CachedFuncResult (ContextVariable):
             pass
 
 
-class PythonPathFunctions:
+class PythonPathFunctions(object):
 
     def __init__(self, context):
         self.context = context
@@ -295,7 +295,7 @@ class PythonPathFunctions:
         return defaultValue
 
 
-class Context:
+class Context(object):
 
     def __init__(self, options=None, allowPythonPath=0):
         self.allowPythonPath = allowPythonPath
