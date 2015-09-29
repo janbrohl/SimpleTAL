@@ -49,6 +49,7 @@ import xml.sax
 import xml.sax.handler
 import io
 import simpletal.simpleTAL
+import simpletal.simpleTALES
 
 # used to check if a path points to an HTML-file
 HTML_EXT_REGEX = re.compile(".*[.]html?$", re.IGNORECASE)
@@ -117,12 +118,10 @@ class TemplateCache(object):
                 self.misses += 1
             return template
 
-DEFAULT_TEMPLATE_CACHE = TemplateCache()
-
 
 class TemplateFolder(object):  # TODO: write tests
 
-    def __init__(self, root, getfunc=DEFAULT_TEMPLATE_CACHE.getTemplate, ext=".html", path=tuple()):
+    def __init__(self, root, getfunc, ext=".html", path=tuple()):
         self._ext = ext
         self._root = root
         self._getfunc = getfunc
@@ -131,32 +130,48 @@ class TemplateFolder(object):  # TODO: write tests
     def __getattr__(self, name):
         if SAFE_NAME_REGEX.match(name) is None:
             raise AttributeError("%r is not allowed" % name)
-        if name == "container":
+        if name == "container" and self._path:
             return self.__class__(self._root, self._getfunc, self._ext, self._path[:-1])
         newPath = self._path + (name,)
         fullPath = os.path.join(self._root, *npath)
         if os.path.isdir(fullPath):
             return self.__class__(self._root, self._getfunc, self._ext, newPath)
         elif os.path.isfile(fullPath):
-            return self._getfunc(fullPath + self.ext)
+            return self._getfunc(fullPath + self._ext)
         else:
             raise AttributeError(name)
 
-    def folders(self):
-        return sorted(name for name in os.listdir(os.path.join(self._root, *self._path))
-                      if SAFE_NAME_REGEX.match(name) is not None)
-
-    def templates(self):
+    def __iter__(self):
         e = self._ext
-        le = len(ext)
-        out = []
-        for name in os.listdir(os.path.join(self._root, *self._path)):
+        le = len(e)
+        for name in sorted(os.listdir(os.path.join(self._root, *self._path))):
             if name.endswith(e):
                 n = name[:-le]
                 if SAFE_NAME_REGEX.match(n):
-                    out.append(n)
-        out.sort()
-        return out
+                    yield n
+            elif SAFE_NAME_REGEX.match(name):
+                yield name
+
+
+class TemplateWrapper(object):  # TODO: write tests
+
+    def __init__(self, template, contextGlobals={}, allowPythonPath=False):
+        self.template = template
+        self.contextGlobals = contextGlobals
+        self.allowPythonPath = allowPythonPath
+
+    def __call__(self, func):
+        return (lambda *args, **kwargs: self.expand(func(*args, **kwargs)))
+
+    def expand(self, options, updateGlobals={}):
+        g = self.contextGlobals.copy()
+        g.update(updateGlobals)
+        ctx = simpletal.simpleTALES.Context(options, self.allowPythonPath)
+        for k, v in g.items():
+            ctx.addGlobal(k, v)
+        f = io.StringIO()
+        self.template.expand(ctx, f)
+        return f.getvalue()
 
 
 class MacroExpansionInterpreter (simpletal.simpleTAL.TemplateInterpreter):
