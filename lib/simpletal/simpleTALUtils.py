@@ -37,6 +37,7 @@
 
 from __future__ import absolute_import
 
+import os.path
 import os
 import stat
 import threading
@@ -46,31 +47,35 @@ import cgi
 import re
 import xml.sax
 import xml.sax.handler
-
-
 import io
 import simpletal.simpleTAL
 
+# used to check if a path points to an HTML-file
+HTML_EXT_REGEX = re.compile(".*[.]html?$", re.IGNORECASE)
 
-# This is used to check for already escaped attributes.
-ESCAPED_TEXT_REGEX = re.compile(r"\&\S+?;")
+# used to check quite strictly that a name does not have a special meaning
+# for the filesystem
+SAFE_NAME_REGEX = re.compile("(?:[a-zA-Z0-9]+[_-]+)*[a-zA-Z0-9]+$")
 
 
-class TemplateCache:
+class TemplateCache(object):
     """ A TemplateCache is a multi-thread safe object that caches compiled templates.
                     This cache only works with file based templates, the ctime of the file is 
                     checked on each hit, if the file has changed the template is re-compiled.
     """
-    html_regex = re.compile(".*[.]html?", re.IGNORECASE)
 
     def __init__(self):
         self.templateCache = {}
         self.cacheLock = threading.Lock()
+        # debugging info
         self.hits = 0
         self.misses = 0
 
+    def isHTML(self, name):
+        return HTML_EXT_REGEX.match(name) is not None
+
     def getTemplate(self, name, inputEncoding='UTF-8'):
-        """ Name should be the path of a template file.  If the path matches self.html_regex it is treated
+        """ Name should be the path of a template file.  If self.isHTML(name) it is treated
                 as an HTML Template, otherwise it's treated as an XML Template.  If the template file
                 has changed since the last cache it will be re-compiled.
 
@@ -86,10 +91,10 @@ class TemplateCache:
 
     def _cacheTemplate_(self, name, inputEncoding, xmlTemplate=0):
         with self.cacheLock:
-            template, oldctime = self.templateCache.get(name, (None, None))
+            template, oldmtime = self.templateCache.get(name, (None, None))
+            mtime = os.path.getmtime(name)
             if template is not None:
-                ctime = os.stat(name)[stat.ST_MTIME]
-                if (oldctime == ctime):
+                if (oldmtime == mtime):
                     # Cache hit!
                     self.hits += 1
                     return template
@@ -101,16 +106,54 @@ class TemplateCache:
                     template = simpletal.simpleTAL.compileXMLTemplate(tempFile)
                 else:
                     # We have to guess...
-                    if self.html_regex.match(name) is None:
-                        template = simpletal.simpleTAL.compileXMLTemplate(
-                            tempFile)
-                    else:
+                    if self.isHTML(name):
                         template = simpletal.simpleTAL.compileHTMLTemplate(
                             tempFile, inputEncoding)
+                    else:
+                        template = simpletal.simpleTAL.compileXMLTemplate(
+                            tempFile)
                 self.templateCache[name] = (
-                    template, os.stat(name)[stat.ST_MTIME])
+                    template, mtime)
                 self.misses += 1
             return template
+
+DEFAULT_TEMPLATE_CACHE = TemplateCache()
+
+
+class TemplateFolder(object):  # TODO: write tests
+
+    def __init__(self, root, getfunc=DEFAULT_TEMPLATE_CACHE.getTemplate, ext=".html", path=tuple()):
+        self._ext = ext
+        self._root = root
+        self._getfunc = getfunc
+        self._path = path
+
+    def __getattr__(self, name):
+        if SAFE_NAME_REGEX.match(name) is None:
+            raise AttributeError("%r is not allowed" % name)
+        newPath = self._path + (name,)
+        fullPath = os.path.join(self._root, *npath)
+        if os.path.isdir(fullPath):
+            return self.__class__(self._root, self._getfunc, self._ext, newPath)
+        elif os.path.isfile(fullPath):
+            return self._getfunc(fullPath + self.ext)
+        else:
+            raise AttributeError(name)
+
+    def folders(self):
+        return [name for name in os.listdir(os.path.join(self._root, *self._path))
+                if SAFE_NAME_REGEX.match(name) is not None]
+
+    def templates(self):
+        e = self._ext
+        le = len(ext)
+        out = []
+        for name in os.listdir(os.path.join(self._root, *self._path)):
+            if name.endswith(e):
+                n = name[:-le]
+                if SAFE_NAME_REGEX.match(n):
+                    out.append(n)
+        return out
 
 
 class MacroExpansionInterpreter (simpletal.simpleTAL.TemplateInterpreter):
