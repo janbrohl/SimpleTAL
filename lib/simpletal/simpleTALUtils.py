@@ -133,7 +133,7 @@ class TemplateFolder(object):  # TODO: write tests
         if name == "container" and self._path:
             return self.__class__(self._root, self._getfunc, self._ext, self._path[:-1])
         newPath = self._path + (name,)
-        fullPath = os.path.join(self._root, *npath)
+        fullPath = os.path.join(self._root, *newPath)
         if os.path.isdir(fullPath):
             return self.__class__(self._root, self._getfunc, self._ext, newPath)
         elif os.path.isfile(fullPath):
