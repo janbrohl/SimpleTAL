@@ -178,13 +178,16 @@ class TemplateWrapper(object):  # TODO: write tests, docs, find better name
 # TODO: write tests, docs, find better name
 def wrapperLoader(templateDir="templates", standardGlobals={}):
     cache = TemplateCache()
+    root = TemplateFolder(templateDir, cache.getTemplate)
+    standardGlobals = standardGlobals.copy()
+    standardGlobals["root"] = root
 
     def load(path):
         pathtuple = tuple(path.strip("/").split("/"))
-        templateFolder = TemplateFolder(
+        container = TemplateFolder(
             templateDir, cache.getTemplate, path=pathtuple[:-1])
         contextGlobals = standardGlobals.copy()
-        contextGlobals["container"] = templateFolder
+        contextGlobals["container"] = container
         loader = TemplateFolder(templateDir, (lambda name: TemplateWrapper(
             cache.getTemplate(name), contextGlobals)), path=pathtuple[:-1])
         return getattr(loader, pathtuple[-1])
