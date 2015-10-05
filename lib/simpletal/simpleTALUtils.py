@@ -119,7 +119,7 @@ class TemplateCache(object):
             return template
 
 
-class TemplateFolder(object):  # TODO: write tests
+class TemplateFolder(object):  # TODO: write tests, docs, find better name
 
     def __init__(self, root, getfunc, ext=".html", path=tuple()):
         self._ext = ext
@@ -153,7 +153,7 @@ class TemplateFolder(object):  # TODO: write tests
                 yield name
 
 
-class TemplateWrapper(object):  # TODO: write tests
+class TemplateWrapper(object):  # TODO: write tests, docs, find better name
 
     def __init__(self, template, contextGlobals={}, allowPythonPath=False):
         self.template = template
@@ -173,6 +173,23 @@ class TemplateWrapper(object):  # TODO: write tests
         f = io.StringIO()
         self.template.expand(ctx, f)
         return f.getvalue()
+
+
+# TODO: write tests, docs, find better name
+def wrapperLoader(templateDir="templates", standardGlobals={}):
+    cache = TemplateCache()
+
+    def load(path):
+        pathtuple = path.strip("/").split("/")
+        templateFolder = TemplateFolder(
+            templateDir, cache.getTemplate, pathtuple[:-1])
+        contextGlobals = standardGlobals.copy()
+        contextGlobals["container"] = templateFolder
+        loader = TemplateFolder(templateDir, (lambda name: TemplateWrapper(
+            cache.getTemplate(name), contextGlobals)), pathtuple[:-1])
+        return getattr(loader, pathtuple[-1])
+
+    return load
 
 
 class MacroExpansionInterpreter (simpletal.simpleTAL.TemplateInterpreter):
