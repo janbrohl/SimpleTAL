@@ -75,7 +75,7 @@ class TemplateCache(object):
     def isHTML(self, name):
         return HTML_EXT_REGEX.match(name) is not None
 
-    def getTemplate(self, name, inputEncoding='UTF-8'):
+    def getTemplate(self, name, inputEncoding='UTF-8-SIG'):
         """ Name should be the path of a template file.  If self.isHTML(name) it is treated
                 as an HTML Template, otherwise it's treated as an XML Template.  If the template file
                 has changed since the last cache it will be re-compiled.
@@ -163,7 +163,7 @@ class TemplateWrapper(object):  # TODO: write tests
     def __call__(self, func):
         return (lambda *args, **kwargs: self.expand(func(*args, **kwargs)))
 
-    def expand(self, options, updateGlobals={}):
+    def expand(self, options=tuple(), updateGlobals={}):
         g = self.contextGlobals.copy()
         g.update(updateGlobals)
         ctx = simpletal.simpleTALES.Context(options, self.allowPythonPath)
