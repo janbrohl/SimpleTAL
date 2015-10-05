@@ -163,9 +163,10 @@ class TemplateWrapper(object):  # TODO: write tests
     def __call__(self, func):
         return (lambda *args, **kwargs: self.expand(func(*args, **kwargs)))
 
-    def expand(self, options=tuple(), updateGlobals={}):
+    def expand(self, options=tuple(), updateGlobals={}, **kwGlobals):
         g = self.contextGlobals.copy()
         g.update(updateGlobals)
+        g.update(kwGlobals)
         ctx = simpletal.simpleTALES.Context(options, self.allowPythonPath)
         for k, v in g.items():
             ctx.addGlobal(k, v)
