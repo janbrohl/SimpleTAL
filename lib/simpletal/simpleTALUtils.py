@@ -136,7 +136,7 @@ class TemplateFolder(object):  # TODO: write tests
         fullPath = os.path.join(self._root, *newPath)
         if os.path.isdir(fullPath):
             return self.__class__(self._root, self._getfunc, self._ext, newPath)
-        elif os.path.isfile(fullPath):
+        elif os.path.isfile(fullPath + self._ext):
             return self._getfunc(fullPath + self._ext)
         else:
             raise AttributeError(name)
