@@ -39,6 +39,7 @@ import logging
 import logging.config
 
 from simpletal import simpleTAL, simpleTALES
+import simpletal.simpleTALUtils
 
 try:
     # Is PyXML's LexicalHandler available?
@@ -69,12 +70,14 @@ class DefineMacroTests (unittest.TestCase):
         self.context.addGlobal ('needsQuoting', """Does "this" work?""")
 
     def _runTest_(self, txt, result, errMsg="Error"):
+        expectedList = simpletal.simpleTALUtils.getXMLList(result)
         macroTemplate = simpleTAL.compileXMLTemplate(txt)
         self.context.addGlobal("site", macroTemplate)
         file = io.StringIO()
         pageTemplate.expand(self.context, file, outputEncoding="iso-8859-1")
         realResult = file.getvalue()
-        self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
+        realList = simpletal.simpleTALUtils.getXMLList(realResult)
+        self.assertEqual(realList, expectedList, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
                          (errMsg, txt, realResult, result, pageTemplate))
 
     def _runCompileTest_(self, txt, result, errMsg="Error"):

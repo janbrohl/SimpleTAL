@@ -39,6 +39,7 @@ import logging
 import logging.config
 
 from simpletal import simpleTAL, simpleTALES
+import simpletal.simpleTALUtils
 
 if (os.path.exists("logging.ini")):
     logging.config.fileConfig("logging.ini")
@@ -56,6 +57,7 @@ class METALNameSpaceTests (unittest.TestCase):
         self.context.addGlobal('three', [1, "Two", 3])
 
     def _runTest_(self, macros, page, result, errMsg="Error"):
+        expectedList = simpletal.simpleTALUtils.getXMLList(result)
         macroTemplate = simpleTAL.compileXMLTemplate(macros)
         # print "Macro template: " + str (macroTemplate)
         pageTemplate = simpleTAL.compileXMLTemplate(page)
@@ -64,7 +66,8 @@ class METALNameSpaceTests (unittest.TestCase):
         file = io.StringIO()
         pageTemplate.expand(self.context, file, outputEncoding="iso-8859-1")
         realResult = file.getvalue()
-        self.assertEqual(realResult, result, "%s - \npassed in macro: %s \npage: %s\ngot back %s \nexpected %s\n" %
+        realList = simpletal.simpleTALUtils.getXMLList(realResult)
+        self.assertEqual(realList, expectedList, "%s - \npassed in macro: %s \npage: %s\ngot back %s \nexpected %s\n" %
                          (errMsg, macros, page, realResult, result))
 
     # Test that rebinding the namespaces works
