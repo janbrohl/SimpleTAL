@@ -7,5 +7,9 @@ python:
   - "3.5"
   - "pypy"
   - "pypy3"
+before_install:
+  - pip install codecov
 install: true
 script: python runtests.py
+after_success:
+  - codecov
