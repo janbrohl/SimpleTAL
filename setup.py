@@ -14,7 +14,18 @@ setup(name="SimpleTAL",
       author_email="colin@owlfish.com",
       url="http://www.owlfish.com/software/simpleTAL/index.html",
       packages=[
-          'simpletal',
+          'simpletal'
       ],
       package_dir={'': 'lib'},
+      classifiers=[
+          "Intended Audience :: Developers",
+          "Development Status :: 4 - Beta",
+          "License :: OSI Approved :: BSD License",
+          "Operating System :: OS Independent",
+          "Programming Language :: Python :: 2.7",
+          "Programming Language :: Python :: 3.2",
+          "Programming Language :: Python :: 3.3",
+          "Programming Language :: Python :: 3.4",
+          "Programming Language :: Python :: 3.5",
+      ]
       )
