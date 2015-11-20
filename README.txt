@@ -1,39 +1,13 @@
-simpleTAL / simpleTALES (Version 4.3)
+simpleTAL / simpleTALES (Version 6.0) 
 -------------------------------------
+[![codecov.io](https://codecov.io/github/janbrohl/SimpleTAL/coverage.svg?branch=python2and3)](https://codecov.io/github/janbrohl/SimpleTAL?branch=python2and3)
+[![Build Status](https://travis-ci.org/janbrohl/SimpleTAL.svg?branch=python2and3)](https://travis-ci.org/janbrohl/SimpleTAL)
+
 This is an implementation of the TAL and TALES specifications
-see (http://www.zope.org/Documentation/Books/ZopeBook/current/AppendixC.stx)
-
-Installation
-------------
-To install SimpleTAL under Unix:
-  
-  (Note that to perform the installation of SimpleTAL you will probably
-   have to have the Python Development package installed.)
-  
-  1 - Become root
-  2 - Run "python setup.py install"
-	
-Under MacOS X:
-  1 - Run "sudo python setup.py install"
-  2 - Close the terminal program and re-open it.
-  
-Notes
------
-This code is made freely available under a BSD style license, see 
-LICENSE.txt for more details.
-
-The DummyLogger.py module is used if you do not have either Python 2.3 
-or the logging code from
-http://www.red-dove.com/python_logging.html installed.
-
-Note that the unit test cases (under tests) require logging to be installed
-to run.
+see http://docs.zope.org/zope2/zope2book/AppendixC.html for Python 2.7 and 3.2+
 
 Unit Tests
 ----------
-All unit tests can be run with the "runtests.py" command.  For all tests to
-pass the PyXML library must be installed.
+All unit tests can be run with the "runtests.py" command.
 
-Documentation
--------------
-Documentation on the SimpleTAL API can be found in documentation/html/
+
