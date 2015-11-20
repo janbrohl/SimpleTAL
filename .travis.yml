@@ -10,6 +10,6 @@ python:
 before_install:
   - pip install codecov
 install: true
-script: python runtests.py
+script: coverage run runtests.py
 after_success:
   - codecov
