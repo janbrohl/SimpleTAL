@@ -51,7 +51,9 @@ except ImportError:
         pass
 
 from simpletal import simpleTAL, simpleTALES
-import simpletal.simpleTALUtils
+
+import xml.etree.ElementTree as ET
+import xmlcompare
 
 if (os.path.exists("logging.ini")):
     logging.config.fileConfig("logging.ini")
@@ -70,18 +72,23 @@ class TALHandlerTestCases (unittest.TestCase):
 
     def _runTest_(self, txt, result, errMsg="Error"):
         template = simpleTAL.compileXMLTemplate(txt)
-        fh = io.StringIO()
-        template.expand(self.context, fh, outputEncoding="iso-8859-1")
-        realResult = fh.getvalue()
-        expectedList = simpletal.simpleTALUtils.getXMLList(result)
+        file = io.StringIO()
+        template.expand(self.context, file, outputEncoding="iso-8859-1")
+        realResult = file.getvalue()
         try:
-            realList = simpletal.simpleTALUtils.getXMLList(realResult)
+            expectedElement = ET.fromstring(result)
+        except Exception as e:
+            self.fail(
+                "Exception (%s) thrown parsing XML expected result: %s" % (str(e), result))
+
+        try:
+            realElement = ET.fromstring(realResult)
         except Exception as e:
             self.fail("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s" % (
                 str(e), realResult, str(template)))
 
-        self.assertEqual(expectedList, realList, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
-                         (errMsg, txt, realResult, result, template))
+        self.assertTrue(xmlcompare.equal(expectedElement, realElement), "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
+                        (errMsg, txt, realResult, result, template))
 
     def testSingleEmptyElement(self):
         self._runTest_(
@@ -108,8 +115,8 @@ class TALHandlerTestCases (unittest.TestCase):
                         """<?xml version="1.0" encoding="iso-8859-1"?>\n<html><br this="this"/><br other="that" that="this"/><br test="/>difficult" bad="Hard />"/></html>""")
 
     def testSingleElementHarderAttributes(self):
-        self._runTest_ ("""<html gold:define-macro="m1"><br gold:define-slot="sl1"/></html>"""
-                        , """<html gold:define-macro="m1"><br gold:define-slot="sl1"/></html>""")
+        self._runTest_ ("""<html xmlns:gold="http://gold" gold:define-macro="m1" ><br gold:define-slot="sl1"/></html>"""
+                        , """<html xmlns:gold="http://gold" gold:define-macro="m1"><br gold:define-slot="sl1"/></html>""")
 
     def testCDATASection(self):
         self._runTest_ ("<single><![CDATA[Here's some <escaped> CDATA section stuff & things.]]></single>"                                         , """<?xml version="1.0" encoding="iso-8859-1"?>\n<single>Here's some &lt;escaped&gt; CDATA section stuff &amp; things.</single>"""

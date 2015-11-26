@@ -40,8 +40,9 @@ import logging
 import logging.config
 
 from simpletal import simpleTAL, simpleTALES
-import simpletal.simpleTALUtils
 
+import xml.etree.ElementTree as ET
+import xmlcompare
 
 if (os.path.exists("logging.ini")):
     logging.config.fileConfig("logging.ini")
@@ -65,19 +66,19 @@ class TALAttributesTestCases (unittest.TestCase):
         template.expand(self.context, file, outputEncoding="iso-8859-1")
         realResult = file.getvalue()
         try:
-            expectedList = simpletal.simpleTALUtils.getXMLList(result)
+            expectedElement = ET.fromstring(result)
         except Exception as e:
             self.fail(
                 "Exception (%s) thrown parsing XML expected result: %s" % (str(e), result))
 
         try:
-            realList = simpletal.simpleTALUtils.getXMLList(realResult)
+            realElement = ET.fromstring(realResult)
         except Exception as e:
             self.fail("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s" % (
                 str(e), realResult, str(template)))
 
-        self.assertEqual(expectedList, realList, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
-                         (errMsg, txt, realResult, result, template))
+        self.assertTrue(xmlcompare.equal(expectedElement, realElement), "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
+                        (errMsg, txt, realResult, result, template))
 
     def testAddingAnAttribute(self):
         self._runTest_('<html tal:attributes="link link" href="owlfish.com">Hello</html>',

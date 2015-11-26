@@ -39,7 +39,9 @@ import logging
 import logging.config
 
 from simpletal import simpleTAL, simpleTALES
-import simpletal.simpleTALUtils
+
+import xml.etree.ElementTree as ET
+import xmlcompare
 
 if (os.path.exists("logging.ini")):
     logging.config.fileConfig("logging.ini")
@@ -57,7 +59,6 @@ class METALNameSpaceTests (unittest.TestCase):
         self.context.addGlobal('three', [1, "Two", 3])
 
     def _runTest_(self, macros, page, result, errMsg="Error"):
-        expectedList = simpletal.simpleTALUtils.getXMLList(result)
         macroTemplate = simpleTAL.compileXMLTemplate(macros)
         # print "Macro template: " + str (macroTemplate)
         pageTemplate = simpleTAL.compileXMLTemplate(page)
@@ -66,14 +67,25 @@ class METALNameSpaceTests (unittest.TestCase):
         file = io.StringIO()
         pageTemplate.expand(self.context, file, outputEncoding="iso-8859-1")
         realResult = file.getvalue()
-        realList = simpletal.simpleTALUtils.getXMLList(realResult)
-        self.assertEqual(realList, expectedList, "%s - \npassed in macro: %s \npage: %s\ngot back %s \nexpected %s\n" %
-                         (errMsg, macros, page, realResult, result))
+        try:
+            expectedElement = ET.fromstring(result)
+        except Exception as e:
+            self.fail(
+                "Exception (%s) thrown parsing XML expected result: %s" % (str(e), result))
+
+        try:
+            realElement = ET.fromstring(realResult)
+        except Exception as e:
+            self.fail("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s" % (
+                str(e), realResult, str(pageTemplate)))
+
+        self.assertTrue(xmlcompare.equal(expectedElement, realElement), "%s - \npassed in: Macros: %s \n Page:%s \ngot back %s \nexpected %s\n\nMacro Template: %s \n\nPage Template: %s" %
+                        (errMsg, macros, page, realResult, result, macroTemplate, pageTemplate))
 
     # Test that rebinding the namespaces works
     def testSingleBindNoCommands(self):
-        self._runTest_('<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><div metal:define-macro="one" class="funny">Before <b metal:define-slot="blue">blue</b> After</div></html>', '<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><body metal:use-macro="site/macros/one">Nowt <i metal:fill-slot="blue">white</i> here</body></html>',
-                       '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><body metal:use-macro="site/macros/one">Nowt <i metal:fill-slot="blue">white</i> here</body></html>', "Single Bind, commands, failed.")
+        self._runTest_('<html xmlns:metal="http://dummy" xmlns:newmetal="http://xml.zope.org/namespaces/metal"><div metal:define-macro="one" class="funny">Before <b metal:define-slot="blue">blue</b> After</div></html>', '<html xmlns:metal="http://dummy" xmlns:newmetal="http://xml.zope.org/namespaces/metal"><body metal:use-macro="site/macros/one">Nowt <i metal:fill-slot="blue">white</i> here</body></html>',
+                       '<?xml version="1.0" encoding="iso-8859-1"?>\n<html xmlns:metal="http://dummy"><body metal:use-macro="site/macros/one">Nowt <i metal:fill-slot="blue">white</i> here</body></html>', "Single Bind, commands, failed.")
 
     def testSingleBindCommands(self):
         self._runTest_('<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><div newmetal:define-macro="one" class="funny">Before <b newmetal:define-slot="blue">blue</b> After</div></html>',

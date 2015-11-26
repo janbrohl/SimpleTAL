@@ -39,7 +39,9 @@ import logging
 import logging.config
 
 from simpletal import simpleTAL, simpleTALES
-import simpletal.simpleTALUtils
+
+import xml.etree.ElementTree as ET
+import xmlcompare
 
 if (os.path.exists("logging.ini")):
     logging.config.fileConfig("logging.ini")
@@ -56,7 +58,6 @@ class DefineSlotsTests (unittest.TestCase):
         self.context.addGlobal ('needsQuoting', """Does "this" & work?""")
 
     def _runTest_(self, macros, page, result, errMsg="Error"):
-        expectedList = simpletal.simpleTALUtils.getXMLList(result)
         macroTemplate = simpleTAL.compileXMLTemplate(macros)
         # print "Macro template: " + str (macroTemplate)
         pageTemplate = simpleTAL.compileXMLTemplate(page)
@@ -65,9 +66,19 @@ class DefineSlotsTests (unittest.TestCase):
         file = io.StringIO()
         pageTemplate.expand(self.context, file, outputEncoding="iso-8859-1")
         realResult = file.getvalue()
-        realList = simpletal.simpleTALUtils.getXMLList(realResult)
-        self.assertEqual(realList, expectedList, "%s - \npassed in macro: %s \npage: %s\ngot back %s \nexpected %s\n" %
-                         (errMsg, macros, page, realResult, result))
+        try:
+            expectedElement = ET.fromstring(result)
+        except Exception as e:
+            self.fail(
+                "Exception (%s) thrown parsing XML expected result: %s" % (str(e), result))
+
+        try:
+            realElement = ET.fromstring(realResult)
+        except Exception as e:
+            self.fail("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s" % (
+                str(e), realResult, str(pageTemplate)))
+        self.assertTrue(xmlcompare.equal(expectedElement, realElement), "%s - \npassed in: Macros: %s \n Page:%s \ngot back %s \nexpected %s\n\nMacro Template: %s \n\nPage Template: %s" %
+                        (errMsg, macros, page, realResult, result, macroTemplate, pageTemplate))
 
     def _runCompileTest_(self, txt, result, errMsg="Error"):
         try:

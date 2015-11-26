@@ -8,9 +8,11 @@ python:
   - "pypy"
   - "pypy3"
 before_install:
+  - pip install https://github.com/janbrohl/xmlcompare/archive/master.zip
   - pip install codecov
 install: true
 script: python runtests.py
 after_success:
   - coverage run runtests.py
   - codecov
+  

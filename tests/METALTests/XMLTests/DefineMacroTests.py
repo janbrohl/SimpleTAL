@@ -39,7 +39,9 @@ import logging
 import logging.config
 
 from simpletal import simpleTAL, simpleTALES
-import simpletal.simpleTALUtils
+
+import xml.etree.ElementTree as ET
+import xmlcompare
 
 try:
     # Is PyXML's LexicalHandler available?
@@ -70,15 +72,25 @@ class DefineMacroTests (unittest.TestCase):
         self.context.addGlobal ('needsQuoting', """Does "this" work?""")
 
     def _runTest_(self, txt, result, errMsg="Error"):
-        expectedList = simpletal.simpleTALUtils.getXMLList(result)
         macroTemplate = simpleTAL.compileXMLTemplate(txt)
         self.context.addGlobal("site", macroTemplate)
         file = io.StringIO()
         pageTemplate.expand(self.context, file, outputEncoding="iso-8859-1")
         realResult = file.getvalue()
-        realList = simpletal.simpleTALUtils.getXMLList(realResult)
-        self.assertEqual(realList, expectedList, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
-                         (errMsg, txt, realResult, result, pageTemplate))
+        try:
+            expectedElement = ET.fromstring(result)
+        except Exception as e:
+            self.fail(
+                "Exception (%s) thrown parsing XML expected result: %s" % (str(e), result))
+
+        try:
+            realElement = ET.fromstring(realResult)
+        except Exception as e:
+            self.fail("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s" % (
+                str(e), realResult, str(pageTemplate)))
+
+        self.assertTrue(xmlcompare.equal(expectedElement, realElement), "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
+                        (errMsg, txt, realResult, result, pageTemplate))
 
     def _runCompileTest_(self, txt, result, errMsg="Error"):
         try:

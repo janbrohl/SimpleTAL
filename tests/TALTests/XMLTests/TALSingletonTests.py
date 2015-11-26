@@ -41,7 +41,8 @@ import logging.config
 
 from simpletal import simpleTAL, simpleTALES
 
-import simpletal.simpleTALUtils
+import xml.etree.ElementTree as ET
+import xmlcompare
 
 if (os.path.exists("logging.ini")):
     logging.config.fileConfig("logging.ini")
@@ -64,19 +65,19 @@ class TALSingletonTests (unittest.TestCase):
         template.expand(self.context, file, outputEncoding="iso-8859-1")
         realResult = file.getvalue()
         try:
-            expectedList = simpletal.simpleTALUtils.getXMLList(result)
+            expectedElement = ET.fromstring(result)
         except Exception as e:
             self.fail(
                 "Exception (%s) thrown parsing XML expected result: %s" % (str(e), result))
 
         try:
-            realList = simpletal.simpleTALUtils.getXMLList(realResult)
+            realElement = ET.fromstring(realResult)
         except Exception as e:
             self.fail("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s" % (
                 str(e), realResult, str(template)))
 
-        self.assertEqual(expectedList, realList, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
-                         (errMsg, txt, realResult, result, template))
+        self.assertTrue(xmlcompare.equal(expectedElement, realElement), "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
+                        (errMsg, txt, realResult, result, template))
 
     def _runMacroTest_(self, macros, page, result, errMsg="Error"):
         macroTemplate = simpleTAL.compileXMLTemplate(macros)
@@ -87,19 +88,19 @@ class TALSingletonTests (unittest.TestCase):
         pageTemplate.expand(self.context, file)
         realResult = file.getvalue()
         try:
-            expectedList = simpletal.simpleTALUtils.getXMLList(result)
+            expectedElement = ET.fromstring(result)
         except Exception as e:
             self.fail(
                 "Exception (%s) thrown parsing XML expected result: %s" % (str(e), result))
 
         try:
-            realList = simpletal.simpleTALUtils.getXMLList(realResult)
+            realElement = ET.fromstring(realResult)
         except Exception as e:
             self.fail("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s\nMacro Template: %s" % (
                 str(e), realResult, str(pageTemplate), str(macroTemplate)))
 
-        self.assertEqual(expectedList, realList, "%s - \npassed in macro: %s \n and page: %s\ngot back %s \nexpected %s\n\nPage Template: %s" %
-                         (errMsg, macros, page, realResult, result, pageTemplate))
+        self.assertTrue(xmlcompare.equal(expectedElement, realElement), "%s - \npassed in macro: %s \n and page: %s\ngot back %s \nexpected %s\n\nPage Template: %s" %
+                        (errMsg, macros, page, realResult, result, pageTemplate))
 
     def testDefineAttributes(self):
         self._runTest_ ("""<html><br tal:define="temp test" tal:attributes="href temp"/><br tal:attributes="href temp"/></html>"""
