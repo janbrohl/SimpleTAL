@@ -12,7 +12,6 @@ matrix:
   allow_failures:
     - python: "2.6"
 before_install:
-  - pip install https://github.com/janbrohl/xmlcompare/archive/master.zip
   - pip install codecov
 install: true
 script: python setup.py test

@@ -7,3 +7,4 @@ autopep_all.cmd
 /env*
 *.sln
 /TestResults
+.eggs/

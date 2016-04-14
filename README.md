@@ -12,7 +12,6 @@ SimpleTAL uses a BSD-3-Clause style license so you are free to do *many* things 
 
 Unit Tests
 ----------
-All unit tests can be run with the "runtests.py" command.
-[XMLCompare](https://github.com/janbrohl/xmlcompare) is required for the XML-Tests.
+All unit tests can be run via setuptools with "setup.py test".
 
 

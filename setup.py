@@ -17,6 +17,7 @@ setup(name="SimpleTAL",
           'simpletal'
       ],
       package_dir={'': 'lib'},
+      tests_require="xmlcompare",
       test_suite='tests.get_loader',
       classifiers=[
           "Intended Audience :: Developers",
