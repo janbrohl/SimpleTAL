@@ -13,9 +13,10 @@ matrix:
     - python: "2.6"
 before_install:
   - pip install codecov
+  pip install xmlcompare
 install: true
-script: python setup.py test
+script: python setup.py test install
 after_success:
-  - coverage run runtests.py
+  - coverage run -m unittest discover -p tests
   - codecov
   

@@ -21,7 +21,7 @@ setup(name="SimpleTALSix",
       ],
       package_dir={'': 'lib'},
       tests_require="xmlcompare",
-      test_suite='tests.get_loader',
+      test_suite='tests',
       classifiers=[
           "Intended Audience :: Developers",
           "Development Status :: 4 - Beta",

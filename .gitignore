@@ -8,3 +8,6 @@ autopep_all.cmd
 *.sln
 /TestResults
 .eggs/
+lib/SimpleTALSix.egg-info/
+dist/
+.coverage
