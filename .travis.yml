@@ -15,7 +15,7 @@ before_install:
   - pip install https://github.com/janbrohl/xmlcompare/archive/master.zip
   - pip install codecov
 install: true
-script: python runtests.py
+script: python setup.py test
 after_success:
   - coverage run runtests.py
   - codecov
