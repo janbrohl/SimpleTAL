@@ -3,3 +3,7 @@
 *__pycache__*
 autoedit.py
 autopep_all.cmd
+/lib/SimpleTAL.egg-info
+/env*
+*.sln
+/TestResults

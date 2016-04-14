@@ -4,7 +4,7 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.getcwd(), 'lib'))
 
-from distutils.core import setup
+from setuptools import setup
 import simpletal
 
 setup(name="SimpleTAL",
@@ -17,6 +17,7 @@ setup(name="SimpleTAL",
           'simpletal'
       ],
       package_dir={'': 'lib'},
+      test_suite='tests.get_loader',
       classifiers=[
           "Intended Audience :: Developers",
           "Development Status :: 4 - Beta",

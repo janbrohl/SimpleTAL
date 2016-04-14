@@ -1230,7 +1230,7 @@ class TemplateCompiler(object):
             if (attProps[0] == "structure"):
                 structureFlag = 1
                 express = " ".join(attProps[1:])
-            elif (attProps[1] == "text"):
+            elif (attProps[0] == "text"):
                 structureFlag = 0
                 express = " ".join(attProps[1:])
             else:
