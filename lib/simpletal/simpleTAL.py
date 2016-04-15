@@ -50,6 +50,7 @@ import xml.sax.saxutils
 import copy
 import sys
 import simpletal.simpleTALES
+from simpletal.simpleTALConstants import *
 import logging
 
 import io
@@ -66,6 +67,9 @@ else:
 name2unicode = dict((k, unichr(v))
                     for k, v in htmlentitydefs.name2codepoint.items())
 
+METAL_NAME_REGEX = re.compile("[a-zA-Z_][a-zA-Z0-9_]*")
+SINGLETON_XML_REGEX = re.compile(b'^<[^\s/>]+(?:\s*[^=>]+="[^">]+")*\s*/>')
+
 
 try:
     # Is PyXML's LexicalHandler available?
@@ -74,7 +78,8 @@ try:
 except ImportError:
     use_lexical_handler = 0
 
-    class LexicalHandler:
+    class LexicalHandler(object):
+        "Dummy lexical handdler class"
         pass
 
 try:
@@ -83,76 +88,6 @@ try:
     use_dom2sax = 1
 except ImportError:
     use_dom2sax = 0
-
-
-# Name-space URIs
-METAL_NAME_URI = "http://xml.zope.org/namespaces/metal"
-TAL_NAME_URI = "http://xml.zope.org/namespaces/tal"
-
-# All commands are of the form (opcode, args, commandList)
-# The numbers are the opcodes, and also the order of priority
-
-# Argument: [(isLocalFlag (Y/n), variableName, variablePath),...]
-TAL_DEFINE = 1
-# Argument: expression, endTagSymbol
-TAL_CONDITION = 2
-# Argument: (varname, expression, endTagSymbol)
-TAL_REPEAT = 3
-# Argument: (replaceFlag, type, expression)
-TAL_CONTENT = 4
-# Not used in byte code, only ordering.
-TAL_REPLACE = 5
-# Argument: [(attributeName, expression)]
-TAL_ATTRIBUTES = 6
-# Argument: expression
-TAL_OMITTAG = 7
-# Argument: (originalAttributeList, currentAttributeList)
-TAL_START_SCOPE = 8
-# Argument: String to output
-TAL_OUTPUT = 9
-# Argument: None
-TAL_STARTTAG = 10
-# Argument: Tag, omitTagFlag
-TAL_ENDTAG_ENDSCOPE = 11
-# Argument: None
-TAL_NOOP = 13
-
-# METAL Starts here
-# Argument: expression, slotParams, endTagSymbol
-METAL_USE_MACRO = 14
-# Argument: macroName, endTagSymbol
-METAL_DEFINE_SLOT = 15
-# Only used for parsing
-METAL_FILL_SLOT = 16
-METAL_DEFINE_MACRO = 17
-
-METAL_NAME_REGEX = re.compile("[a-zA-Z_][a-zA-Z0-9_]*")
-SINGLETON_XML_REGEX = re.compile(b'^<[^\s/>]+(?:\s*[^=>]+="[^">]+")*\s*/>')
-
-# The list of elements in HTML that can not have end tags - done as a dictionary for fast
-# lookup.
-# looked up at http://www.w3.org/TR/html401/index/elements.html
-HTML4_VOID_ELEMENTS = frozenset(['AREA', 'BASE', 'BASEFONT', 'BR',
-                                 'COL', 'FRAME', 'HR', 'IMG',
-                                 'INPUT', 'ISINDEX', 'LINK', 'META',
-                                 'PARAM'])
-# looked up at http://www.w3.org/TR/html-markup/syntax.html#void-element
-HTML5_VOID_ELEMENTS = frozenset(['AREA', 'BASE', 'BR', 'COL',
-                                 'COMMAND', 'EMBED', 'HR', 'IMG',
-                                 'INPUT', 'KEYGEN', 'LINK', 'META',
-                                 'PARAM', 'SOURCE', 'TRACK', 'WBR'])
-
-HTML_FORBIDDEN_ENDTAG = HTML4_VOID_ELEMENTS | HTML5_VOID_ELEMENTS
-
-# List of element:attribute pairs that can use minimized form in HTML
-HTML_BOOLEAN_ATTS = frozenset([('AREA', 'NOHREF'), ('IMG', 'ISMAP'), ('OBJECT', 'DECLARE'),
-                               ('INPUT', 'CHECKED'), ('INPUT', 'DISABLED'),
-                               ('INPUT', 'READONLY'), ('INPUT', 'ISMAP'),
-                               ('SELECT', 'MULTIPLE'), ('SELECT', 'DISABLED'),
-                               ('OPTGROUP', 'DISABLED'), ('OPTION', 'SELECTED'),
-                               ('OPTION', 'DISABLED'), ('TEXTAREA', 'DISABLED'),
-                               ('TEXTAREA', 'READONLY'), ('BUTTON', 'DISABLED'),
-                               ('SCRIPT', 'DEFER')])
 
 
 class TemplateInterpreter(object):

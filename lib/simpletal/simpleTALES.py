@@ -42,21 +42,10 @@ from __future__ import absolute_import
 
 import sys
 import logging
+from simpletal.simpleTALConstants import DEFAULTVALUE
 
 if sys.version_info >= (3, 0):
     unicode = str
-
-
-class SignalValue(object):
-    """ Helper class to make unique values with a useful __str__"""
-
-    def __init__(self, info):
-        self.__info = info
-
-    def __str__(self):
-        return self.__info
-
-DEFAULTVALUE = SignalValue("This constant represents a default value.")
 
 
 class PathNotFoundException (Exception):

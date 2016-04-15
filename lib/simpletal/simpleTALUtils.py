@@ -54,6 +54,7 @@ import xml.sax.handler
 import io
 import simpletal.simpleTAL
 import simpletal.simpleTALES
+import simpletal.simpleTALConstants
 
 # used to check if a path points to an HTML-file
 HTML_EXT_REGEX = re.compile(".*[.]html?$", re.IGNORECASE)
@@ -205,19 +206,19 @@ class MacroExpansionInterpreter (simpletal.simpleTAL.TemplateInterpreter):
         simpletal.simpleTAL.TemplateInterpreter.__init__(self)
         # Override the standard interpreter way of doing things.
         self.macroStateStack = []
-        self.commandHandler.update({simpletal.simpleTAL.TAL_DEFINE: self.cmdNoOp,
-                                    simpletal.simpleTAL.TAL_CONDITION: self.cmdNoOp,
-                                    simpletal.simpleTAL.TAL_REPEAT: self.cmdNoOp,
-                                    simpletal.simpleTAL.TAL_CONTENT: self.cmdNoOp,
-                                    simpletal.simpleTAL.TAL_ATTRIBUTES: self.cmdNoOp,
-                                    simpletal.simpleTAL.TAL_OMITTAG: self.cmdNoOp,
-                                    simpletal.simpleTAL.TAL_START_SCOPE: self.cmdStartScope,
-                                    simpletal.simpleTAL.TAL_OUTPUT: self.cmdOutput,
-                                    simpletal.simpleTAL.TAL_STARTTAG: self.cmdOutputStartTag,
-                                    simpletal.simpleTAL.TAL_ENDTAG_ENDSCOPE: self.cmdEndTagEndScope,
-                                    simpletal.simpleTAL.METAL_USE_MACRO: self.cmdUseMacro,
-                                    simpletal.simpleTAL.METAL_DEFINE_SLOT: self.cmdDefineSlot,
-                                    simpletal.simpleTAL.TAL_NOOP: self.cmdNoOp})
+        self.commandHandler.update({simpletal.simpleTALConstants.TAL_DEFINE: self.cmdNoOp,
+                                    simpletal.simpleTALConstants.TAL_CONDITION: self.cmdNoOp,
+                                    simpletal.simpleTALConstants.TAL_REPEAT: self.cmdNoOp,
+                                    simpletal.simpleTALConstants.TAL_CONTENT: self.cmdNoOp,
+                                    simpletal.simpleTALConstants.TAL_ATTRIBUTES: self.cmdNoOp,
+                                    simpletal.simpleTALConstants.TAL_OMITTAG: self.cmdNoOp,
+                                    simpletal.simpleTALConstants.TAL_START_SCOPE: self.cmdStartScope,
+                                    simpletal.simpleTALConstants.TAL_OUTPUT: self.cmdOutput,
+                                    simpletal.simpleTALConstants.TAL_STARTTAG: self.cmdOutputStartTag,
+                                    simpletal.simpleTALConstants.TAL_ENDTAG_ENDSCOPE: self.cmdEndTagEndScope,
+                                    simpletal.simpleTALConstants.METAL_USE_MACRO: self.cmdUseMacro,
+                                    simpletal.simpleTALConstants.METAL_DEFINE_SLOT: self.cmdDefineSlot,
+                                    simpletal.simpleTALConstants.TAL_NOOP: self.cmdNoOp})
 
         self.inMacro = None
         self.macroArg = None
