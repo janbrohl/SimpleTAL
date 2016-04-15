@@ -9,7 +9,7 @@ import simpletal
 
 setup(name="SimpleTALSix",
       version=simpletal.__version__,
-      description="SimpleTAL is a stand alone Python implementation of the TAL, TALES and METAL  specifications  used in Zope to power HTML and XML templates.",
+      description="Stand alone Python implementation of the TAL, TALES and METAL specifications used in Zope to power HTML and XML templates.",
       author="Colin Stewart",
       author_email="colin@owlfish.com",
       maintainer="Jan Brohl",
