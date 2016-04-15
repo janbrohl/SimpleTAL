@@ -1,32 +1,36 @@
 #!/usr/bin/python
 # -*- coding: iso-8859-1 -*-
 
-#       Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
-#		All rights reserved.
+#    Copyright (c) 2016, Jan Brohl <janbrohl@t-online.de>
+#    All rights reserved.
+#    See LICENSE.txt
+
+#    Copyright (c) 2004 Colin Stewart (http://www.owlfish.com/)
+#    All rights reserved.
 #
-#		Redistribution and use in source and binary forms, with or without
-#		modification, are permitted provided that the following conditions
-#		are met:
-#		1. Redistributions of source code must retain the above copyright
-#		   notice, this list of conditions and the following disclaimer.
-#		2. Redistributions in binary form must reproduce the above copyright
-#		   notice, this list of conditions and the following disclaimer in the
-#		   documentation and/or other materials provided with the distribution.
-#		3. The name of the author may not be used to endorse or promote products
-#		   derived from this software without specific prior written permission.
+#    Redistribution and use in source and binary forms, with or without
+#    modification, are permitted provided that the following conditions
+#    are met:
+#    1. Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#    2. Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#    3. The name of the author may not be used to endorse or promote products
+#       derived from this software without specific prior written permission.
 #
-#		THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-#		IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-#		OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-#		IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-#		INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-#		NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-#		DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-#		THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-#		(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-#		THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#    THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+#    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+#    OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#    IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+#    INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+#    NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+#    DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+#    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+#    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+#    THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-#		If you make any bug fixes or feature enhancements please let me know!
+#    If you make any bug fixes or feature enhancements please let me know!
 
 """		
 		
@@ -156,7 +160,7 @@ class TALIteratorRepeatTestCases (unittest.TestCase):
 
 # The only way to see inside an iterator is to cheat, and call it early.  Doing this might be unexpected, so iterators don't support end.
 #	def testEndAct (self):
-#		self._runTest_ ('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/end">Hello</p></html>', "<html><p>0</p><p>1</p></html>", "Repeat of two length actual iterator failed to end.")
+#    self._runTest_ ('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/end">Hello</p></html>', "<html><p>0</p><p>1</p></html>", "Repeat of two length actual iterator failed to end.")
 
     def testLengthAct(self):
         self._runTest_('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/length">Hello</p></html>', "<html><p>%s</p><p>%s</p></html>" %
