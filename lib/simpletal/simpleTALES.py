@@ -47,9 +47,16 @@ if sys.version_info >= (3, 0):
     unicode = str
 
 
-class DEFAULTVALUE(object):
-    "This constant represents a default value."
-    pass
+class SignalValue(object):
+    """ Helper class to make unique values with a useful __str__"""
+
+    def __init__(self, info):
+        self.__info = info
+
+    def __str__(self):
+        return self.__info
+
+DEFAULTVALUE = SignalValue("This constant represents a default value.")
 
 
 class PathNotFoundException (Exception):
