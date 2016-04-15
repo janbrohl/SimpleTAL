@@ -1,2 +1,2 @@
-include *.txt *.md runtests.py
+include *.txt *.md *.rst
 recursive-include tests *.py
