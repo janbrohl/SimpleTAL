@@ -37,7 +37,6 @@
 		The classes in this module implement the TAL language, expanding
 		both XML and HTML templates.
 		
-		Module Dependencies: logging, simpleTALES, simpleTALTemplates
 """
 
 from __future__ import unicode_literals
@@ -58,12 +57,9 @@ import io
 if sys.version_info >= (3, 0):
     unicode = str
     unichr = chr
-
-
-try:
     import html.parser as HTMLParser
     import html.entities as htmlentitydefs
-except ImportError:
+else:
     import HTMLParser
     import htmlentitydefs
 
