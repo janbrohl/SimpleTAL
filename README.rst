@@ -1,6 +1,6 @@
-
 SimpleTALSix - simple TAL / METAL / TALES for Python 2 and 3
------------------------------------------
+============================================================
+
 .. image:: https://codecov.io/github/janbrohl/SimpleTAL/coverage.svg?branch=six
     :target: https://codecov.io/github/janbrohl/SimpleTAL?branch=six
 .. image:: https://travis-ci.org/janbrohl/SimpleTAL.svg?branch=six
@@ -13,9 +13,11 @@ Forked from http://www.owlfish.com/software/simpleTAL/
 
 License
 -------
+
 SimpleTAL and SimpleTALSix use a BSD-3-Clause style license so you are free to do *many* things with it. 
 
 
 Unit Tests
 ----------
+
 All unit tests can be run via setuptools with "setup.py test".
