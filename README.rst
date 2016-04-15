@@ -5,6 +5,9 @@ SimpleTALSix - simple TAL / METAL / TALES for Python 2 and 3
     :target: https://codecov.io/github/janbrohl/SimpleTAL?branch=six
 .. image:: https://travis-ci.org/janbrohl/SimpleTAL.svg?branch=six
     :target: https://travis-ci.org/janbrohl/SimpleTAL
+.. image:: https://readthedocs.org/projects/simpletalsix/badge/?version=latest
+    :target: http://simpletalsix.readthedocs.org/en/latest/?badge=latest
+
 
 This is an implementation of the TAL and TALES specifications
 see http://docs.zope.org/zope2/zope2book/AppendixC.html for Python 2.7 and 3.2+ (possibly working on other versions too)
