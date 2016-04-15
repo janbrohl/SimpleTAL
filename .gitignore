@@ -11,3 +11,4 @@ autopep_all.cmd
 lib/SimpleTALSix.egg-info/
 dist/
 .coverage
+docs/build/
