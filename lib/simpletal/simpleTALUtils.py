@@ -37,7 +37,6 @@
 		Initially this is just the HTMLStructureCleaner class, used to clean
 		up HTML that can then be used as 'structure' content.
 		
-		Module Dependencies: None
 """
 
 from __future__ import absolute_import
