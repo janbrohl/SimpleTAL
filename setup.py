@@ -22,6 +22,7 @@ setup(name="SimpleTALSix",
       package_dir={'': 'lib'},
       tests_require="xmlcompare",
       test_suite='tests',
+      license="BSD-3-Clause",
       classifiers=[
           "Intended Audience :: Developers",
           "Development Status :: 4 - Beta",
