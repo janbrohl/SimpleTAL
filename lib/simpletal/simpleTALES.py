@@ -36,23 +36,20 @@
 		The classes in this module implement the TALES specification, used
 		by the simpleTAL module.
 		
-		Module Dependencies: logging
 """
 
 from __future__ import absolute_import
 
 import sys
+import logging
 
 if sys.version_info >= (3, 0):
     unicode = str
 
-try:
-    import logging
-except ImportError:
-    import simpletal.DummyLogger as logging
 
-
-DEFAULTVALUE = "This represents a Default value."
+class DEFAULTVALUE(object):
+    "This constant represents a default value."
+    pass
 
 
 class PathNotFoundException (Exception):
@@ -493,7 +490,7 @@ class Context(object):
         if (pathResult is None):
             # Value was Nothing
             return self.true
-        if (pathResult == DEFAULTVALUE):
+        if (pathResult is DEFAULTVALUE):
             return self.false
         try:
             resultLen = len(pathResult)
