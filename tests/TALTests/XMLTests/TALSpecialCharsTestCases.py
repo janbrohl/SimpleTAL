@@ -46,7 +46,7 @@ import io
 import logging
 import logging.config
 
-if sys.version_info.major >= 3:
+if sys.version_info >= (3, 0):
     unicode = str
 
 from simpletal import simpleTAL, simpleTALES

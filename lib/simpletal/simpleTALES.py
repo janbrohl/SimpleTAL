@@ -43,7 +43,7 @@ from __future__ import absolute_import
 
 import sys
 
-if sys.version_info.major >= 3:
+if sys.version_info >= (3, 0):
     unicode = str
 
 try:

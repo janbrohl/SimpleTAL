@@ -55,7 +55,7 @@ import logging
 
 import io
 
-if sys.version_info.major >= 3:
+if sys.version_info >= (3, 0):
     unicode = str
     unichr = chr
 
