@@ -104,19 +104,19 @@ class RepeatVariable (ContextVariable):
             raise IndexError("Repeat Finished")
 
     def createMap(self):
-        self.map = {}
-        self.map['index'] = self.getIndex
-        self.map['number'] = self.getNumber
-        self.map['even'] = self.getEven
-        self.map['odd'] = self.getOdd
-        self.map['start'] = self.getStart
-        self.map['end'] = self.getEnd
-        # TODO: first and last need to be implemented.
-        self.map['length'] = len(self.sequence)
-        self.map['letter'] = self.getLowerLetter
-        self.map['Letter'] = self.getUpperLetter
-        self.map['roman'] = self.getLowerRoman
-        self.map['Roman'] = self.getUpperRoman
+        self.map = {
+            'index': self.getIndex,
+            'number': self.getNumber,
+            'even': self.getEven,
+            'odd': self.getOdd,
+            'start': self.getStart,
+            'end': self.getEnd,
+            'length': len(self.sequence),
+            'letter': self.getLowerLetter,
+            'Letter': self.getUpperLetter,
+            'roman': self.getLowerRoman,
+            'Roman': self.getUpperRoman
+        }
 
     # Repeat implementation goes here
     def getIndex(self):
@@ -159,7 +159,9 @@ class RepeatVariable (ContextVariable):
         return self.getLowerLetter().upper()
 
     def getLowerRoman(self):
-        romanNumeralList = (('m', 1000), ('cm', 900), ('d', 500), ('cd', 400), ('c', 100), ('xc', 90), ('l', 50), ('xl', 40), ('x', 10), ('ix', 9), ('v', 5), ('iv', 4), ('i', 1)
+        romanNumeralList = (('m', 1000), ('cm', 900), ('d', 500), ('cd', 400),
+                            ('c', 100), ('xc', 90), ('l', 50), ('xl', 40),
+                            ('x', 10), ('ix', 9), ('v', 5), ('iv', 4), ('i', 1)
                             )
         if (self.position > 3999):
             # Roman numbers only supported up to 4000
@@ -203,19 +205,32 @@ class IteratorRepeatVariable (RepeatVariable):
             raise IndexError("Repeat Finished")
 
     def createMap(self):
-        self.map = {}
-        self.map['index'] = self.getIndex
-        self.map['number'] = self.getNumber
-        self.map['even'] = self.getEven
-        self.map['odd'] = self.getOdd
-        self.map['start'] = self.getStart
-        self.map['end'] = self.getEnd
-        # TODO: first and last need to be implemented.
-        self.map['length'] = sys.maxsize
-        self.map['letter'] = self.getLowerLetter
-        self.map['Letter'] = self.getUpperLetter
-        self.map['roman'] = self.getLowerRoman
-        self.map['Roman'] = self.getUpperRoman
+        self.map = {'index': self.getIndex,
+                    'number': self.getNumber,
+                    'even': self.getEven,
+                    'odd': self.getOdd,
+                    'start': self.getStart,
+                    'end': self.getEnd,
+                    'length': self.getLength,
+                    'letter': self.getLowerLetter,
+                    'Letter': self.getUpperLetter,
+                    'roman': self.getLowerRoman,
+                    'Roman': self.getUpperRoman
+                    }
+
+    def getLength(self):
+        inf = float("inf")
+        try:
+            hint = self.sequence.__length_hint__()
+            if hint is NotImplemented or hint == inf:
+                return inf
+        except AttributeError:
+            pass
+        t = tuple(self.sequence)
+        size = len(t) + self.getNumber()
+        self.map["length"] = size
+        self.sequence = iter(t)
+        return size
 
     def getEnd(self):
         if (self.iterStatus == 2):

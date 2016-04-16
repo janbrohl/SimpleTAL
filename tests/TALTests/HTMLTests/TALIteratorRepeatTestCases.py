@@ -163,8 +163,8 @@ class TALIteratorRepeatTestCases (unittest.TestCase):
 #    self._runTest_ ('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/end">Hello</p></html>', "<html><p>0</p><p>1</p></html>", "Repeat of two length actual iterator failed to end.")
 
     def testLengthAct(self):
-        self._runTest_('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/length">Hello</p></html>', "<html><p>%s</p><p>%s</p></html>" %
-                       (str(sys.maxsize), str(sys.maxsize)), "Repeat of two length actual iterator failed to generate length.")
+        self._runTest_('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/length">Hello</p></html>',
+                       "<html><p>2</p><p>2</p></html>", "Repeat of two length actual iterator failed to generate length.")
 
     def testLetterSmallAct(self):
         self._runTest_('<html><p tal:repeat="entry twoAct" tal:content="repeat/entry/letter">Hello</p></html>',
