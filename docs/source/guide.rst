@@ -1,7 +1,7 @@
 TAL/TALES and METAL Reference Guide
 ###################################
 
-A guide to using TAL, TALES, and METAL.
+A guide to using TAL_, TALES_, and METAL_.
 
 Introduction
 ============
@@ -12,10 +12,21 @@ This is a simple reference guide to the TAL and TALES languages.  Formal languag
 .. _TALES: https://web.archive.org/web/20130517091955/http://wiki.zope.org/ZPT/TAL
 .. _METAL: https://web.archive.org/web/20130517091955/http://wiki.zope.org/ZPT/TAL
 
+.. highlight:: html
+
 TAL Commands
 ============
 
-TAL consists of seven different commands (highest priority first): define, condition, repeat, content, replace, attributes, and omit-tag.  
+TAL_ consists of seven different commands (highest priority first):
+
+    * `tal:define`_
+    * `tal:condition`_
+    * `tal:repeat`_
+    * `tal:content`_
+    * `tal:replace`_
+    * `tal:attributes`_
+    * `tal:omit-tag`_
+
 Commands are attributes on HTML or XML tags, e.g. ``<div tal:content="article">Article goes here</div>``
 
 tal:define
@@ -73,11 +84,11 @@ Description:  Evaluates "expression", and if it is a sequence, repeats this tag 
 Example::
 
     <table>
-	  <tr tal:repeat="fruit basket">
-	    <td tal:content="repeat/fruit/number"></td>
-	    <td tal:content="fruit/name"></td>
-	  </tr>
-	</table>
+      <tr tal:repeat="fruit basket">
+        <td tal:content="repeat/fruit/number"></td>
+        <td tal:content="fruit/name"></td>
+      </tr>
+    </table>
 
 
 
@@ -113,6 +124,7 @@ Description:  Evaluates each "expression" and replaces the tag's attribute "name
 Example::
 
     <a tal:attributes="href user/homepage;title user/fullname">Your Homepage</a>
+    
 
 tal:omit-tag
 ------------
@@ -123,12 +135,14 @@ Description: Removes the tag (leaving the tags content) if the expression evalua
 
 Example::
 
-	<p><b tal:omit-tag="not:user/firstVisit">Welcome</b> to this page!</h1>
+    <h1>
+      <b tal:omit-tag="not:user/firstVisit">Welcome</b> to this page!
+    </h1>
 
 TALES Expressions
 =================
 
-The expressions used in TAL are called TALES expressions.  The simplest TALES expression is a path which references a value, e.g. page/body references the body property of the page object.
+The expressions used in TAL_ are called TALES_ expressions.  The simplest TALES_ expression is a path which references a value, e.g. page/body references the body property of the page object.
 
 path
 ----
@@ -164,7 +178,7 @@ Description: Returns true if the path exists, false otherwise.  This is particul
 
 Example::
 
-	<p tal:omit-tag="not:exists:book/chapter/title" tal:content="book/chapter/title"></p>
+    <p tal:omit-tag="not:exists:book/chapter/title" tal:content="book/chapter/title"></p>
 
 nocall
 ------
@@ -186,7 +200,7 @@ Description: Returns the inverse of the tales-path.  If the path returns true, `
 
 Example::
 
-	<p tal:condition="not: user/firstLogin">Welcome to the site!</p>
+    <p tal:condition="not: user/firstLogin">Welcome to the site!</p>
 
 string
 ------
@@ -197,7 +211,7 @@ Description:  Evaluates to a literal string with value text while substituting v
 
 Example::
 
-	<b tal:content="string:Welcome ${user/name}!"></b>
+    <b tal:content="string:Welcome ${user/name}!"></b>
 
 python
 ------
@@ -213,7 +227,7 @@ Example::
 METAL Macro Language
 ====================
 
-METAL is a macro language commonly used with TAL and TALES.  METAL allows part of a template to be used as a macro in later parts of a template, or a separate template altogether.
+METAL_ is a macro language commonly used with TAL_ and TALES_.  METAL_ allows part of a template to be used as a macro in later parts of a template, or a separate template altogether.
 
 metal:define-macro
 ------------------
@@ -224,7 +238,9 @@ Description:  Defines a new macro that can be reference later as "name".
 
 Example::
 
-    <div metal:define-macro="footer">Copyright <span tal:content="page/lastModified">2004</span></div>
+    <div metal:define-macro="footer">
+      Copyright <span tal:content="page/lastModified">2004</span>
+    </div>
 
 metal:use-macro
 ---------------
@@ -235,7 +251,7 @@ Description:  Evaluates "expression" and uses this as a macro.
 
 Example::
 
-	<div metal:use-macro="footer"></div>
+    <div metal:use-macro="footer"></div>
 
 metal:define-slot
 -----------------
@@ -247,9 +263,9 @@ Description:  Defines a customisation point in a macro with the given name.
 Example::
 
     <div metal:define-macro="footer">
-	  <b>Standard disclaimer for the site.</b>
-	  <i metal:define-slot="Contact">Contact admin@site.com</i>
-	</div>
+      <b>Standard disclaimer for the site.</b>
+      <i metal:define-slot="Contact">Contact admin@site.com</i>
+    </div>
 
 metal:fill-slot
 ---------------
@@ -261,5 +277,5 @@ Description:  Replaces the content of a slot with this element.
 Example::
 
     <div metal:use-macro="footer">
-	  <i metal:fill-slot="Contact">Contact someone else</i>
-	</div>
+      <i metal:fill-slot="Contact">Contact someone else</i>
+    </div>
