@@ -262,7 +262,7 @@ class TemplateInterpreter(object):
 
         # The first time through this command
         result = self.context.evaluate(args[1], self.originalAttributes)
-        if (result is not None and result is simpletal.simpleTALES.DEFAULTVALUE):
+        if (result is not None and result is DEFAULTVALUE):
             # Leave everything un-touched.
             self.programCounter += 1
             return
@@ -326,7 +326,7 @@ class TemplateInterpreter(object):
             self.movePCForward = self.symbolTable[args[3]]
             self.programCounter += 1
             return
-        elif (result is not simpletal.simpleTALES.DEFAULTVALUE):
+        elif (result is not DEFAULTVALUE):
             # We have content, so let's suppress the natural content and output
             # this!
             if (args[0]):
@@ -351,7 +351,7 @@ class TemplateInterpreter(object):
             if (resultVal is None):
                 # Remove this attribute from the current attributes
                 attsToRemove.add(attName)
-            elif (resultVal is not simpletal.simpleTALES.DEFAULTVALUE):
+            elif (resultVal is not DEFAULTVALUE):
                 # We have a value - let's use it!
                 attsToRemove.add(attName)
                 if (isinstance(resultVal, unicode)):
@@ -503,7 +503,7 @@ class TemplateInterpreter(object):
             self.movePCForward = self.symbolTable[args[2]]
             self.programCounter += 1
             return
-        if (value is not simpletal.simpleTALES.DEFAULTVALUE and isinstance(value, SubTemplate)):
+        if (value is not DEFAULTVALUE and isinstance(value, SubTemplate)):
             # We have a macro, so let's use it
             self.outputTag = 0
             self.slotParameters = args[1]
