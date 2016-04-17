@@ -315,13 +315,23 @@ class MacroExpansionInterpreter (simpletal.simpleTAL.TemplateInterpreter):
 
 
 def expandMacros(context, template, outputFile, outputEncoding="utf-8"):
-    """Expand METAL macros only, do not touch TAL statements."""
+    """
+        This function can be used to expand a template which contains METAL 
+        macros, while leaving in place all the TAL and METAL commands.
+
+        Doing this makes editing a template which uses METAL macros easier, 
+        because the results of the macro can be seen immediately.
+        The macros referred to by the passed in template must be present in 
+        the context so that their contents can be referenced.  The 
+        outputEncoding determines the encoding of the returned string, which 
+        will contain the expanded macro.
+    """
     interp = MacroExpansionInterpreter()
     interp.initialise(context, outputFile)
     return template.expand(context, outputFile, outputEncoding, interpreter=interp)
 
 
-def ExpandMacros(context,template, outputEncoding="utf-8"):
-    f=io.BytesIO()
+def ExpandMacros(context, template, outputEncoding="utf-8"):
+    f = io.BytesIO()
     expandMacros(context, template, f, outputEncoding)
     return f.getvalue()

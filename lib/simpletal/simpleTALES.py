@@ -239,6 +239,17 @@ class IteratorRepeatVariable (RepeatVariable):
 
 
 class PathFunctionVariable (ContextVariable):
+    """
+        This class wraps a callable object (e.g. function) so that it can 
+        receive part of a TAL path as it's argument.
+
+        To use this simply create a new instance of the PathFunctionVariable 
+        and then place this into the Context (see above). The path passed to 
+        the function is that part of the path not already used. For example 
+        if the function "helloFunc" is placed in the Context the path 
+        "helloFunc/an/example" results in the string "an/example" being passed
+        to the function.
+    """
 
     def __init__(self, func):
         ContextVariable.__init__(self, value=func)
@@ -253,6 +264,15 @@ class PathFunctionVariable (ContextVariable):
 
 
 class CachedFuncResult (ContextVariable):
+    """
+        This class wraps a callable object (e.g. function) so that the 
+        callable is only called once.  
+
+        In normal SimpleTAL operation any function placed into a Context 
+        might be called multiple times during template expansion. To ensure 
+        that it is only called once simply wrap in the CachedFuncResult 
+        object first.
+    """
 
     def value(self, currentPath=None):
         try:
@@ -262,6 +282,12 @@ class CachedFuncResult (ContextVariable):
         return self.cachedValue
 
     def clearCache(self):
+        """
+            Clears the cache.  
+
+            Use this to clear the cache between multiple template expansions 
+            if the callable should be executed once per template expansion.
+        """
         try:
             del self.cachedValue
         except:
@@ -310,7 +336,21 @@ class PythonPathFunctions(object):
 
 class Context(object):
 
-    def __init__(self, options=None, allowPythonPath=0):
+    def __init__(self, options=None, allowPythonPath=False):
+        """
+            Creates a new Context object, for use by SimpleTAL when expanding
+            a template.  
+
+            The options variable, if passed, will be made available as a 
+            global variable under the name "options" as per the TALES 
+            specification.
+            By default Python TAL paths (e.g. 'python: 1 + 2') are not
+            allowed.  If you require them, and you completely trust the 
+            authors of the templates, they can be enabled by passing in 
+            allowPythonPath=True.
+
+            Any python modules that you wish to use need to be added to the Context object using addGlobal.
+        """
         self.allowPythonPath = allowPythonPath
         self.globals = {}
         self.locals = {}
@@ -341,6 +381,12 @@ class Context(object):
         self.addGlobal('repeat', self.repeatMap)
 
     def addGlobal(self, name, value):
+        """
+            Adds the value to the context under name.  
+
+            Value can either be a fundamental python data type or a callable
+            object.
+        """
         self.globals[name] = value
 
     def pushLocals(self):
