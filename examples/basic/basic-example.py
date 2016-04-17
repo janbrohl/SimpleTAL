@@ -30,13 +30,13 @@
 		If you make any bug fixes or feature enhancements please let me know!
 		
 		As simple as it gets:
-				1 - Create a context
-				2 - Compile a template
-				3 - Expand the template
+				1. Create a context
+				2. Compile a template
+				3. Expand the template
 		
-		Module Dependencies: simpleTAL, simpleTALES
-"""
 
+"""
+# Include to docs from here
 from simpletal import simpleTAL, simpleTALES
 import sys
 

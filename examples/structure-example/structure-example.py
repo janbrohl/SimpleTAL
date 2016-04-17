@@ -30,9 +30,9 @@
 		
 		This shows how to include structure into a template, and how
 		multiple templates can be embedded within each other.
-		
-		Module Dependencies: simpleTAL, simpleTALES
+
 """
+# Include to docs from here
 from simpletal import simpleTAL, simpleTALES
 import sys
 

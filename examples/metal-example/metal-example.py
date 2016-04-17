@@ -30,10 +30,9 @@
 		If you make any bug fixes or feature enhancements please let me know!
 		
 		An example of how to use METAL.
-				
-		Module Dependencies: simpleTAL, simpleTALES
-"""
 
+"""
+# Include to docs from here
 from simpletal import simpleTAL, simpleTALES
 import sys
 

@@ -32,6 +32,8 @@ Contents
    
    guide
    
+   examples
+   
    simpletal
    
    license

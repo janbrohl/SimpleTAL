@@ -30,15 +30,14 @@
 		If you make any bug fixes or feature enhancements please let me know!
 		
 		A demonstration of how TAL/TALES can be used from a cgi program.  Quick instructions:
-			1 - Copy this file and the two templates ("fields.html" and "results.html") to 
-			    the cgi-bin directory on your webserver
-			2 - Ensure that simpleTAL, simpleTALES and DummyLogger are installed in your site-packages
-			    directory
-			3 - Go to http://servername/cgi-bin/simple-cgi.py
-		
-		Module Dependencies: simpleTAL, simpleTALES
-"""
+			1. Copy this file and the two templates ("fields.html" and "results.html") to 
+			   the cgi-bin directory on your webserver
+			2. Ensure that simpleTAL, simpleTALES and DummyLogger are installed in your site-packages
+			   directory
+			3. Go to http://servername/cgi-bin/simple-cgi.py
 
+"""
+# Include to docs from here
 from simpletal import simpleTAL, simpleTALES
 import cgi
 import sys
