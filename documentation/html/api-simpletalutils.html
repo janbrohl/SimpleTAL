@@ -9,7 +9,7 @@
   <p id="subject">Documentation on how to use the simpleTALUtils Module.</p>
   <div><h2>simpleTALUtils</h2>
 <p>This module holds optional classes and functions that might be of use while using SimpleTAL, but are not required by SimpleTAL directly.</p>
-<h3>def ExpandMacros (context, template, outputEncoding="ISO-8859-1")</h3>
+<h3>def expandMacros (context, template, outputEncoding="ISO-8859-1")</h3>
 <p>This function can be used to expand a template which contains METAL macros, while leaving in place all the TAL and METAL commands.&nbsp; Doing this makes editing a template which uses METAL macros easier, because the results of the macro can be seen immediately.</p>
 <p>The macros referred to by the passed in template must be present in the context so that their contents can be referenced.&nbsp; The outputEncoding determines the encoding of the returned string, which will contain the expanded macro.</p>
 <h3>FastStringOutput</h3>

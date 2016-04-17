@@ -168,15 +168,25 @@ class TemplateWrapper(object):  # TODO: write tests, docs, find better name
     def __call__(self, func):
         return (lambda *args, **kwargs: self.expand(func(*args, **kwargs)))
 
-    def expand(self, options=tuple(), updateGlobals={}, **kwGlobals):
+    def _ctx(self, options, updateGlobals, kwGlobals):
         g = self.contextGlobals.copy()
         g.update(updateGlobals)
         g.update(kwGlobals)
         ctx = simpletal.simpleTALES.Context(options, self.allowPythonPath)
         for k, v in g.items():
             ctx.addGlobal(k, v)
+        return ctx
+
+    def expand(self, options=tuple(), updateGlobals={}, **kwGlobals):
+        ctx = self._ctx(options, updateGlobals, kwGlobals)
         f = io.StringIO()
         self.template.expand(ctx, f)
+        return f.getvalue()
+
+    def expandMacros(options=tuple(), updateGlobals={}, **kwGlobals):
+        ctx = self._ctx(options, updateGlobals, kwGlobals)
+        f = io.StringIO()
+        expandMacros(ctx, self.template)
         return f.getvalue()
 
 
@@ -304,10 +314,14 @@ class MacroExpansionInterpreter (simpletal.simpleTAL.TemplateInterpreter):
         self.programCounter += 1
 
 
-def ExpandMacros(context, template, outputEncoding="utf-8"):
-    out = io.StringIO()
+def expandMacros(context, template, outputFile, outputEncoding="utf-8"):
+    """Expand METAL macros only, do not touch TAL statements."""
     interp = MacroExpansionInterpreter()
-    interp.initialise(context, out)
-    template.expand(context, out, outputEncoding=outputEncoding,
-                    interpreter=interp)
-    return out.getvalue().encode(outputEncoding)
+    interp.initialise(context, outputFile)
+    return template.expand(context, outputFile, outputEncoding, interpreter=interp)
+
+
+def ExpandMacros(context,template, outputEncoding="utf-8"):
+    f=io.BytesIO()
+    expandMacros(context, template, f, outputEncoding)
+    return f.getvalue()

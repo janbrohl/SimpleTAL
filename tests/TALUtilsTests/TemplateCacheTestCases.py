@@ -78,7 +78,9 @@ class TemplateCacheTestCases (unittest.TestCase):
         shutil.rmtree(self.temp_dir)
 
     def _runTest_(self, template, txt, result, errMsg="Error"):
-        realResult = simpleTALUtils.ExpandMacros(self.context, template)
+        f = io.StringIO()
+        simpleTALUtils.expandMacros(self.context, template, f)
+        realResult = f.getvalue()
         self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
                          (errMsg, txt, realResult, result, template))
 

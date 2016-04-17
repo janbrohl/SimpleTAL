@@ -34,8 +34,7 @@ from __future__ import print_function
 from simpletal import simpleTAL, simpleTALES, simpleTALUtils
 
 import time
-import StringIO
-import cStringIO
+import io
 import sys
 
 macroTemplate = """<html>
@@ -107,7 +106,7 @@ context.addGlobal("macTemp", macTemplate)
 
 
 def METALTime(count, template):
-    file = simpleTALUtils.FastStringOutput()
+    file = io.StringIO()
     start = time.clock()
     for attempt in range(count):
         template.expand(context, file)
@@ -120,7 +119,9 @@ def METALTime(count, template):
 # print "Result: " + str(result) + " for 2000 template expansions"
 
 # Pre-expand macros
-expanded = simpleTALUtils.ExpandMacros(context, template)
+f = io.StringIO()
+simpleTALUtils.expandMacros(context, template, f)
+expanded = f.getvalue()
 # print expanded
 realTemplate = simpleTAL.compileHTMLTemplate(expanded)
 

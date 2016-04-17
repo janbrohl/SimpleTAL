@@ -71,20 +71,22 @@ class MacroExpansionTestCases (unittest.TestCase):
         self.context.addGlobal('weblog', weblog)
 
     def _runTest_(self, template, txt, result, errMsg="Error"):
-        realResult = simpleTALUtils.ExpandMacros(self.context, template)
+        f = io.StringIO()
+        simpleTALUtils.expandMacros(self.context, template, f)
+        realResult = f.getvalue()
         self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
                          (errMsg, txt, realResult, result, template))
 
     def testMacroExpansionSlots(self):
         txt = '<html><div metal:use-macro="mac/macros/one">Hello<b metal:fill-slot="blue">Blue</b></div></html>'
         template = simpleTAL.compileHTMLTemplate(txt)
-        self._runTest_(template, txt, b'<html><body metal:use-macro="mac/macros/one">World is <b metal:fill-slot="blue">Blue</b></body></html>',
+        self._runTest_(template, txt, '<html><body metal:use-macro="mac/macros/one">World is <b metal:fill-slot="blue">Blue</b></body></html>',
                        'Expasion with slots failed.')
 
     def testXMLMacroExpansionSlots(self):
         txt = '<?xml version="1.0" encoding="utf-8"?>\n<html><div metal:use-macro="mac/macros/one">Hello<b metal:fill-slot="blue">Blue</b></div></html>'
         template = simpleTAL.compileXMLTemplate(txt)
-        self._runTest_(template, txt, b'<?xml version="1.0"?>\n<html><body metal:use-macro="mac/macros/one">World is <b metal:fill-slot="blue">Blue</b></body></html>', 'Expansion with slots failed.')
+        self._runTest_(template, txt, '<?xml version="1.0"?>\n<html><body metal:use-macro="mac/macros/one">World is <b metal:fill-slot="blue">Blue</b></body></html>', 'Expansion with slots failed.')
 
 if __name__ == '__main__':
     unittest.main()
