@@ -12,3 +12,4 @@ lib/SimpleTALSix.egg-info/
 dist/
 .coverage
 docs/build/
+docs/[Mm]ake*

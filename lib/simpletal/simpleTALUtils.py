@@ -124,90 +124,56 @@ class TemplateCache(object):
             return template
 
 
-class TemplateFolder(object):  # TODO: write tests, docs, find better name
+class TemplateRoot(object):  # TODO: write tests, docs
 
-    def __init__(self, root, getfunc, ext=".html", path=tuple()):
-        self._ext = ext
-        self._root = root
-        self._getfunc = getfunc
-        self._path = path
+    def __init__(self, rootPath, loadFunc, templateExt=".html"):
+        self.root = os.path.abspath(rootPath)
+        self.loadFunc = loadFunc
+        self.templateExt = templateExt
 
-    def __getattr__(self, name):
-        if SAFE_NAME_REGEX.match(name) is None:
-            raise AttributeError("%r is not allowed" % name)
-        if name == "container" and self._path:
-            return self.__class__(self._root, self._getfunc, self._ext, self._path[:-1])
-        newPath = self._path + (name,)
-        fullPath = os.path.join(self._root, *newPath)
-        if os.path.isdir(fullPath):
-            return self.__class__(self._root, self._getfunc, self._ext, newPath)
-        elif os.path.isfile(fullPath + self._ext):
-            return self._getfunc(fullPath + self._ext)
-        else:
-            raise AttributeError(name)
-
-    def __iter__(self):
-        e = self._ext
-        le = len(e)
-        for name in sorted(os.listdir(os.path.join(self._root, *self._path))):
-            if name.endswith(e):
-                n = name[:-le]
-                if SAFE_NAME_REGEX.match(n):
-                    yield n
-            elif SAFE_NAME_REGEX.match(name):
-                yield name
-
-
-class TemplateWrapper(object):  # TODO: write tests, docs, find better name
-
-    def __init__(self, template, contextGlobals={}, allowPythonPath=False):
-        self.template = template
-        self.contextGlobals = contextGlobals
-        self.allowPythonPath = allowPythonPath
-
-    def __call__(self, func):
-        return (lambda *args, **kwargs: self.expand(func(*args, **kwargs)))
-
-    def _ctx(self, options, updateGlobals, kwGlobals):
-        g = self.contextGlobals.copy()
-        g.update(updateGlobals)
-        g.update(kwGlobals)
-        ctx = simpletal.simpleTALES.Context(options, self.allowPythonPath)
-        for k, v in g.items():
+    def expand(self, templatePath, options=None, addGlobals={}):
+        tpl = self.get(templatePath)
+        ctx = simpletal.simpleTALES.Context(options)
+        ctx.addGlobal("templates", self.getForContext())
+        for k, v in addGlobals.items():
             ctx.addGlobal(k, v)
-        return ctx
-
-    def expand(self, options=tuple(), updateGlobals={}, **kwGlobals):
-        ctx = self._ctx(options, updateGlobals, kwGlobals)
         f = io.StringIO()
-        self.template.expand(ctx, f)
+        tpl.expand(ctx, f)
         return f.getvalue()
 
-    def expandMacros(options=tuple(), updateGlobals={}, **kwGlobals):
-        ctx = self._ctx(options, updateGlobals, kwGlobals)
+    def expandMacros(self, templatePath, options=None, addGlobals={}):
+        tpl = self.get(templatePath)
+        ctx = simpletal.simpleTALES.Context(options)
+        ctx.addGlobal("templates", self.getForContext())
+        for k, v in addGlobals.items():
+            ctx.addGlobal(k, v)
         f = io.StringIO()
-        expandMacros(ctx, self.template)
+        expandMacros(ctx, tpl, f)
         return f.getvalue()
 
+    def get(self, templatePath):
+        p = self.resolvePath(subpath + self.templateExt)
+        if p is not None and os.path.isfile(p):
+            return self.loadFunc(p)
+        return None
 
-# TODO: write tests, docs, find better name
-def wrapperLoader(templateDir="templates", standardGlobals={}):
-    cache = TemplateCache()
-    root = TemplateFolder(templateDir, cache.getTemplate)
-    standardGlobals = standardGlobals.copy()
-    standardGlobals["root"] = root
+    def resolvePath(self, subpath):
+        p = os.path.abspath(os.path.join(self.root, subpath))
+        if p == self.root or p.startswith(self.root + os.sep):
+            return p
+        else:
+            return None
 
-    def load(path):
-        pathtuple = tuple(path.strip("/").split("/"))
-        container = TemplateFolder(
-            templateDir, cache.getTemplate, path=pathtuple[:-1])
-        contextGlobals = standardGlobals.copy()
-        contextGlobals["container"] = container
-        loader = TemplateFolder(templateDir, (lambda name: TemplateWrapper(
-            cache.getTemplate(name), contextGlobals)), path=pathtuple[:-1])
-        return getattr(loader, pathtuple[-1])
-
-    return load
+    def getForContext(self, subpath=None):
+        if subpath:
+            p = self.resolvePath(subpath + self.templateExt)
+            if p is not None and os.path.isfile(p):
+                return self.loadFunc(p)
+            p = self.resolvePath(subpath)
+            if pa is not None and os.path.isdir(p):
+                return simpletal.simpleTALES.PathFunctionVariable(lambda path: self.getForContext(os.path.join(subpath, path)))
+            return None
+        return simpletal.simpleTALES.PathFunctionVariable(self.getForContext)
 
 
 class MacroExpansionInterpreter (simpletal.simpleTAL.TemplateInterpreter):
