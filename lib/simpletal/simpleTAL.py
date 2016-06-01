@@ -269,6 +269,8 @@ class TemplateInterpreter(object):
         try:
             # We have three options, either the result is a natural sequence,
             # an iterator., or something that can produce an iterator.
+
+            o = result[0]
             isSequence = len(result)
             if (isSequence):
                 # Only setup if we have a sequence with length
