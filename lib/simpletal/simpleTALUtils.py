@@ -152,7 +152,7 @@ class TemplateRoot(object):  # TODO: write tests, docs
         return f.getvalue()
 
     def get(self, templatePath):
-        p = self.resolvePath(subpath + self.templateExt)
+        p = self.resolvePath(templatePath + self.templateExt)
         if p is not None and os.path.isfile(p):
             return self.loadFunc(p)
         return None
