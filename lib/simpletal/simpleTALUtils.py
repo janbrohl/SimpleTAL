@@ -106,7 +106,7 @@ class TemplateCache(object):
                     return template
 
             # Cache miss, let's cache this template
-            with open(name, 'r') as tempFile:
+            with open(name, 'rb') as tempFile:
                 if (xmlTemplate):
                     # We know it is XML
                     template = simpletal.simpleTAL.compileXMLTemplate(tempFile)
