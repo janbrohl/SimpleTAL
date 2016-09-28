@@ -42,6 +42,7 @@
 from __future__ import absolute_import
 
 import os.path
+import posixpath
 import os
 import stat
 import threading
@@ -166,13 +167,23 @@ class TemplateRoot(object):  # TODO: write tests, docs
 
     def getForContext(self, subpath=None):
         if subpath:
-            p = self.resolvePath(subpath + self.templateExt)
-            if p is not None and os.path.isfile(p):
-                return self.loadFunc(p)
             p = self.resolvePath(subpath)
-            if pa is not None and os.path.isdir(p):
-                return simpletal.simpleTALES.PathFunctionVariable(lambda path: self.getForContext(os.path.join(subpath, path)))
-            return None
+            if p is None:
+                raise ValueError(subpath)
+            if "/macros/" in subpath:
+                parts = subpath.split("/")
+                if len(parts) > 2 and parts[-2] == "macros":
+                    tpl = self.getForContext("/".join(parts[:-2]))
+                    return tpl.macros[parts[-1]]
+
+            if os.path.isdir(p):
+                return simpletal.simpleTALES.PathFunctionVariable(lambda path: self.getForContext(posixpath.join(subpath, path)))
+
+            pe = p + self.templateExt
+            if os.path.isfile(pe):
+                return self.loadFunc(pe)
+
+            raise ValueError(subpath)
         return simpletal.simpleTALES.PathFunctionVariable(self.getForContext)
 
 

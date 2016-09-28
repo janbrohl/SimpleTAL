@@ -98,8 +98,6 @@ METAL_DEFINE_MACRO = 17
 "Only used for parsing"
 
 
-
-
 HTML4_VOID_ELEMENTS = frozenset(['AREA', 'BASE', 'BASEFONT', 'BR',
                                  'COL', 'FRAME', 'HR', 'IMG',
                                  'INPUT', 'ISINDEX', 'LINK', 'META',
@@ -136,6 +134,7 @@ HTML_BOOLEAN_ATTS = frozenset([('AREA', 'NOHREF'), ('IMG', 'ISMAP'), ('OBJECT', 
 """
 Set of element:attribute pairs that can use minimized form in HTML
 """
+
 
 class SignalValue(object):
     """ Helper class to make unique values with a useful __str__"""
