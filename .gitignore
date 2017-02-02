@@ -15,3 +15,4 @@ docs/build/
 docs/[Mm]ake*
 build.bat
 upload.bat
+build/
