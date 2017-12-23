@@ -66,7 +66,7 @@ SAFE_NAME_REGEX = re.compile("(?:[a-zA-Z0-9]+[_-]+)*[a-zA-Z0-9]+$")
 
 class TemplateCache(object):
     """ A TemplateCache is a multi-thread safe object that caches compiled templates.
-                    This cache only works with file based templates, the ctime of the file is 
+                    This cache only works with file based templates, the mtime of the file is 
                     checked on each hit, if the file has changed the template is re-compiled.
     """
 
@@ -124,6 +124,11 @@ class TemplateCache(object):
 
 
 class TemplateRoot(object):  # TODO: write tests, docs
+    """
+    Simple-to-use templating.
+    Interface not yet fully stable.
+    """
+
     def __init__(self, rootPath, loadFunc, templateExt=".html"):
         self.root = os.path.abspath(rootPath)
         self.loadFunc = loadFunc
@@ -185,6 +190,10 @@ class TemplateRoot(object):  # TODO: write tests, docs
 
 
 class MacroExpansionInterpreter(simpletal.simpleTAL.TemplateInterpreter):
+    """
+    A MacroExpansionInterpreter only expands METAL macros but does not touch TAL.
+    """
+
     def __init__(self):
         simpletal.simpleTAL.TemplateInterpreter.__init__(self)
         # Override the standard interpreter way of doing things.
@@ -322,6 +331,9 @@ def expandMacros(context, template, outputFile, outputEncoding="utf-8"):
 
 
 def ExpandMacros(context, template, outputEncoding="utf-8"):
+    """
+    This legacy function does the same as expandMacros but returns a string instead of writing to a file.
+    """
     f = io.BytesIO()
     expandMacros(context, template, f, outputEncoding)
     return f.getvalue()
