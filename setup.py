@@ -7,11 +7,15 @@ sys.path.insert(0, os.path.join(os.getcwd(), 'lib'))
 from setuptools import setup
 import simpletal
 
+with open("README.rst") as f:
+    long_description = f.read()
+
 setup(
     name="SimpleTALSix",
     version=simpletal.__version__,
     description=
     "Stand alone Python implementation of the TAL, TALES and METAL specifications used in Zope to power HTML and XML templates.",
+    long_description=long_description,
     author="Colin Stewart",
     author_email="colin@owlfish.com",
     maintainer="Jan Brohl",
