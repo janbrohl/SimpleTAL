@@ -31,7 +31,6 @@
 #    THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #    If you make any bug fixes or feature enhancements please let me know!
-
 """ 	
 		
 		Unit test cases.
@@ -53,8 +52,7 @@ else:
     logging.basicConfig()
 
 
-class TALDefineTestCases (unittest.TestCase):
-
+class TALDefineTestCases(unittest.TestCase):
     def setUp(self):
         self.context = simpleTALES.Context()
         self.context.addGlobal('test', 'testing')
@@ -67,48 +65,68 @@ class TALDefineTestCases (unittest.TestCase):
         file = io.StringIO()
         template.expand(self.context, file)
         realResult = file.getvalue()
-        self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
-                         (errMsg, txt, realResult, result, template))
+        self.assertEqual(
+            realResult, result,
+            "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s"
+            % (errMsg, txt, realResult, result, template))
 
     def testDefineString(self):
-        self._runTest_('<html tal:define="def1 test"><p tal:content="def1"></p></html>',
-                       "<html><p>testing</p></html>", "Simple string define failed.")
+        self._runTest_(
+            '<html tal:define="def1 test"><p tal:content="def1"></p></html>',
+            "<html><p>testing</p></html>", "Simple string define failed.")
 
     def testDefineList(self):
-        self._runTest_('<html tal:define="def1 two"><p tal:repeat="var def1">Hello <b tal:content="var"></b></p></html>',
-                       '<html><p>Hello <b>one</b></p><p>Hello <b>two</b></p></html>', 'List define failed.')
+        self._runTest_(
+            '<html tal:define="def1 two"><p tal:repeat="var def1">Hello <b tal:content="var"></b></p></html>',
+            '<html><p>Hello <b>one</b></p><p>Hello <b>two</b></p></html>',
+            'List define failed.')
 
     def testDefineGlobal(self):
-        self._runTest_('<html><p tal:define="global def1 test"></p><p tal:content="def1"></p></html>',
-                       '<html><p></p><p>testing</p></html>', 'Global did not set globally')
+        self._runTest_(
+            '<html><p tal:define="global def1 test"></p><p tal:content="def1"></p></html>',
+            '<html><p></p><p>testing</p></html>',
+            'Global did not set globally')
 
     def testDefineLocal(self):
-        self._runTest_('<html><p tal:define="local def1 test"></p><p tal:content="def1"></p></html>',
-                       '<html><p></p><p></p></html>', 'Explicit local available globaly')
+        self._runTest_(
+            '<html><p tal:define="local def1 test"></p><p tal:content="def1"></p></html>',
+            '<html><p></p><p></p></html>', 'Explicit local available globaly')
 
     def testDefineImplicitLocal(self):
-        self._runTest_('<html><p tal:define="def1 test"></p><p tal:content="def1"></p></html>',
-                       '<html><p></p><p></p></html>', 'Implicit local available globaly')
+        self._runTest_(
+            '<html><p tal:define="def1 test"></p><p tal:content="def1"></p></html>',
+            '<html><p></p><p></p></html>', 'Implicit local available globaly')
 
     def testDefineDefault(self):
-        self._runTest_('<html><p tal:define="global test default"></p><p tal:content="test">Can you see me?</p></html>',
-                       '<html><p></p><p>Can you see me?</p></html>', 'Default variable did not define proplerly.')
+        self._runTest_(
+            '<html><p tal:define="global test default"></p><p tal:content="test">Can you see me?</p></html>',
+            '<html><p></p><p>Can you see me?</p></html>',
+            'Default variable did not define proplerly.')
 
     def testDefineNothing(self):
-        self._runTest_('<html><p tal:define="global test nothing"></p><p tal:content="test">Can you see me?</p></html>',
-                       '<html><p></p><p></p></html>', 'Nothing variable did not define proplerly.')
+        self._runTest_(
+            '<html><p tal:define="global test nothing"></p><p tal:content="test">Can you see me?</p></html>',
+            '<html><p></p><p></p></html>',
+            'Nothing variable did not define proplerly.')
 
     def testDefineMultipleLocal(self):
-        self._runTest_('<html><div tal:define="firstVar test;secondVar string:This is a semi;;colon;thirdVar string:Test"><p tal:content="test">Testing</p><p tal:content="secondVar"></p><p tal:content="thirdVar"></p></div></html>',
-                       '<html><div><p>testing</p><p>This is a semi;colon</p><p>Test</p></div></html>', 'Multiple defines failed.')
+        self._runTest_(
+            '<html><div tal:define="firstVar test;secondVar string:This is a semi;;colon;thirdVar string:Test"><p tal:content="test">Testing</p><p tal:content="secondVar"></p><p tal:content="thirdVar"></p></div></html>',
+            '<html><div><p>testing</p><p>This is a semi;colon</p><p>Test</p></div></html>',
+            'Multiple defines failed.')
 
     def testDefineMultipleMixed(self):
-        self._runTest_('<html><div tal:define="firstVar test;global secondVar string:This is a semi;;colon;thirdVar string:Test"><p tal:content="test">Testing</p><p tal:content="secondVar"></p><p tal:content="thirdVar"></p></div><b tal:content="secondVar"></b></html>',
-                       '<html><div><p>testing</p><p>This is a semi;colon</p><p>Test</p></div><b>This is a semi;colon</b></html>', 'Multiple defines failed.')
+        self._runTest_(
+            '<html><div tal:define="firstVar test;global secondVar string:This is a semi;;colon;thirdVar string:Test"><p tal:content="test">Testing</p><p tal:content="secondVar"></p><p tal:content="thirdVar"></p></div><b tal:content="secondVar"></b></html>',
+            '<html><div><p>testing</p><p>This is a semi;colon</p><p>Test</p></div><b>This is a semi;colon</b></html>',
+            'Multiple defines failed.')
 
     def testDefineMultipleLocalRef(self):
-        self._runTest_('<html><div tal:define="firstVar test;secondVar firstVar"><p tal:content="test">Testing</p><p tal:content="secondVar"></p></div></html>',
-                       '<html><div><p>testing</p><p>testing</p></div></html>', 'Multiple local defines with references to earlier define failed.')
+        self._runTest_(
+            '<html><div tal:define="firstVar test;secondVar firstVar"><p tal:content="test">Testing</p><p tal:content="secondVar"></p></div></html>',
+            '<html><div><p>testing</p><p>testing</p></div></html>',
+            'Multiple local defines with references to earlier define failed.')
+
 
 if __name__ == '__main__':
     unittest.main()

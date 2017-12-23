@@ -31,7 +31,6 @@
 #    THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #    If you make any bug fixes or feature enhancements please let me know!
-
 """				
 		Unit test cases.
 		
@@ -55,8 +54,7 @@ else:
     logging.basicConfig()
 
 
-class METALNameSpaceTests (unittest.TestCase):
-
+class METALNameSpaceTests(unittest.TestCase):
     def setUp(self):
         self.context = simpleTALES.Context()
         self.context.addGlobal('test', 'testing')
@@ -76,31 +74,45 @@ class METALNameSpaceTests (unittest.TestCase):
         try:
             expectedElement = ET.fromstring(result)
         except Exception as e:
-            self.fail(
-                "Exception (%s) thrown parsing XML expected result: %s" % (str(e), result))
+            self.fail("Exception (%s) thrown parsing XML expected result: %s" %
+                      (str(e), result))
 
         try:
             realElement = ET.fromstring(realResult)
         except Exception as e:
-            self.fail("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s" % (
-                str(e), realResult, str(pageTemplate)))
+            self.fail(
+                "Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s"
+                % (str(e), realResult, str(pageTemplate)))
 
-        self.assertTrue(xmlcompare.equal(expectedElement, realElement), "%s - \npassed in: Macros: %s \n Page:%s \ngot back %s \nexpected %s\n\nMacro Template: %s \n\nPage Template: %s" %
-                        (errMsg, macros, page, realResult, result, macroTemplate, pageTemplate))
+        self.assertTrue(
+            xmlcompare.equal(expectedElement, realElement),
+            "%s - \npassed in: Macros: %s \n Page:%s \ngot back %s \nexpected %s\n\nMacro Template: %s \n\nPage Template: %s"
+            % (errMsg, macros, page, realResult, result, macroTemplate,
+               pageTemplate))
 
     # Test that rebinding the namespaces works
     def testSingleBindNoCommands(self):
-        self._runTest_('<html xmlns:metal="http://dummy" xmlns:newmetal="http://xml.zope.org/namespaces/metal"><div metal:define-macro="one" class="funny">Before <b metal:define-slot="blue">blue</b> After</div></html>', '<html xmlns:metal="http://dummy" xmlns:newmetal="http://xml.zope.org/namespaces/metal"><body metal:use-macro="site/macros/one">Nowt <i metal:fill-slot="blue">white</i> here</body></html>',
-                       '<?xml version="1.0" encoding="iso-8859-1"?>\n<html xmlns:metal="http://dummy"><body metal:use-macro="site/macros/one">Nowt <i metal:fill-slot="blue">white</i> here</body></html>', "Single Bind, commands, failed.")
+        self._runTest_(
+            '<html xmlns:metal="http://dummy" xmlns:newmetal="http://xml.zope.org/namespaces/metal"><div metal:define-macro="one" class="funny">Before <b metal:define-slot="blue">blue</b> After</div></html>',
+            '<html xmlns:metal="http://dummy" xmlns:newmetal="http://xml.zope.org/namespaces/metal"><body metal:use-macro="site/macros/one">Nowt <i metal:fill-slot="blue">white</i> here</body></html>',
+            '<?xml version="1.0" encoding="iso-8859-1"?>\n<html xmlns:metal="http://dummy"><body metal:use-macro="site/macros/one">Nowt <i metal:fill-slot="blue">white</i> here</body></html>',
+            "Single Bind, commands, failed.")
 
     def testSingleBindCommands(self):
-        self._runTest_('<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><div newmetal:define-macro="one" class="funny">Before <b newmetal:define-slot="blue">blue</b> After</div></html>',
-                       '<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><body newmetal:use-macro="site/macros/one">Nowt <i newmetal:fill-slot="blue">white</i> here</body></html>', '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><div class="funny">Before <i>white</i> After</div></html>', "Single Bind, commands, failed.")
+        self._runTest_(
+            '<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><div newmetal:define-macro="one" class="funny">Before <b newmetal:define-slot="blue">blue</b> After</div></html>',
+            '<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><body newmetal:use-macro="site/macros/one">Nowt <i newmetal:fill-slot="blue">white</i> here</body></html>',
+            '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><div class="funny">Before <i>white</i> After</div></html>',
+            "Single Bind, commands, failed.")
 
     # Test to ensure that using elements in the metal namespace omits tags
     def testMETALEmlement(self):
-        self._runTest_('<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><newmetal:div newmetal:define-macro="one" class="funny">Before <b newmetal:define-slot="blue">blue</b> After</newmetal:div></html>',
-                       '<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><body newmetal:use-macro="site/macros/one">Nowt <newmetal:block newmetal:fill-slot="blue">white</newmetal:block> here</body></html>', '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>Before white After</html>', "METAL namespace does not cause implicit omit-tag")
+        self._runTest_(
+            '<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><newmetal:div newmetal:define-macro="one" class="funny">Before <b newmetal:define-slot="blue">blue</b> After</newmetal:div></html>',
+            '<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><body newmetal:use-macro="site/macros/one">Nowt <newmetal:block newmetal:fill-slot="blue">white</newmetal:block> here</body></html>',
+            '<?xml version="1.0" encoding="iso-8859-1"?>\n<html>Before white After</html>',
+            "METAL namespace does not cause implicit omit-tag")
+
 
 if __name__ == '__main__':
     unittest.main()

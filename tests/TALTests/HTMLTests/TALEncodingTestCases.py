@@ -31,7 +31,6 @@
 #    THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #    If you make any bug fixes or feature enhancements please let me know!
-
 """		
 		
 		Unit test cases.
@@ -55,16 +54,17 @@ else:
 
 import types
 try:
+
     class UnicodeSubclass(unicode):
         pass
+
     oldPython = 0
 except:
     # Python 2.1
     oldPython = 1
 
 
-class TALEncodingTestCases (unittest.TestCase):
-
+class TALEncodingTestCases(unittest.TestCase):
     def setUp(self):
         self.context = simpleTALES.Context()
         self.context.addGlobal('test', 'Testing this and that')
@@ -74,50 +74,61 @@ class TALEncodingTestCases (unittest.TestCase):
         self.context.addGlobal('three', [1, "Two", 3])
         self.context.addGlobal('badascii', 'This costs nothing, yep £0')
         if (not oldPython):
-            self.context.addGlobal(
-                'inheritance', UnicodeSubclass('\u2018subclass\u2019'))
+            self.context.addGlobal('inheritance',
+                                   UnicodeSubclass('\u2018subclass\u2019'))
 
     def _runTest_(self, txt, result, errMsg="Error"):
         template = simpleTAL.compileHTMLTemplate(txt)
         file = io.StringIO()
         template.expand(self.context, file)
         realResult = file.getvalue()
-        self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
-                         (errMsg, txt, realResult, result, template))
+        self.assertEqual(
+            realResult, result,
+            "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s"
+            % (errMsg, txt, realResult, result, template))
 
     def testISOToUTF8(self):
         utf8Pound = b"\xc2\xa3"
         template = simpleTAL.compileHTMLTemplate(
-            '<html>£3.12?  <b tal:replace="HighBC"></b></html>'.encode("iso-8859-1"), 'iso-8859-1')
+            '<html>£3.12?  <b tal:replace="HighBC"></b></html>'.encode(
+                "iso-8859-1"), 'iso-8859-1')
         file = io.BytesIO()
         template.expand(self.context, file, 'utf-8')
         result = file.getvalue()
         expectedResult = b"<html>" + utf8Pound + \
             b"3.12?  This cost nothing, yep " + utf8Pound + b"0!</html>"
-        self.assertEqual(result, expectedResult, "UTF8 Encoding failed.  \nResult was: %r\nExpected result: %r" % (
-            result, expectedResult))
+        self.assertEqual(
+            result, expectedResult,
+            "UTF8 Encoding failed.  \nResult was: %r\nExpected result: %r" %
+            (result, expectedResult))
 
     def testISOToISO(self):
         template = simpleTAL.compileHTMLTemplate(
-            '<html>£3.12?  <b tal:replace="HighBC"></b></html>'.encode("iso-8859-1"), 'iso-8859-1')
+            '<html>£3.12?  <b tal:replace="HighBC"></b></html>'.encode(
+                "iso-8859-1"), 'iso-8859-1')
         file = io.BytesIO()
         template.expand(self.context, file, 'iso-8859-1')
         result = file.getvalue()
         expectedResult = "<html>£3.12?  This cost nothing, yep £0!</html>".encode(
             "iso-8859-1")
-        self.assertEqual(result, expectedResult, "ISO Encoding failed.  \nResult was: %r\nExpected result: %r" % (
-            result, expectedResult))
+        self.assertEqual(
+            result, expectedResult,
+            "ISO Encoding failed.  \nResult was: %r\nExpected result: %r" %
+            (result, expectedResult))
 
     def testUTF8ToISO(self):
         template = simpleTAL.compileHTMLTemplate(
-            b'<html>\xc2\xa33.12?  <b tal:replace="HighBC"></b></html>', 'utf-8')
+            b'<html>\xc2\xa33.12?  <b tal:replace="HighBC"></b></html>',
+            'utf-8')
         file = io.BytesIO()
         template.expand(self.context, file, 'iso-8859-1')
         result = file.getvalue()
         expectedResult = "<html>£3.12?  This cost nothing, yep £0!</html>".encode(
             "iso-8859-1")
-        self.assertEqual(result, expectedResult,
-                         "UTF8 -> ISO Encoding failed.  \nResult was: %r\nExpected result: %r" % (result, expectedResult))
+        self.assertEqual(
+            result, expectedResult,
+            "UTF8 -> ISO Encoding failed.  \nResult was: %r\nExpected result: %r"
+            % (result, expectedResult))
 
     def testUnicodeSubclass(self):
         if (oldPython):
@@ -128,8 +139,11 @@ class TALEncodingTestCases (unittest.TestCase):
         template.expand(self.context, file, 'utf-8')
         result = file.getvalue()
         expectedResult = "<html>\u2018subclass\u2019</html>".encode('utf-8')
-        self.assertEqual(result, expectedResult, "Unicode subclass failed.  \nResult was: %r\nExpected result: %r" % (
-            result, expectedResult))
+        self.assertEqual(
+            result, expectedResult,
+            "Unicode subclass failed.  \nResult was: %r\nExpected result: %r" %
+            (result, expectedResult))
+
 
 #	def testBadAscii (self):
 #    template = simpleTAL.compileHTMLTemplate ('<html><p tal:replace="badascii"></p></html>')

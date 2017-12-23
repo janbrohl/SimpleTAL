@@ -30,7 +30,6 @@
 #    THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #    If you make any bug fixes or feature enhancements please let me know!
-
 """ simpleTALES Implementation
 		
 		The classes in this module implement the TALES specification, used
@@ -48,21 +47,21 @@ if sys.version_info >= (3, 0):
     unicode = str
 
 
-class PathNotFoundException (Exception):
+class PathNotFoundException(Exception):
     pass
 
 
-class ContextContentException (Exception):
+class ContextContentException(Exception):
     """ This is raised when invalid content has been placed into the Context object.
             For example using non-ascii characters instead of Unicode strings.
     """
     pass
 
+
 PATHNOTFOUNDEXCEPTION = PathNotFoundException()
 
 
 class ContextVariable(Exception):
-
     def __init__(self, value=None):
         self.ourValue = value
 
@@ -78,7 +77,7 @@ class ContextVariable(Exception):
         return repr(self.ourValue)
 
 
-class RepeatVariable (ContextVariable):
+class RepeatVariable(ContextVariable):
     """ To be written"""
 
     def __init__(self, sequence):
@@ -161,8 +160,8 @@ class RepeatVariable (ContextVariable):
     def getLowerRoman(self):
         romanNumeralList = (('m', 1000), ('cm', 900), ('d', 500), ('cd', 400),
                             ('c', 100), ('xc', 90), ('l', 50), ('xl', 40),
-                            ('x', 10), ('ix', 9), ('v', 5), ('iv', 4), ('i', 1)
-                            )
+                            ('x', 10), ('ix', 9), ('v', 5), ('iv', 4), ('i',
+                                                                        1))
         if (self.position > 3999):
             # Roman numbers only supported up to 4000
             return ' '
@@ -178,8 +177,7 @@ class RepeatVariable (ContextVariable):
         return self.getLowerRoman().upper()
 
 
-class IteratorRepeatVariable (RepeatVariable):
-
+class IteratorRepeatVariable(RepeatVariable):
     def __init__(self, sequence):
         RepeatVariable.__init__(self, sequence)
         self.curValue = None
@@ -205,18 +203,19 @@ class IteratorRepeatVariable (RepeatVariable):
             raise IndexError("Repeat Finished")
 
     def createMap(self):
-        self.map = {'index': self.getIndex,
-                    'number': self.getNumber,
-                    'even': self.getEven,
-                    'odd': self.getOdd,
-                    'start': self.getStart,
-                    'end': self.getEnd,
-                    'length': self.getLength,
-                    'letter': self.getLowerLetter,
-                    'Letter': self.getUpperLetter,
-                    'roman': self.getLowerRoman,
-                    'Roman': self.getUpperRoman
-                    }
+        self.map = {
+            'index': self.getIndex,
+            'number': self.getNumber,
+            'even': self.getEven,
+            'odd': self.getOdd,
+            'start': self.getStart,
+            'end': self.getEnd,
+            'length': self.getLength,
+            'letter': self.getLowerLetter,
+            'Letter': self.getUpperLetter,
+            'roman': self.getLowerRoman,
+            'Roman': self.getUpperRoman
+        }
 
     def getLength(self):
         inf = float("inf")
@@ -238,7 +237,7 @@ class IteratorRepeatVariable (RepeatVariable):
         return 0
 
 
-class PathFunctionVariable (ContextVariable):
+class PathFunctionVariable(ContextVariable):
     """
         This class wraps a callable object (e.g. function) so that it can 
         receive part of a TAL path as it's argument.
@@ -263,7 +262,7 @@ class PathFunctionVariable (ContextVariable):
             raise result
 
 
-class CachedFuncResult (ContextVariable):
+class CachedFuncResult(ContextVariable):
     """
         This class wraps a callable object (e.g. function) so that the 
         callable is only called once.  
@@ -295,7 +294,6 @@ class CachedFuncResult (ContextVariable):
 
 
 class PythonPathFunctions(object):
-
     def __init__(self, context):
         self.context = context
 
@@ -335,7 +333,6 @@ class PythonPathFunctions(object):
 
 
 class Context(object):
-
     def __init__(self, options=None, allowPythonPath=False):
         """
             Creates a new Context object, for use by SimpleTAL when expanding
@@ -438,7 +435,8 @@ class Context(object):
     def evaluatePython(self, expr):
         if (not self.allowPythonPath):
             self.log.warning(
-                "Parameter allowPythonPath is false.  NOT Evaluating python expression %s" % expr)
+                "Parameter allowPythonPath is false.  NOT Evaluating python expression %s"
+                % expr)
             return self.false
         #self.log.debug ("Evaluating python expression %s" % expr)
 
@@ -468,7 +466,8 @@ class Context(object):
             # An exception occured evaluating the template, return the
             # exception as text
             self.log.warning(
-                "Exception occurred evaluating python path, exception: " + str(e))
+                "Exception occurred evaluating python path, exception: " +
+                str(e))
             return "Exception: %s" % str(e)
 
     def evaluatePath(self, expr):

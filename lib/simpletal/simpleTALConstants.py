@@ -1,6 +1,5 @@
 # -*- coding: iso-8859-1 -*-
 
-
 #    Copyright (c) 2016, Jan Brohl <janbrohl@t-online.de>
 #    All rights reserved.
 #    See LICENSE.txt
@@ -32,10 +31,8 @@
 #
 #    If you make any bug fixes or feature enhancements please let me know!
 
-
 from __future__ import unicode_literals
 from __future__ import absolute_import
-
 
 METAL_NAME_URI = "http://xml.zope.org/namespaces/metal"
 "METAL namespace URI"
@@ -43,10 +40,8 @@ METAL_NAME_URI = "http://xml.zope.org/namespaces/metal"
 TAL_NAME_URI = "http://xml.zope.org/namespaces/tal"
 "TAL namespace URI"
 
-
 # All commands are of the form (opcode, args, commandList)
 # The numbers are the opcodes, and also the order of priority
-
 
 TAL_DEFINE = 1
 "Argument: [(isLocalFlag (Y/n), variableName, variablePath),...]"
@@ -97,21 +92,20 @@ METAL_FILL_SLOT = 16
 METAL_DEFINE_MACRO = 17
 "Only used for parsing"
 
-
-HTML4_VOID_ELEMENTS = frozenset(['AREA', 'BASE', 'BASEFONT', 'BR',
-                                 'COL', 'FRAME', 'HR', 'IMG',
-                                 'INPUT', 'ISINDEX', 'LINK', 'META',
-                                 'PARAM'])
+HTML4_VOID_ELEMENTS = frozenset([
+    'AREA', 'BASE', 'BASEFONT', 'BR', 'COL', 'FRAME', 'HR', 'IMG', 'INPUT',
+    'ISINDEX', 'LINK', 'META', 'PARAM'
+])
 """
 The set of elements in HTML4 that can not have end tags
 
 Source: http://www.w3.org/TR/html401/index/elements.html
 """
 
-HTML5_VOID_ELEMENTS = frozenset(['AREA', 'BASE', 'BR', 'COL',
-                                 'COMMAND', 'EMBED', 'HR', 'IMG',
-                                 'INPUT', 'KEYGEN', 'LINK', 'META',
-                                 'PARAM', 'SOURCE', 'TRACK', 'WBR'])
+HTML5_VOID_ELEMENTS = frozenset([
+    'AREA', 'BASE', 'BR', 'COL', 'COMMAND', 'EMBED', 'HR', 'IMG', 'INPUT',
+    'KEYGEN', 'LINK', 'META', 'PARAM', 'SOURCE', 'TRACK', 'WBR'
+])
 """
 The set of elements in HTML5 that can not have end tags
 
@@ -123,14 +117,13 @@ HTML_FORBIDDEN_ENDTAG = HTML4_VOID_ELEMENTS | HTML5_VOID_ELEMENTS
 The set of elements in HTML5 that can not have end tags
 """
 
-HTML_BOOLEAN_ATTS = frozenset([('AREA', 'NOHREF'), ('IMG', 'ISMAP'), ('OBJECT', 'DECLARE'),
-                               ('INPUT', 'CHECKED'), ('INPUT', 'DISABLED'),
-                               ('INPUT', 'READONLY'), ('INPUT', 'ISMAP'),
-                               ('SELECT', 'MULTIPLE'), ('SELECT', 'DISABLED'),
-                               ('OPTGROUP', 'DISABLED'), ('OPTION', 'SELECTED'),
-                               ('OPTION', 'DISABLED'), ('TEXTAREA', 'DISABLED'),
-                               ('TEXTAREA', 'READONLY'), ('BUTTON', 'DISABLED'),
-                               ('SCRIPT', 'DEFER')])
+HTML_BOOLEAN_ATTS = frozenset(
+    [('AREA', 'NOHREF'), ('IMG', 'ISMAP'), ('OBJECT', 'DECLARE'), ('INPUT',
+                                                                   'CHECKED'),
+     ('INPUT', 'DISABLED'), ('INPUT', 'READONLY'), ('INPUT', 'ISMAP'),
+     ('SELECT', 'MULTIPLE'), ('SELECT', 'DISABLED'), ('OPTGROUP', 'DISABLED'),
+     ('OPTION', 'SELECTED'), ('OPTION', 'DISABLED'), ('TEXTAREA', 'DISABLED'),
+     ('TEXTAREA', 'READONLY'), ('BUTTON', 'DISABLED'), ('SCRIPT', 'DEFER')])
 """
 Set of element:attribute pairs that can use minimized form in HTML
 """
@@ -144,5 +137,6 @@ class SignalValue(object):
 
     def __str__(self):
         return self.__info
+
 
 DEFAULTVALUE = SignalValue("This constant represents a default value.")

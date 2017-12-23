@@ -31,7 +31,6 @@
 #    THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #    If you make any bug fixes or feature enhancements please let me know!
-
 """		
 		
 		Unit test cases.
@@ -61,8 +60,7 @@ except ImportError:
     use_dom2sax = 0
 
 
-class CompileDOMTemplateTestCases (unittest.TestCase):
-
+class CompileDOMTemplateTestCases(unittest.TestCase):
     def setUp(self):
         self.context = simpleTALES.Context()
         entry = """<insertedData>Some structure: <b tal:content="weblog/subject"></b></insertedData>"""
@@ -82,8 +80,10 @@ class CompileDOMTemplateTestCases (unittest.TestCase):
         file = io.StringIO()
         template.expand(self.context, file, outputEncoding="iso-8859-1")
         realResult = file.getvalue()
-        self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
-                         (errMsg, dom.toxml(), realResult, result, template))
+        self.assertEqual(
+            realResult, result,
+            "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s"
+            % (errMsg, dom.toxml(), realResult, result, template))
 
     def testContentNothing(self):
         domImpl = xml.dom.getDOMImplementation()
@@ -92,5 +92,7 @@ class CompileDOMTemplateTestCases (unittest.TestCase):
         h1.setAttribute("tal:content", "test")
         doc.firstChild.appendChild(h1)
 
-        self._runTest_(doc, '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><h1>testing</h1></html>',
-                       "DOM Template failed to compile.")
+        self._runTest_(
+            doc,
+            '<?xml version="1.0" encoding="iso-8859-1"?>\n<html><h1>testing</h1></html>',
+            "DOM Template failed to compile.")

@@ -31,7 +31,6 @@
 #    THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #    If you make any bug fixes or feature enhancements please let me know!
-
 """ 	
 		
 		Unit test cases.
@@ -65,12 +64,15 @@ def pathFunction(thePath):
     return thePath
 
 
-class PathTests (unittest.TestCase):
-
+class PathTests(unittest.TestCase):
     def setUp(self):
         self.context = simpleTALES.Context()
-        self.context.addGlobal('colours', {
-                               'blue': 'The sea is blue', 'red': 'The ball is red', 'green': 'The grass is green'})
+        self.context.addGlobal(
+            'colours', {
+                'blue': 'The sea is blue',
+                'red': 'The ball is red',
+                'green': 'The grass is green'
+            })
         self.context.addGlobal('aList', ['blue', 'green'])
         self.context.addGlobal('goodColour', 'goodColourPath')
         self.context.addGlobal('goodColourPath', 'Black is good')
@@ -81,25 +83,33 @@ class PathTests (unittest.TestCase):
         file = io.StringIO()
         template.expand(self.context, file)
         realResult = file.getvalue()
-        self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
-                         (errMsg, txt, realResult, result, template))
+        self.assertEqual(
+            realResult, result,
+            "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s"
+            % (errMsg, txt, realResult, result, template))
 
     def testRepeatVariablePath(self):
-        self._runTest_('<html><ul><li tal:repeat="colour aList" tal:content="colours/?colour">List</li></ul></html>', '<html><ul><li>The sea is blue</li><li>The grass is green</li></ul></html>', 'Path variable during repeat failed.'
-                       )
+        self._runTest_(
+            '<html><ul><li tal:repeat="colour aList" tal:content="colours/?colour">List</li></ul></html>',
+            '<html><ul><li>The sea is blue</li><li>The grass is green</li></ul></html>',
+            'Path variable during repeat failed.')
 
     def testLocalVariablePath(self):
-        self._runTest_('<html><p tal:define="one string:red">It is red: <b tal:content="colours/?one"></b></p></html>', '<html><p>It is red: <b>The ball is red</b></p></html>', 'Local variable path failed.'
-                       )
+        self._runTest_(
+            '<html><p tal:define="one string:red">It is red: <b tal:content="colours/?one"></b></p></html>',
+            '<html><p>It is red: <b>The ball is red</b></p></html>',
+            'Local variable path failed.')
 
     def testGlobalVariablePath(self):
-        self._runTest_('<html><p tal:content="?goodColour"></p></html>', '<html><p>Black is good</p></html>', 'Global variable path failed.'
-                       )
+        self._runTest_('<html><p tal:content="?goodColour"></p></html>',
+                       '<html><p>Black is good</p></html>',
+                       'Global variable path failed.')
 
     def testNoSuchVariablePath(self):
-        self._runTest_('<html><p tal:content="?badColour"></p></html>', '<html><p></p></html>', 'No such variable failed.'
-                       )
+        self._runTest_('<html><p tal:content="?badColour"></p></html>',
+                       '<html><p></p></html>', 'No such variable failed.')
 
     def testNoSuchVariablePath2(self):
-        self._runTest_('<html><p tal:content="colours/?noSuchColour"></p></html>', '<html><p></p></html>', 'No such variable2 failed.'
-                       )
+        self._runTest_(
+            '<html><p tal:content="colours/?noSuchColour"></p></html>',
+            '<html><p></p></html>', 'No such variable2 failed.')

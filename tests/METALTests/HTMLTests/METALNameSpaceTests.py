@@ -31,7 +31,6 @@
 #    THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #    If you make any bug fixes or feature enhancements please let me know!
-
 """ 			
 		Unit test cases.
 		
@@ -52,8 +51,7 @@ else:
     logging.basicConfig()
 
 
-class METALNameSpaceTests (unittest.TestCase):
-
+class METALNameSpaceTests(unittest.TestCase):
     def setUp(self):
         self.context = simpleTALES.Context()
         self.context.addGlobal('test', 'testing')
@@ -70,22 +68,34 @@ class METALNameSpaceTests (unittest.TestCase):
         file = io.StringIO()
         pageTemplate.expand(self.context, file)
         realResult = file.getvalue()
-        self.assertEqual(realResult, result, "%s - \npassed in macro: %s \npage: %s\ngot back %s \nexpected %s\n" %
-                         (errMsg, macros, page, realResult, result))
+        self.assertEqual(
+            realResult, result,
+            "%s - \npassed in macro: %s \npage: %s\ngot back %s \nexpected %s\n"
+            % (errMsg, macros, page, realResult, result))
 
     # Test that rebinding the namespaces works
     def testSingleBindNoCommands(self):
-        self._runTest_('<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><div metal:define-macro="one" class="funny">Before <b metal:define-slot="blue">blue</b> After</div></html>',
-                       '<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><body metal:use-macro="site/macros/one">Nowt <i metal:fill-slot="blue">white</i> here</body></html>', '<html><body metal:use-macro="site/macros/one">Nowt <i metal:fill-slot="blue">white</i> here</body></html>', "Single Bind, commands, failed.")
+        self._runTest_(
+            '<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><div metal:define-macro="one" class="funny">Before <b metal:define-slot="blue">blue</b> After</div></html>',
+            '<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><body metal:use-macro="site/macros/one">Nowt <i metal:fill-slot="blue">white</i> here</body></html>',
+            '<html><body metal:use-macro="site/macros/one">Nowt <i metal:fill-slot="blue">white</i> here</body></html>',
+            "Single Bind, commands, failed.")
 
     def testSingleBindCommands(self):
-        self._runTest_('<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><div newmetal:define-macro="one" class="funny">Before <b newmetal:define-slot="blue">blue</b> After</div></html>',
-                       '<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><body newmetal:use-macro="site/macros/one">Nowt <i newmetal:fill-slot="blue">white</i> here</body></html>', '<html><div class="funny">Before <i>white</i> After</div></html>', "Single Bind, commands, failed.")
+        self._runTest_(
+            '<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><div newmetal:define-macro="one" class="funny">Before <b newmetal:define-slot="blue">blue</b> After</div></html>',
+            '<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><body newmetal:use-macro="site/macros/one">Nowt <i newmetal:fill-slot="blue">white</i> here</body></html>',
+            '<html><div class="funny">Before <i>white</i> After</div></html>',
+            "Single Bind, commands, failed.")
 
     # Test to ensure that using elements in the metal namespace omits tags
     def testMETALEmlement(self):
-        self._runTest_('<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><newmetal:div newmetal:define-macro="one" class="funny">Before <b newmetal:define-slot="blue">blue</b> After</newmetal:div></html>',
-                       '<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><body newmetal:use-macro="site/macros/one">Nowt <newmetal:block newmetal:fill-slot="blue">white</newmetal:block> here</body></html>', '<html>Before white After</html>', "METAL namespace does not cause implicit omit-tag")
+        self._runTest_(
+            '<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><newmetal:div newmetal:define-macro="one" class="funny">Before <b newmetal:define-slot="blue">blue</b> After</newmetal:div></html>',
+            '<html xmlns:newmetal="http://xml.zope.org/namespaces/metal"><body newmetal:use-macro="site/macros/one">Nowt <newmetal:block newmetal:fill-slot="blue">white</newmetal:block> here</body></html>',
+            '<html>Before white After</html>',
+            "METAL namespace does not cause implicit omit-tag")
+
 
 if __name__ == '__main__':
     unittest.main()

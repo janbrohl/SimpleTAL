@@ -30,7 +30,6 @@
 #    THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #    If you make any bug fixes or feature enhancements please let me know!
-
 """ simpleTALUtils
 		
 		This module is holds utilities that make using SimpleTAL easier. 
@@ -119,14 +118,12 @@ class TemplateCache(object):
                     else:
                         template = simpletal.simpleTAL.compileXMLTemplate(
                             tempFile)
-                self.templateCache[name] = (
-                    template, mtime)
+                self.templateCache[name] = (template, mtime)
                 self.misses += 1
             return template
 
 
 class TemplateRoot(object):  # TODO: write tests, docs
-
     def __init__(self, rootPath, loadFunc, templateExt=".html"):
         self.root = os.path.abspath(rootPath)
         self.loadFunc = loadFunc
@@ -187,28 +184,43 @@ class TemplateRoot(object):  # TODO: write tests, docs
         return simpletal.simpleTALES.PathFunctionVariable(self.getForContext)
 
 
-class MacroExpansionInterpreter (simpletal.simpleTAL.TemplateInterpreter):
-
+class MacroExpansionInterpreter(simpletal.simpleTAL.TemplateInterpreter):
     def __init__(self):
         simpletal.simpleTAL.TemplateInterpreter.__init__(self)
         # Override the standard interpreter way of doing things.
         self.macroStateStack = []
-        self.commandHandler.update({simpletal.simpleTALConstants.TAL_DEFINE: self.cmdNoOp,
-                                    simpletal.simpleTALConstants.TAL_CONDITION: self.cmdNoOp,
-                                    simpletal.simpleTALConstants.TAL_REPEAT: self.cmdNoOp,
-                                    simpletal.simpleTALConstants.TAL_CONTENT: self.cmdNoOp,
-                                    simpletal.simpleTALConstants.TAL_ATTRIBUTES: self.cmdNoOp,
-                                    simpletal.simpleTALConstants.TAL_OMITTAG: self.cmdNoOp,
-                                    simpletal.simpleTALConstants.TAL_START_SCOPE: self.cmdStartScope,
-                                    simpletal.simpleTALConstants.TAL_OUTPUT: self.cmdOutput,
-                                    simpletal.simpleTALConstants.TAL_STARTTAG: self.cmdOutputStartTag,
-                                    simpletal.simpleTALConstants.TAL_ENDTAG_ENDSCOPE: self.cmdEndTagEndScope,
-                                    simpletal.simpleTALConstants.METAL_USE_MACRO: self.cmdUseMacro,
-                                    simpletal.simpleTALConstants.METAL_DEFINE_SLOT: self.cmdDefineSlot,
-                                    simpletal.simpleTALConstants.TAL_NOOP: self.cmdNoOp})
+        self.commandHandler.update({
+            simpletal.simpleTALConstants.TAL_DEFINE:
+            self.cmdNoOp,
+            simpletal.simpleTALConstants.TAL_CONDITION:
+            self.cmdNoOp,
+            simpletal.simpleTALConstants.TAL_REPEAT:
+            self.cmdNoOp,
+            simpletal.simpleTALConstants.TAL_CONTENT:
+            self.cmdNoOp,
+            simpletal.simpleTALConstants.TAL_ATTRIBUTES:
+            self.cmdNoOp,
+            simpletal.simpleTALConstants.TAL_OMITTAG:
+            self.cmdNoOp,
+            simpletal.simpleTALConstants.TAL_START_SCOPE:
+            self.cmdStartScope,
+            simpletal.simpleTALConstants.TAL_OUTPUT:
+            self.cmdOutput,
+            simpletal.simpleTALConstants.TAL_STARTTAG:
+            self.cmdOutputStartTag,
+            simpletal.simpleTALConstants.TAL_ENDTAG_ENDSCOPE:
+            self.cmdEndTagEndScope,
+            simpletal.simpleTALConstants.METAL_USE_MACRO:
+            self.cmdUseMacro,
+            simpletal.simpleTALConstants.METAL_DEFINE_SLOT:
+            self.cmdDefineSlot,
+            simpletal.simpleTALConstants.TAL_NOOP:
+            self.cmdNoOp
+        })
 
         self.inMacro = None
         self.macroArg = None
+
     # Original cmdOutput
     # Original cmdEndTagEndScope
 
@@ -272,8 +284,8 @@ class MacroExpansionInterpreter (simpletal.simpleTAL.TemplateInterpreter):
                 elif (isinstance(resultVal, str)):
                     self.file.write(cgi.escape(unicode(resultVal, 'ascii')))
                 else:
-                    self.file.write(cgi.escape(
-                        unicode(str(resultVal), 'ascii')))
+                    self.file.write(
+                        cgi.escape(unicode(str(resultVal), 'ascii')))
 
         if (self.outputTag and not args[1]):
             self.file.write('</' + args[0] + '>')
@@ -305,7 +317,8 @@ def expandMacros(context, template, outputFile, outputEncoding="utf-8"):
     """
     interp = MacroExpansionInterpreter()
     interp.initialise(context, outputFile)
-    return template.expand(context, outputFile, outputEncoding, interpreter=interp)
+    return template.expand(
+        context, outputFile, outputEncoding, interpreter=interp)
 
 
 def ExpandMacros(context, template, outputEncoding="utf-8"):

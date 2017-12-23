@@ -31,7 +31,6 @@
 #    THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #    If you make any bug fixes or feature enhancements please let me know!
-
 """		
 		
 		Unit test cases.
@@ -57,8 +56,7 @@ else:
     logging.basicConfig()
 
 
-class TALSingletonTests (unittest.TestCase):
-
+class TALSingletonTests(unittest.TestCase):
     def setUp(self):
         self.context = simpleTALES.Context()
         self.context.addGlobal('test', 'testing')
@@ -74,17 +72,20 @@ class TALSingletonTests (unittest.TestCase):
         try:
             expectedElement = ET.fromstring(result)
         except Exception as e:
-            self.fail(
-                "Exception (%s) thrown parsing XML expected result: %s" % (str(e), result))
+            self.fail("Exception (%s) thrown parsing XML expected result: %s" %
+                      (str(e), result))
 
         try:
             realElement = ET.fromstring(realResult)
         except Exception as e:
-            self.fail("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s" % (
-                str(e), realResult, str(template)))
+            self.fail(
+                "Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s"
+                % (str(e), realResult, str(template)))
 
-        self.assertTrue(xmlcompare.equal(expectedElement, realElement), "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
-                        (errMsg, txt, realResult, result, template))
+        self.assertTrue(
+            xmlcompare.equal(expectedElement, realElement),
+            "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s"
+            % (errMsg, txt, realResult, result, template))
 
     def _runMacroTest_(self, macros, page, result, errMsg="Error"):
         macroTemplate = simpleTAL.compileXMLTemplate(macros)
@@ -97,87 +98,101 @@ class TALSingletonTests (unittest.TestCase):
         try:
             expectedElement = ET.fromstring(result)
         except Exception as e:
-            self.fail(
-                "Exception (%s) thrown parsing XML expected result: %s" % (str(e), result))
+            self.fail("Exception (%s) thrown parsing XML expected result: %s" %
+                      (str(e), result))
 
         try:
             realElement = ET.fromstring(realResult)
         except Exception as e:
-            self.fail("Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s\nMacro Template: %s" % (
-                str(e), realResult, str(pageTemplate), str(macroTemplate)))
+            self.fail(
+                "Exception (%s) thrown parsing XML actual result: %s\nPage Template: %s\nMacro Template: %s"
+                % (str(e), realResult, str(pageTemplate), str(macroTemplate)))
 
-        self.assertTrue(xmlcompare.equal(expectedElement, realElement), "%s - \npassed in macro: %s \n and page: %s\ngot back %s \nexpected %s\n\nPage Template: %s" %
-                        (errMsg, macros, page, realResult, result, pageTemplate))
+        self.assertTrue(
+            xmlcompare.equal(expectedElement, realElement),
+            "%s - \npassed in macro: %s \n and page: %s\ngot back %s \nexpected %s\n\nPage Template: %s"
+            % (errMsg, macros, page, realResult, result, pageTemplate))
 
     def testDefineAttributes(self):
-        self._runTest_ ("""<html><br tal:define="temp test" tal:attributes="href temp"/><br tal:attributes="href temp"/></html>"""
-                        , """<html><br href="testing" /><br/></html>"""
-                        , """Local define followed by attributes and global test failed.""")
+        self._runTest_(
+            """<html><br tal:define="temp test" tal:attributes="href temp"/><br tal:attributes="href temp"/></html>""",
+            """<html><br href="testing" /><br/></html>""",
+            """Local define followed by attributes and global test failed.""")
 
     def testConditionDefine(self):
-        self._runTest_ ("""<html><br tal:define="global temp test" tal:attributes="href temp"/><br tal:condition="exists: temp"/><img tal:condition="not:exists:temp"/></html>"""
-                        , """<html><br href="testing" /><br/></html>"""
-                        , """Global define and condition failed""")
+        self._runTest_(
+            """<html><br tal:define="global temp test" tal:attributes="href temp"/><br tal:condition="exists: temp"/><img tal:condition="not:exists:temp"/></html>""",
+            """<html><br href="testing" /><br/></html>""",
+            """Global define and condition failed""")
 
     def testRepeatAttributes(self):
-        self._runTest_ ("""<html><br tal:repeat="temp three" tal:attributes="href temp"/></html>"""
-                        , """<html><br href="1" /><br href="Two"/><br href="3"/></html>"""
-                        , """Repeat and attributes failed.""")
+        self._runTest_(
+            """<html><br tal:repeat="temp three" tal:attributes="href temp"/></html>""",
+            """<html><br href="1" /><br href="Two"/><br href="3"/></html>""",
+            """Repeat and attributes failed.""")
 
     def testContentRepeat(self):
-        self._runTest_ ("""<html><br tal:repeat="temp three" tal:content="temp"/></html>"""
-                        , """<html><br>1</br><br>Two</br><br>3</br></html>"""
-                        , """Content with Repeat failed.""")
+        self._runTest_(
+            """<html><br tal:repeat="temp three" tal:content="temp"/></html>""",
+            """<html><br>1</br><br>Two</br><br>3</br></html>""",
+            """Content with Repeat failed.""")
 
     def testReplaceRepeat(self):
-        self._runTest_ ("""<html><br tal:repeat="temp three" tal:replace="temp"/></html>"""
-                        , """<html>1Two3</html>"""
-                        , """Replace with Repeat failed.""")
+        self._runTest_(
+            """<html><br tal:repeat="temp three" tal:replace="temp"/></html>""",
+            """<html>1Two3</html>""", """Replace with Repeat failed.""")
 
     def testReplaceRepeatAttributes(self):
-        self._runTest_ ("""<html><br tal:repeat="temp three" tal:attributes="href temp" tal:replace="temp"/></html>"""
-                        , """<html>1Two3</html>"""
-                        , """Replace with Repeat failed.""")
+        self._runTest_(
+            """<html><br tal:repeat="temp three" tal:attributes="href temp" tal:replace="temp"/></html>""",
+            """<html>1Two3</html>""", """Replace with Repeat failed.""")
 
     def testContentRepeatAttributes(self):
-        self._runTest_ ("""<html><br tal:repeat="temp three" tal:attributes="href temp" tal:content="temp"/></html>"""
-                        , """<html><br href="1">1</br><br href="Two">Two</br><br href="3">3</br></html>"""
-                        , """Content with Repeat and Attributes failed.""")
+        self._runTest_(
+            """<html><br tal:repeat="temp three" tal:attributes="href temp" tal:content="temp"/></html>""",
+            """<html><br href="1">1</br><br href="Two">Two</br><br href="3">3</br></html>""",
+            """Content with Repeat and Attributes failed.""")
 
     def testOmitTagContentRepeatAttributes(self):
-        self._runTest_ ("""<html><br tal:repeat="temp three" tal:omit-tag="default" tal:attributes="href temp" tal:content="temp"/></html>"""
-                        , """<html>1Two3</html>"""
-                        , """OmitTag with Content and Repeat and Attributes failed.""")
+        self._runTest_(
+            """<html><br tal:repeat="temp three" tal:omit-tag="default" tal:attributes="href temp" tal:content="temp"/></html>""",
+            """<html>1Two3</html>""",
+            """OmitTag with Content and Repeat and Attributes failed.""")
 
     def testDefineMacroSlots(self):
-        self._runMacroTest_ ("""<html metal:define-macro="m1"><br metal:define-slot="sl1"/></html>"""
-                             , """<div metal:use-macro="site/macros/m1"><p metal:fill-slot="sl1">Hello</p></div>"""
-                             , """<html><p>Hello</p></html>"""
-                             , """METAL with define-slot on singleton failed.""")
+        self._runMacroTest_(
+            """<html metal:define-macro="m1"><br metal:define-slot="sl1"/></html>""",
+            """<div metal:use-macro="site/macros/m1"><p metal:fill-slot="sl1">Hello</p></div>""",
+            """<html><p>Hello</p></html>""",
+            """METAL with define-slot on singleton failed.""")
 
     def testDefineMacro(self):
-        self._runMacroTest_ ("""<html metal:define-macro="m1" id="test"/>"""
-                             , """<div metal:use-macro="site/macros/m1"><p metal:fill-slot="sl1">Hello</p></div>"""
-                             , """<html id="test"/>"""
-                             , """METAL with define-macro on singleton failed.""")
+        self._runMacroTest_(
+            """<html metal:define-macro="m1" id="test"/>""",
+            """<div metal:use-macro="site/macros/m1"><p metal:fill-slot="sl1">Hello</p></div>""",
+            """<html id="test"/>""",
+            """METAL with define-macro on singleton failed.""")
 
     def testUseMacro(self):
-        self._runMacroTest_ ("""<html metal:define-macro="m1"><br metal:define-slot="sl1"/></html>"""
-                             , """<div metal:use-macro="site/macros/m1"/>"""
-                             , """<html><br/></html>"""
-                             , """METAL with use-macro on singleton failed.""")
+        self._runMacroTest_(
+            """<html metal:define-macro="m1"><br metal:define-slot="sl1"/></html>""",
+            """<div metal:use-macro="site/macros/m1"/>""",
+            """<html><br/></html>""",
+            """METAL with use-macro on singleton failed.""")
 
     def testFillSlot(self):
-        self._runMacroTest_ ("""<html metal:define-macro="m1"><br metal:define-slot="sl1"/></html>"""
-                             , """<div metal:use-macro="site/macros/m1"><i metal:fill-slot="sl1" id="test"/></div>"""
-                             , """<html><i id="test"/></html>"""
-                             , """METAL with fill-slot on singleton failed.""")
+        self._runMacroTest_(
+            """<html metal:define-macro="m1"><br metal:define-slot="sl1"/></html>""",
+            """<div metal:use-macro="site/macros/m1"><i metal:fill-slot="sl1" id="test"/></div>""",
+            """<html><i id="test"/></html>""",
+            """METAL with fill-slot on singleton failed.""")
 
     def testRepeatUseMacro(self):
-        self._runMacroTest_ ("""<html metal:define-macro="m1"><br metal:define-slot="sl1"/></html>"""
-                             , """<test><p tal:repeat="nums three"><div metal:use-macro="site/macros/m1"/></p></test>"""
-                             , """<test><p><html><br/></html></p><p><html><br/></html></p><p><html><br/></html></p></test>"""
-                             , """METAL with repeat and use-macro on singleton failed.""")
+        self._runMacroTest_(
+            """<html metal:define-macro="m1"><br metal:define-slot="sl1"/></html>""",
+            """<test><p tal:repeat="nums three"><div metal:use-macro="site/macros/m1"/></p></test>""",
+            """<test><p><html><br/></html></p><p><html><br/></html></p><p><html><br/></html></p></test>""",
+            """METAL with repeat and use-macro on singleton failed.""")
 
 
 if __name__ == '__main__':

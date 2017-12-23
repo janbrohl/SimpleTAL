@@ -31,7 +31,6 @@
 #    THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #    If you make any bug fixes or feature enhancements please let me know!
-
 """ 	
 		
 		Unit test cases.
@@ -53,8 +52,7 @@ else:
     logging.basicConfig()
 
 
-class TALContentTestCases (unittest.TestCase):
-
+class TALContentTestCases(unittest.TestCase):
     def setUp(self):
         self.context = simpleTALES.Context()
         entry = """Some structure: <b tal:content="weblog/subject"></b>"""
@@ -72,20 +70,26 @@ class TALContentTestCases (unittest.TestCase):
         file = io.StringIO()
         template.expand(self.context, file)
         realResult = file.getvalue()
-        self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
-                         (errMsg, txt, realResult, result, template))
+        self.assertEqual(
+            realResult, result,
+            "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s"
+            % (errMsg, txt, realResult, result, template))
 
     def testContentNothing(self):
         self._runTest_('<html><p tal:content="nothing"></p></html>',
-                       '<html><p></p></html>', 'Content of nothing did not evaluate to empty tag.')
+                       '<html><p></p></html>',
+                       'Content of nothing did not evaluate to empty tag.')
 
     def testContentDefault(self):
-        self._runTest_('<html><p tal:content="default">Original</p></html>',
-                       '<html><p>Original</p></html>', 'Content of default did not evaluate to existing content')
+        self._runTest_(
+            '<html><p tal:content="default">Original</p></html>',
+            '<html><p>Original</p></html>',
+            'Content of default did not evaluate to existing content')
 
     def testContentString(self):
         self._runTest_('<html><p tal:content="test">Original</p></html>',
-                       '<html><p>testing</p></html>', 'Content of string did not evaluate to contain string')
+                       '<html><p>testing</p></html>',
+                       'Content of string did not evaluate to contain string')
 
     def testContentStructure(self):
         # This test has specific needs - i.e. wrap the weblog/entry in a
@@ -95,12 +99,17 @@ class TALContentTestCases (unittest.TestCase):
         weblog = {'subject': 'Test subject', 'entry': entryTemplate}
         self.context.addGlobal('weblog', weblog)
 
-        self._runTest_('<html><p tal:content="structure weblog/entry">Original</p></html>',
-                       '<html><p>Some structure: <b>Test subject</b></p></html>', 'Content of Structure did not evaluate to expected result')
+        self._runTest_(
+            '<html><p tal:content="structure weblog/entry">Original</p></html>',
+            '<html><p>Some structure: <b>Test subject</b></p></html>',
+            'Content of Structure did not evaluate to expected result')
 
     def testTALDisabledContentStructure(self):
-        self._runTest_('<html><p tal:content="structure weblog/entry">Original</p></html>',
-                       '<html><p>Some structure: <b tal:content="weblog/subject"></b></p></html>', 'Content of Structure did not evaluate to expected result')
+        self._runTest_(
+            '<html><p tal:content="structure weblog/entry">Original</p></html>',
+            '<html><p>Some structure: <b tal:content="weblog/subject"></b></p></html>',
+            'Content of Structure did not evaluate to expected result')
+
 
 if __name__ == '__main__':
     unittest.main()

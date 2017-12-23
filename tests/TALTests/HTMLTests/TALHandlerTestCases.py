@@ -31,7 +31,6 @@
 #    THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #    If you make any bug fixes or feature enhancements please let me know!
-
 """		
 		
 		Unit test cases.
@@ -53,8 +52,7 @@ else:
     logging.basicConfig()
 
 
-class TALHandlerTestCases (unittest.TestCase):
-
+class TALHandlerTestCases(unittest.TestCase):
     def setUp(self):
         self.context = simpleTALES.Context()
         self.context.addGlobal('test', 'testing')
@@ -67,8 +65,10 @@ class TALHandlerTestCases (unittest.TestCase):
         file = io.StringIO()
         template.expand(self.context, file)
         realResult = file.getvalue()
-        self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
-                         (errMsg, txt, realResult, result, template))
+        self.assertEqual(
+            realResult, result,
+            "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s"
+            % (errMsg, txt, realResult, result, template))
 
     def testEmptyFile(self):
         self._runTest_("", "", "Empty template contains more text than given.")
@@ -90,8 +90,9 @@ class TALHandlerTestCases (unittest.TestCase):
                        "<p>Hello.<br><b>World</b></p>")
 
     def testComments(self):
-        self._runTest_("<html><!-- This is a comment <here> --><p>Boo</p></html>",
-                       "<html><!-- This is a comment <here> --><p>Boo</p></html>")
+        self._runTest_(
+            "<html><!-- This is a comment <here> --><p>Boo</p></html>",
+            "<html><!-- This is a comment <here> --><p>Boo</p></html>")
 
     def testUnbalancedCloseTag(self):
         try:
@@ -104,26 +105,27 @@ class TALHandlerTestCases (unittest.TestCase):
             pass
 
     def testEncodedCharsSection(self):
-        self._runTest_ ("""<p>&lt;section&gt; stuff &amp; things.</p>"""
-                        , """<p>&lt;section&gt; stuff &amp; things.</p>"""
-                        , "Quoted chars were not re-encoded correctly.")
+        self._runTest_("""<p>&lt;section&gt; stuff &amp; things.</p>""",
+                       """<p>&lt;section&gt; stuff &amp; things.</p>""",
+                       "Quoted chars were not re-encoded correctly.")
 
     def testDocumentTypeDeclaration(self):
-        self._runTest_("""<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><html><p tal:content="test"></p></html>"""
-                       , """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><html><p>testing</p></html>"""
-                       , """Document type was not output correctly."""
-                       )
+        self._runTest_(
+            """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><html><p tal:content="test"></p></html>""",
+            """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><html><p>testing</p></html>""",
+            """Document type was not output correctly.""")
 
     def testHTMLComments(self):
-        self._runTest_("""<html><!-- Tal content coming up.--><p tal:content="test"></p></html>"""
-                       , """<html><!-- Tal content coming up.--><p>testing</p></html>"""
-                       , """Comment not output correctly."""
-                       )
+        self._runTest_(
+            """<html><!-- Tal content coming up.--><p tal:content="test"></p></html>""",
+            """<html><!-- Tal content coming up.--><p>testing</p></html>""",
+            """Comment not output correctly.""")
 
     def testProcessingInstructions(self):
-        self._runTest_ ("""<?xml version="1.0" encoding="iso-8859-1"?>\n<p>Some<?test testInstruction="yes" doNothing="yes"?><i>markup</i></p>"""
-                        , """<?xml version="1.0" encoding="iso-8859-1"?>\n<p>Some<?test testInstruction="yes" doNothing="yes"?><i>markup</i></p>"""
-                        , """Processing instructions not preserved.""")
+        self._runTest_(
+            """<?xml version="1.0" encoding="iso-8859-1"?>\n<p>Some<?test testInstruction="yes" doNothing="yes"?><i>markup</i></p>""",
+            """<?xml version="1.0" encoding="iso-8859-1"?>\n<p>Some<?test testInstruction="yes" doNothing="yes"?><i>markup</i></p>""",
+            """Processing instructions not preserved.""")
 
 
 if __name__ == '__main__':

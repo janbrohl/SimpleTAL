@@ -31,7 +31,6 @@
 #    THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #    If you make any bug fixes or feature enhancements please let me know!
-
 """ 	
 		
 		Unit test cases.
@@ -65,8 +64,7 @@ def exceptionalFunction(param):
     raise Exception(param)
 
 
-class PythonPathTests (unittest.TestCase):
-
+class PythonPathTests(unittest.TestCase):
     def setUp(self):
         pass
 
@@ -87,88 +85,123 @@ class PythonPathTests (unittest.TestCase):
         file = io.StringIO()
         template.expand(self.context, file)
         realResult = file.getvalue()
-        self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
-                         (errMsg, txt, realResult, result, template))
+        self.assertEqual(
+            realResult, result,
+            "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s"
+            % (errMsg, txt, realResult, result, template))
 
     def testPythonPathException(self):
-        self._runTest_ ("""<html tal:content="python:exceptFunc ('Test exception!')">Exists</html>"""
-                        , '<html>Exception: Test exception!</html>', 'Exception thrown during python path not handled!', allowPythonPath=1
-                        )
+        self._runTest_(
+            """<html tal:content="python:exceptFunc ('Test exception!')">Exists</html>""",
+            '<html>Exception: Test exception!</html>',
+            'Exception thrown during python path not handled!',
+            allowPythonPath=1)
 
     def testPythonPathDisabled(self):
-        self._runTest_ ("""<html tal:content="python:helloFunc ('Colin!')">Exists</html>"""
-                        , '<html>0</html>', 'Python path with allowPythonPath=false still expanded!', allowPythonPath=0
-                        )
+        self._runTest_(
+            """<html tal:content="python:helloFunc ('Colin!')">Exists</html>""",
+            '<html>0</html>',
+            'Python path with allowPythonPath=false still expanded!',
+            allowPythonPath=0)
 
     def testPythonPathFuncSuccess(self):
-        self._runTest_ ("""<html tal:content="python:helloFunc ('Colin!')">Exists</html>"""
-                        , '<html>Hello Colin!</html>', 'Python path with function failed.', allowPythonPath=1
-                        )
+        self._runTest_(
+            """<html tal:content="python:helloFunc ('Colin!')">Exists</html>""",
+            '<html>Hello Colin!</html>',
+            'Python path with function failed.',
+            allowPythonPath=1)
 
     def testPythonPathSliceSuccess(self):
-        self._runTest_ ("""<html tal:repeat="num python:myList[2:4]" tal:content="num">Exists</html>"""
-                        , '<html>3</html><html>4</html>', 'Python path with slice failed.', allowPythonPath=1
-                        )
+        self._runTest_(
+            """<html tal:repeat="num python:myList[2:4]" tal:content="num">Exists</html>""",
+            '<html>3</html><html>4</html>',
+            'Python path with slice failed.',
+            allowPythonPath=1)
 
     def testPythonStringCompare(self):
-        self._runTest_ ("""<html tal:condition="python: testing=='testing'">Passed.</html>"""
-                        , '<html>Passed.</html>', 'Python string compare failed.', allowPythonPath=1
-                        )
+        self._runTest_(
+            """<html tal:condition="python: testing=='testing'">Passed.</html>""",
+            '<html>Passed.</html>',
+            'Python string compare failed.',
+            allowPythonPath=1)
 
     def testPythonPathFunc(self):
-        self._runTest_ ("""<html tal:content="python: path ('map/test')">Passed.</html>"""
-                        , '<html>maptest</html>', 'Python path function call failed', allowPythonPath=1
-                        )
+        self._runTest_(
+            """<html tal:content="python: path ('map/test')">Passed.</html>""",
+            '<html>maptest</html>',
+            'Python path function call failed',
+            allowPythonPath=1)
 
     def testPythonStringFunc(self):
-        self._runTest_ ("""<html tal:content="python: string ('Hello ${map/test} there')">Passed.</html>"""
-                        , '<html>Hello maptest there</html>', 'Python string function call failed', allowPythonPath=1
-                        )
+        self._runTest_(
+            """<html tal:content="python: string ('Hello ${map/test} there')">Passed.</html>""",
+            '<html>Hello maptest there</html>',
+            'Python string function call failed',
+            allowPythonPath=1)
 
     def testPythonExistsFunc1(self):
-        self._runTest_ ("""<html tal:condition="python: exists ('map/test')">Passed.</html>"""
-                        , '<html>Passed.</html>', 'Python exists function call failed', allowPythonPath=1
-                        )
+        self._runTest_(
+            """<html tal:condition="python: exists ('map/test')">Passed.</html>""",
+            '<html>Passed.</html>',
+            'Python exists function call failed',
+            allowPythonPath=1)
 
     def testPythonExistsFunc2(self):
-        self._runTest_ ("""<html tal:condition="python: exists ('map/nosuchpath')">Passed.</html>"""
-                        , '', 'Python exists function call failed', allowPythonPath=1
-                        )
+        self._runTest_(
+            """<html tal:condition="python: exists ('map/nosuchpath')">Passed.</html>""",
+            '',
+            'Python exists function call failed',
+            allowPythonPath=1)
 
     def testPythonNocallFunc(self):
-        self._runTest_ ("""<html tal:condition="python: callable (nocall ('helloFunc'))">Passed.</html>"""
-                        , '<html>Passed.</html>', 'Python nocall function call failed', allowPythonPath=1
-                        )
+        self._runTest_(
+            """<html tal:condition="python: callable (nocall ('helloFunc'))">Passed.</html>""",
+            '<html>Passed.</html>',
+            'Python nocall function call failed',
+            allowPythonPath=1)
 
     def testPythonPathFuncWithFunc(self):
-        self._runTest_ ("""<html tal:condition="python: path ('helloFunction')=='Hello'">Passed.</html>"""
-                        , '<html>Passed.</html>', 'Python path function using a function failed', allowPythonPath=1
-                        )
+        self._runTest_(
+            """<html tal:condition="python: path ('helloFunction')=='Hello'">Passed.</html>""",
+            '<html>Passed.</html>',
+            'Python path function using a function failed',
+            allowPythonPath=1)
 
     def testPythonPathFuncWithPath(self):
-        self._runTest_ ("""<html tal:condition="python: helloPath ('helloFunction')=='Hello helloFunction'">Passed.</html>"""
-                        , '<html>Passed.</html>', 'Python path function wrapped in a PathFunctionVariable failed', allowPythonPath=1
-                        )
+        self._runTest_(
+            """<html tal:condition="python: helloPath ('helloFunction')=='Hello helloFunction'">Passed.</html>""",
+            '<html>Passed.</html>',
+            'Python path function wrapped in a PathFunctionVariable failed',
+            allowPythonPath=1)
 
     def testTestFunctionDefault(self):
-        self._runTest_ ("""<html tal:condition="python: test (path ('data/one'))">Passed.</html>"""
-                        , '<html>Passed.</html>', 'Test function failed to use default.', allowPythonPath=1
-                        )
+        self._runTest_(
+            """<html tal:condition="python: test (path ('data/one'))">Passed.</html>""",
+            '<html>Passed.</html>',
+            'Test function failed to use default.',
+            allowPythonPath=1)
 
     def testTestFunctionTwoArgs(self):
-        self._runTest_ ("""<html tal:condition="python: test (0,1)">Passed.</html>"""
-                        , '', 'Test function failed to use default of false.', allowPythonPath=1
-                        )
+        self._runTest_(
+            """<html tal:condition="python: test (0,1)">Passed.</html>""",
+            '',
+            'Test function failed to use default of false.',
+            allowPythonPath=1)
 
     def testTestFunctionThreeArgs(self):
-        self._runTest_ ("""<html tal:content="python: test (0,1,2)">Passed.</html>"""
-                        , '<html>2</html>', 'Test function failed to use default.', allowPythonPath=1
-                        )
+        self._runTest_(
+            """<html tal:content="python: test (0,1,2)">Passed.</html>""",
+            '<html>2</html>',
+            'Test function failed to use default.',
+            allowPythonPath=1)
 
     def testTestFunctionFiveArgs(self):
-        self._runTest_ ("""<html tal:content="python: test (0,1,0,2,5)">Passed.</html>"""
-                        , '<html>5</html>', 'Test function failed to use default.', allowPythonPath=1
-                        )
+        self._runTest_(
+            """<html tal:content="python: test (0,1,0,2,5)">Passed.</html>""",
+            '<html>5</html>',
+            'Test function failed to use default.',
+            allowPythonPath=1)
+
 
 if __name__ == '__main__':
     unittest.main()

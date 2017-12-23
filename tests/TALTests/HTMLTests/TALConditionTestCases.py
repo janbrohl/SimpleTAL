@@ -31,7 +31,6 @@
 #    THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #    If you make any bug fixes or feature enhancements please let me know!
-
 """ 	
 		
 		Unit test cases.
@@ -53,8 +52,7 @@ else:
     logging.basicConfig()
 
 
-class TALConditionTestCases (unittest.TestCase):
-
+class TALConditionTestCases(unittest.TestCase):
     def setUp(self):
         self.context = simpleTALES.Context()
         self.context.addGlobal('test', 'testing')
@@ -67,24 +65,29 @@ class TALConditionTestCases (unittest.TestCase):
         file = io.StringIO()
         template.expand(self.context, file)
         realResult = file.getvalue()
-        self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
-                         (errMsg, txt, realResult, result, template))
+        self.assertEqual(
+            realResult, result,
+            "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s"
+            % (errMsg, txt, realResult, result, template))
 
     def testConditionDefault(self):
         self._runTest_('<html tal:condition="default">Hello</html>',
-                       "<html>Hello</html>", "Condition 'default' did not evaluate to true")
+                       "<html>Hello</html>",
+                       "Condition 'default' did not evaluate to true")
 
     def testConditionExists(self):
-        self._runTest_('<html tal:condition="test">Hello</html>', '<html>Hello</html>',
+        self._runTest_('<html tal:condition="test">Hello</html>',
+                       '<html>Hello</html>',
                        'Condition for something that exists evaluated false')
 
     def testConditionNothing(self):
-        self._runTest_('<html tal:condition="nothing">Hello</html>',
-                       '', 'Condition nothing evaluated to true')
+        self._runTest_('<html tal:condition="nothing">Hello</html>', '',
+                       'Condition nothing evaluated to true')
 
     def testConditionMissing(self):
-        self._runTest_('<html tal:condition="thisdoesnotexists">Hello</html>',
-                       '', 'Condition for something that does not exist evaluated to true')
+        self._runTest_(
+            '<html tal:condition="thisdoesnotexists">Hello</html>', '',
+            'Condition for something that does not exist evaluated to true')
 
 
 if __name__ == '__main__':

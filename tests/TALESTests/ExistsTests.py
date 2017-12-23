@@ -31,7 +31,6 @@
 #    THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #    If you make any bug fixes or feature enhancements please let me know!
-
 """ 	
 		
 		Unit test cases.
@@ -60,16 +59,21 @@ def nestedFunction():
     return {'nest': simpleFunction}
 
 
-class ExistsTests (unittest.TestCase):
-
+class ExistsTests(unittest.TestCase):
     def setUp(self):
         self.context = simpleTALES.Context()
         self.context.addGlobal('top', 'Hello from the top')
         self.context.addGlobal('alt', 'Wobble the way')
-        self.context.addGlobal(
-            'theMap', {'top': 'Hello', 'onelevel': {'top': 'Bye'}})
-        self.context.addGlobal(
-            'funcMap', {'simple': simpleFunction, 'nested': nestedFunction})
+        self.context.addGlobal('theMap', {
+            'top': 'Hello',
+            'onelevel': {
+                'top': 'Bye'
+            }
+        })
+        self.context.addGlobal('funcMap', {
+            'simple': simpleFunction,
+            'nested': nestedFunction
+        })
         self.context.addGlobal('topFunc', simpleFunction)
 
     def _runTest_(self, txt, result, errMsg="Error"):
@@ -77,36 +81,44 @@ class ExistsTests (unittest.TestCase):
         file = io.StringIO()
         template.expand(self.context, file)
         realResult = file.getvalue()
-        self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
-                         (errMsg, txt, realResult, result, template))
+        self.assertEqual(
+            realResult, result,
+            "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s"
+            % (errMsg, txt, realResult, result, template))
 
     def testOneVarDoesExist(self):
-        self._runTest_('<html tal:condition="exists:top">Top</html>', '<html>Top</html>', 'Exists check on single variable failed.'
-                       )
+        self._runTest_('<html tal:condition="exists:top">Top</html>',
+                       '<html>Top</html>',
+                       'Exists check on single variable failed.')
 
     def testOneVarDoesNotExist(self):
-        self._runTest_('<html tal:condition="exists:nosuchvar">Top</html>', '', 'Exists check on single variable that does not exist failed.'
-                       )
+        self._runTest_(
+            '<html tal:condition="exists:nosuchvar">Top</html>', '',
+            'Exists check on single variable that does not exist failed.')
 
     def testTwoVarDoesExist(self):
-        self._runTest_('<html tal:condition="exists:nosuchvar | exists:top">Top</html>', '<html>Top</html>', 'Exists check on two variables failed.'
-                       )
+        self._runTest_(
+            '<html tal:condition="exists:nosuchvar | exists:top">Top</html>',
+            '<html>Top</html>', 'Exists check on two variables failed.')
 
     def testTwoVarDoesNotExist(self):
-        self._runTest_('<html tal:condition="exists:nosuchvar | exists:nosuchvar2">Top</html>', '', 'Exists check on two variables that dont exist failed.'
-                       )
+        self._runTest_(
+            '<html tal:condition="exists:nosuchvar | exists:nosuchvar2">Top</html>',
+            '', 'Exists check on two variables that dont exist failed.')
 
     def testOneFuncExist(self):
-        self._runTest_('<html tal:condition="exists:topFunc">Top</html>', '<html>Top</html>', 'Exists check on one function failed.'
-                       )
+        self._runTest_('<html tal:condition="exists:topFunc">Top</html>',
+                       '<html>Top</html>',
+                       'Exists check on one function failed.')
 
     def testTwoFuncExist(self):
-        self._runTest_('<html tal:condition="exists:nosuchvar | exists:topFunc">Top</html>', '<html>Top</html>', 'Exists check on two function failed.'
-                       )
+        self._runTest_(
+            '<html tal:condition="exists:nosuchvar | exists:topFunc">Top</html>',
+            '<html>Top</html>', 'Exists check on two function failed.')
 
     def testNothingExists(self):
-        self._runTest_('<html tal:condition=exists:nothing>Top</html>', '<html>Top</html>', 'Nothing should exist!'
-                       )
+        self._runTest_('<html tal:condition=exists:nothing>Top</html>',
+                       '<html>Top</html>', 'Nothing should exist!')
 
 
 if __name__ == '__main__':

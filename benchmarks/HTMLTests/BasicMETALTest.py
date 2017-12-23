@@ -98,8 +98,8 @@ That should do...<br>
 
 context = simpleTALES.Context()
 context.addGlobal("title", "Performance testing!")
-context.addGlobal("myList", ["One", "Two", "Three",
-                             "Four", "Five", "Six", "Seven", "Eight"])
+context.addGlobal(
+    "myList", ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight"])
 template = simpleTAL.compileHTMLTemplate(performanceTemplate)
 macTemplate = simpleTAL.compileHTMLTemplate(macroTemplate)
 context.addGlobal("macTemp", macTemplate)
@@ -113,6 +113,7 @@ def METALTime(count, template):
     end = time.clock()
     # print "Resuling file: " + file.getvalue()
     return (end - start)
+
 
 # print "Timing TAL templates"
 #result = NGTemplates (2000)

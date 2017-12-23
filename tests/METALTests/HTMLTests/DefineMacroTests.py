@@ -31,7 +31,6 @@
 #    THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #    If you make any bug fixes or feature enhancements please let me know!
-
 """ 			
 		Unit test cases.
 		
@@ -51,26 +50,25 @@ if (os.path.exists("logging.ini")):
 else:
     logging.basicConfig()
 
-pageTemplate = simpleTAL.compileHTMLTemplate ("""<html>
+pageTemplate = simpleTAL.compileHTMLTemplate("""<html>
 <body metal:use-macro="site/macros/one">
 <h1 metal:fill-slot="title">Expansion of macro one</h1>
 </body>
 </html>""")
 
-pageTemplate2 = simpleTAL.compileHTMLTemplate ("""<html>
+pageTemplate2 = simpleTAL.compileHTMLTemplate("""<html>
 <body><div foo="a" tal:repeat="i string:abc">
 <div metal:use-macro="site/macros/one"></div>
 </div>
 </body></html>""")
 
 
-class DefineMacroTests (unittest.TestCase):
-
+class DefineMacroTests(unittest.TestCase):
     def setUp(self):
         self.context = simpleTALES.Context()
         self.context.addGlobal('test', 'testing')
         self.context.addGlobal('link', 'www.owlfish.com')
-        self.context.addGlobal ('needsQuoting', """Does "this" work?""")
+        self.context.addGlobal('needsQuoting', """Does "this" work?""")
 
     def _runTest_(self, txt, result, errMsg="Error"):
         macroTemplate = simpleTAL.compileHTMLTemplate(txt)

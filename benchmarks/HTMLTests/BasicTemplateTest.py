@@ -124,8 +124,8 @@ performanceTemplate = """<html>
 
 context = simpleTALES.Context()
 context.addGlobal("title", "Performance testing!")
-context.addGlobal("myList", ["One", "Two", "Three",
-                             "Four", "Five", "Six", "Seven", "Eight"])
+context.addGlobal(
+    "myList", ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight"])
 
 
 def NGTemplates(count):

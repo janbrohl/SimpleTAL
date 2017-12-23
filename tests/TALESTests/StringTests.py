@@ -31,7 +31,6 @@
 #    THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #    If you make any bug fixes or feature enhancements please let me know!
-
 """ 	
 		
 		Unit test cases.
@@ -61,14 +60,15 @@ def simpleFalseFunc():
     return 0
 
 
-class StringTests (unittest.TestCase):
-
+class StringTests(unittest.TestCase):
     def setUp(self):
         self.context = simpleTALES.Context()
         self.context.addGlobal('top', 'Hello from the top')
         self.context.addGlobal('alt', 'Wobble the way')
-        self.context.addGlobal(
-            'holder', {'helloFunc': simpleFunction, 'falseFunc': simpleFalseFunc})
+        self.context.addGlobal('holder', {
+            'helloFunc': simpleFunction,
+            'falseFunc': simpleFalseFunc
+        })
         self.context.addGlobal('version', 3.1)
         self.context.addGlobal('uniString', "Hello")
 
@@ -77,76 +77,100 @@ class StringTests (unittest.TestCase):
         file = io.StringIO()
         template.expand(self.context, file)
         realResult = file.getvalue()
-        self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
-                         (errMsg, txt, realResult, result, template))
+        self.assertEqual(
+            realResult, result,
+            "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s"
+            % (errMsg, txt, realResult, result, template))
 
     def testEmptyString(self):
-        self._runTest_('<html tal:content="string:">Exists</html>', '<html></html>', 'Empty string returned something!'
-                       )
+        self._runTest_('<html tal:content="string:">Exists</html>',
+                       '<html></html>', 'Empty string returned something!')
 
     def testStaticString(self):
-        self._runTest_('<html tal:content="string:Hello World!">Exists</html>', '<html>Hello World!</html>', 'Static string didnt appear!'
-                       )
+        self._runTest_('<html tal:content="string:Hello World!">Exists</html>',
+                       '<html>Hello World!</html>',
+                       'Static string didnt appear!')
 
     def testSingleVariable(self):
-        self._runTest_('<html tal:content="string:$top">Exists</html>', '<html>Hello from the top</html>', 'Single variable failed.'
-                       )
+        self._runTest_('<html tal:content="string:$top">Exists</html>',
+                       '<html>Hello from the top</html>',
+                       'Single variable failed.')
 
     def testStartVariable(self):
-        self._runTest_('<html tal:content="string:$top of here">Exists</html>', '<html>Hello from the top of here</html>', 'Start variable failed.'
-                       )
+        self._runTest_('<html tal:content="string:$top of here">Exists</html>',
+                       '<html>Hello from the top of here</html>',
+                       'Start variable failed.')
 
     def testMidVariable(self):
-        self._runTest_('<html tal:content="string:Thoughts - $top eh?">Exists</html>', '<html>Thoughts - Hello from the top eh?</html>', 'Mid variable failed.'
-                       )
+        self._runTest_(
+            '<html tal:content="string:Thoughts - $top eh?">Exists</html>',
+            '<html>Thoughts - Hello from the top eh?</html>',
+            'Mid variable failed.')
 
     def testEndVariable(self):
-        self._runTest_('<html tal:content="string:Thought - $top">Exists</html>', '<html>Thought - Hello from the top</html>', 'End variable failed.'
-                       )
+        self._runTest_(
+            '<html tal:content="string:Thought - $top">Exists</html>',
+            '<html>Thought - Hello from the top</html>',
+            'End variable failed.')
 
     def testNumericVariable(self):
-        self._runTest_('<html tal:content="string:Thought - $version">Exists</html>', '<html>Thought - 3.1</html>', 'Numeric test variable failed.'
-                       )
+        self._runTest_(
+            '<html tal:content="string:Thought - $version">Exists</html>',
+            '<html>Thought - 3.1</html>', 'Numeric test variable failed.')
 
     def testUnicodeVariable(self):
-        self._runTest_('<html tal:content="string:Thought - ${uniString}">Exists</html>', '<html>Thought - Hello</html>', 'Unicode test variable failed.'
-                       )
+        self._runTest_(
+            '<html tal:content="string:Thought - ${uniString}">Exists</html>',
+            '<html>Thought - Hello</html>', 'Unicode test variable failed.')
 
     def testSinglePath(self):
-        self._runTest_('<html tal:content="string:${top}">Exists</html>', '<html>Hello from the top</html>', 'Single path failed.'
-                       )
+        self._runTest_('<html tal:content="string:${top}">Exists</html>',
+                       '<html>Hello from the top</html>',
+                       'Single path failed.')
 
     def testStartPath(self):
-        self._runTest_('<html tal:content="string:${top} of here">Exists</html>', '<html>Hello from the top of here</html>', 'Start path failed.'
-                       )
+        self._runTest_(
+            '<html tal:content="string:${top} of here">Exists</html>',
+            '<html>Hello from the top of here</html>', 'Start path failed.')
 
     def testMidPath(self):
-        self._runTest_('<html tal:content="string:Thoughts - ${top}eh?">Exists</html>', '<html>Thoughts - Hello from the topeh?</html>', 'Mid path failed.'
-                       )
+        self._runTest_(
+            '<html tal:content="string:Thoughts - ${top}eh?">Exists</html>',
+            '<html>Thoughts - Hello from the topeh?</html>',
+            'Mid path failed.')
 
     def testEndPath(self):
-        self._runTest_('<html tal:content="string:Thought - ${top}">Exists</html>', '<html>Thought - Hello from the top</html>', 'End path failed.'
-                       )
+        self._runTest_(
+            '<html tal:content="string:Thought - ${top}">Exists</html>',
+            '<html>Thought - Hello from the top</html>', 'End path failed.')
 
     def testMultiplePath(self):
-        self._runTest_('<html tal:content="string:Thought - ${top} is here and ${no/such/path | string:recursive}">Exists</html>', '<html>Thought - Hello from the top is here and recursive</html>', 'Multiple paths failed.'
-                       )
+        self._runTest_(
+            '<html tal:content="string:Thought - ${top} is here and ${no/such/path | string:recursive}">Exists</html>',
+            '<html>Thought - Hello from the top is here and recursive</html>',
+            'Multiple paths failed.')
 
     def testNoSuchPath(self):
-        self._runTest_('<html tal:content="string:${no/such/path}">Exists</html>', '<html></html>', 'No such path failed.'
-                       )
+        self._runTest_(
+            '<html tal:content="string:${no/such/path}">Exists</html>',
+            '<html></html>', 'No such path failed.')
 
     def testTrailingDollar(self):
-        self._runTest_('<html tal:content="string:A trailing dollar: $">Exists</html>', '<html>A trailing dollar: </html>', 'No such path failed.'
-                       )
+        self._runTest_(
+            '<html tal:content="string:A trailing dollar: $">Exists</html>',
+            '<html>A trailing dollar: </html>', 'No such path failed.')
 
     def testDollarEscaping(self):
-        self._runTest_('<html tal:content="string:$$A trailing $$dollar: $$">Exists</html>', '<html>$A trailing $dollar: $</html>', 'No such path failed.'
-                       )
+        self._runTest_(
+            '<html tal:content="string:$$A trailing $$dollar: $$">Exists</html>',
+            '<html>$A trailing $dollar: $</html>', 'No such path failed.')
 
     def testPartialMissing(self):
-        self._runTest_('<html tal:content="string: First bit here: ${alt} second bit not: ${nosuchname} there.">Exists</html>', '<html>First bit here: Wobble the way second bit not:  there.</html>', 'Combination of non-existant variable and existing test failed.'
-                       )
+        self._runTest_(
+            '<html tal:content="string: First bit here: ${alt} second bit not: ${nosuchname} there.">Exists</html>',
+            '<html>First bit here: Wobble the way second bit not:  there.</html>',
+            'Combination of non-existant variable and existing test failed.')
+
 
 if __name__ == '__main__':
     unittest.main()

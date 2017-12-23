@@ -31,7 +31,6 @@
 #    THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #    If you make any bug fixes or feature enhancements please let me know!
-
 """		
 		
 		Unit test cases.
@@ -53,8 +52,7 @@ else:
     logging.basicConfig()
 
 
-class TALOmitTagTestCases (unittest.TestCase):
-
+class TALOmitTagTestCases(unittest.TestCase):
     def setUp(self):
         self.context = simpleTALES.Context()
         self.context.addGlobal('test', 'testing')
@@ -65,12 +63,15 @@ class TALOmitTagTestCases (unittest.TestCase):
         file = io.StringIO()
         template.expand(self.context, file)
         realResult = file.getvalue()
-        self.assertEqual(realResult, result, "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s" %
-                         (errMsg, txt, realResult, result, template))
+        self.assertEqual(
+            realResult, result,
+            "%s - \npassed in: %s \ngot back %s \nexpected %s\n\nTemplate: %s"
+            % (errMsg, txt, realResult, result, template))
 
     def testOmitTagTrue(self):
-        self._runTest_('<html tal:omit-tag="link" href="owlfish.com">Hello</html>',
-                       'Hello', "Omit tag, true, failed.")
+        self._runTest_(
+            '<html tal:omit-tag="link" href="owlfish.com">Hello</html>',
+            'Hello', "Omit tag, true, failed.")
 
     def testOmitTagNoArg(self):
         self._runTest_('<html tal:omit-tag href="owlfish.com">Hello</html>',
@@ -81,8 +82,10 @@ class TALOmitTagTestCases (unittest.TestCase):
                        'Hello', "Omit tag, empty arg, failed.")
 
     def testOmitTagFalse(self):
-        self._runTest_('<html tal:omit-tag="wibble" href="owlfish.com">Hello</html>',
-                       '<html href="owlfish.com">Hello</html>', "Omit tag, false, failed.")
+        self._runTest_(
+            '<html tal:omit-tag="wibble" href="owlfish.com">Hello</html>',
+            '<html href="owlfish.com">Hello</html>',
+            "Omit tag, false, failed.")
 
 
 if __name__ == '__main__':
