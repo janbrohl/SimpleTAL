@@ -1,1 +1,1 @@
-python -m yapf -p -i -r lib tests benchmarks
+python -m yapf -p -i -r lib tests benchmarks setup.py
