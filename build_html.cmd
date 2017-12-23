@@ -1,0 +1,1 @@
+python -m sphinx docs\source docs\build\html
