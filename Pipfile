@@ -13,4 +13,4 @@ name = "pypi"
 
 sphinx = "*"
 sphinx-rtd-theme = "*"
-
+yapf = "*"
