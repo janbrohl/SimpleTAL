@@ -6,11 +6,12 @@ name = "pypi"
 
 
 [packages]
-
+setuptools = "*"
 
 
 [dev-packages]
-
-sphinx = "*"
-sphinx-rtd-theme = "*"
-yapf = "*"
+yapf = "*" # formatter
+sphinx = "*" # documentation generator 
+sphinx-rtd-theme = "*" # theme for docs
+xmlcompare = "*" # compare xml - for testing
+twine = "*" # upload to pypi
