@@ -16,3 +16,4 @@ docs/[Mm]ake*
 build.bat
 upload.bat
 build/
+Pipfile.lock
