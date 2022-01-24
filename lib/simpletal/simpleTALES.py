@@ -58,7 +58,7 @@ class ContextContentException(Exception):
     pass
 
 
-PATHNOTFOUNDEXCEPTION = PathNotFoundException()
+PATHNOTFOUNDEXCEPTION = PathNotFoundException
 
 
 class ContextVariable(Exception):
